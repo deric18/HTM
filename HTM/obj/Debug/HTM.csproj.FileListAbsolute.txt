@@ -1,0 +1,7 @@
+C:\Users\Morpheus\source\repos\HTM\HTM\bin\Debug\HTM.exe.config
+C:\Users\Morpheus\source\repos\HTM\HTM\bin\Debug\HTM.exe
+C:\Users\Morpheus\source\repos\HTM\HTM\bin\Debug\HTM.pdb
+C:\Users\Morpheus\source\repos\HTM\HTM\obj\Debug\HTM.csprojResolveAssemblyReference.cache
+C:\Users\Morpheus\source\repos\HTM\HTM\obj\Debug\HTM.csproj.CoreCompileInputs.cache
+C:\Users\Morpheus\source\repos\HTM\HTM\obj\Debug\HTM.exe
+C:\Users\Morpheus\source\repos\HTM\HTM\obj\Debug\HTM.pdb
