@@ -40,6 +40,11 @@ namespace HTM
             }
         }
 
+        public void RegisterSegment(string segID)
+        {
+
+        }
+
 
 
 

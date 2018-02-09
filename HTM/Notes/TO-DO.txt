@@ -1,0 +1,8 @@
+﻿Axonal and Dendritic Initial orientation and Growth Mechanism
+-Objective should be to increase as much sparsity as possible.
+-Generate a random orientation generator to assign initial orientation
+-Create a growth mechanism for axon which should changes direction if it is not finding any connections and it should also when it has grown above the limit.
+
+Extraction of outputs temporal output / spatial output ?
+
+Also need to account for temporal axons for incoming temporal connection and apical axons from upper layers

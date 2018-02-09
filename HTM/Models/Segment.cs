@@ -41,9 +41,12 @@ namespace HTM.Models
 
         public void Grow()
         {
+            //Make sure you are not connecting to an axon of your own neuron
             //If already bracnhed and maxed out on MAXBRANCH , dont branch and add new position to the highest spiking branch
             //If not branched and check if segment has max positions else create new branch 
             //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.
+
+
         }
 
         private void CreateNewBranch()
@@ -53,7 +56,7 @@ namespace HTM.Models
                 _hasSubSegments = true;
                 SubSegments = new List<Segment>();
             }
-
+            
             Segment newSegment = new Segment(NeuronID, ID, SubSegments.Count);
             SubSegments.Add(newSegment);
             
