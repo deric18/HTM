@@ -13,14 +13,14 @@ namespace HTM
         private List<Position3D> _temporalInput;
         private Dictionary<Position3D, string> _posToSegment;
         private List<Neuron> _predictedList;
-        private static Dictionary<string, string> Pos3DToSegmentMappings;
+        private static Dictionary<string, string> _segmentMappings;
 
         private CPM(int length, int breadth, int width)
         {
             _length = length;
             _breadth = breadth;
             _width = width;
-            Pos3DToSegmentMappings = new Dictionary<string, string>();
+            _segmentMappings = new Dictionary<string, string>();
 
             try
             {
@@ -40,7 +40,7 @@ namespace HTM
             }
         }
 
-        public void RegisterSegment(string segID)
+        public void RegisterSegment(string segID, Position3D pos3d)
         {
 
         }
