@@ -1,6 +1,9 @@
 ﻿namespace HTM.Models
 {
-    class Neuron
+    /// <summary>
+    /// 1.Account for both excitatory and inhibitory neurons
+    /// </summary>
+    public class Neuron
     {
 
     }

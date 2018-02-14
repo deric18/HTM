@@ -3,6 +3,9 @@
 -Generate a random orientation generator to assign initial orientation
 -Create a growth mechanism for axon which should changes direction if it is not finding any connections and it should also when it has grown above the limit.
 
-Extraction of outputs temporal output / spatial output ?
+Answer : Axon should be initially just one and then start to segment off after max allowed positions in different directions.
 
-Also need to account for temporal axons for incoming temporal connection and apical axons from upper layers
+Extraction of outputs temporal output / spatial output ?
+Answer : inputSDR should be in CPM that is directly one to one from input and output SDR is the state of the system and is the temporal lateral output from the system.
+
+Also need to account for temporal axons for incoming temporal connection and apical axons from upper layers.

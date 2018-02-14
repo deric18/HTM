@@ -45,6 +45,10 @@ namespace HTM
 
         }
 
+        public static bool CheckForSelfConnection(Position3D pos3d, string neuronID)
+        {
+            return false;
+        }
 
 
 

@@ -1,0 +1,1 @@
+﻿1.Every Neuron tried to express itself as much as possible over the whole network , Every Neuron tends to connect to as many accidental good connections as possible to express itself on the whole network.
