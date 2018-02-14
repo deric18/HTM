@@ -9,6 +9,8 @@ namespace HTM.Models
     /// </summary>
     public class Segment
     {
+        private Position3D _basePosition;
+        private bool _fullyConnected;
         public string NeuronID {  get; private set; }
         public string ID { get; private set; }
         private uint _sumVoltage;
@@ -17,7 +19,7 @@ namespace HTM.Models
         private List<Segment> SubSegments;
         private uint _spikeCounter;
 
-        public Segment(string neuronID, string segmentID, int id)
+        public Segment(string neuronID, string segmentID, int id, Position3D baseSegement)
         {
             ID = segmentID + "-" + id.ToString();
             NeuronID = neuronID;
@@ -25,6 +27,7 @@ namespace HTM.Models
             Connections = new Dictionary<Position3D, int>();
             _hasSubSegments = false;
             _spikeCounter = 0;
+            _fullyConnected = false;
         }
         
         public bool Process(uint voltage, Position3D pos3d)
@@ -48,19 +51,32 @@ namespace HTM.Models
             //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.
             if (Connections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"]))
             {
-                Position3D pos3d = GextNextPositionForSegment();
-                if (CPM.CheckForSelfConnection(pos3d, NeuronID))
-                {
-
-                }
+                AddNewConnection();                                
             }
-             
-
+            else if(SubSegments?.Count < int.Parse(ConfigurationManager.AppSettings["MAX_SEGMENTS_PER_NEURON"]))
+            {                
+                CreateNewBranch();
+            }
+            else
+            {
+                _fullyConnected = true;
+            }            
         }
 
-        private Position3D GextNextPositionForSegment()
+        private void AddNewConnection()
         {
-            throw new NotImplementedException();
+            Position3D pos3d = GetNextPositionForSegment();
+            Connections.Add(pos3d, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));
+            CPM.UpdateConnectionGraph(pos3d);
+        }
+
+        private Position3D GetNextPositionForSegment()
+        {//Need to figure out connection direction and all that stuff
+            Position3D pos3d = new Position3D();
+            if (CPM.CheckForSelfConnection(pos3d, NeuronID))
+            {
+            }
+            throw new NotImplementedException("Not Yet Implemented!!! He HE HE ");
         }
 
         private void CreateNewBranch()
@@ -70,8 +86,8 @@ namespace HTM.Models
                 _hasSubSegments = true;
                 SubSegments = new List<Segment>();
             }
-            
-            Segment newSegment = new Segment(NeuronID, ID, SubSegments.Count);
+            Position3D baseSegment = GetNextPositionForSegment();
+            Segment newSegment = new Segment(NeuronID, ID, SubSegments.Count, baseSegment);
             SubSegments.Add(newSegment);
             
         }

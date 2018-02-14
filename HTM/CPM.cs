@@ -50,8 +50,9 @@ namespace HTM
             return false;
         }
 
-
-
-
+        internal static void UpdateConnectionGraph(Position3D pos3d)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
