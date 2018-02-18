@@ -1,0 +1,14 @@
+﻿Connection Point Manager :
+-Connection Point Management: 
+	1.Maintains list of all the connection points present in the system , total dendrite points and total connection points / synapse points.
+	2.Supports functionalities like processing spatial input , processing temporal or apical inputs, processing neuronal fires.
+-Block Initialization : 
+	1.Inititalises and starts up the whole block.
+-Handles different work cycles like:
+	1.Predict workcycle.
+	2.Process workcycle.
+-Supports some analysis functions for network analysis.
+
+CPM
+{
+}

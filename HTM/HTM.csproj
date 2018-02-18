@@ -44,10 +44,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CPM.cs" />
+    <Compile Include="Enums\InputPatternType.cs" />
+    <Compile Include="Enums\NetworkState.cs" />
+    <Compile Include="Models\AxonLines.cs" />
     <Compile Include="Models\Column.cs" />
     <Compile Include="Models\Neuron.cs" />
     <Compile Include="Models\Position2D.cs" />
     <Compile Include="Models\Position3D.cs" />
+    <Compile Include="Models\Position4D.cs" />
     <Compile Include="Models\SDR.cs" />
     <Compile Include="Models\Segment.cs" />
     <Compile Include="Program.cs" />
@@ -57,6 +61,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Notes\FunctionalDiagram.txt" />
     <Content Include="Notes\Thoughts.txt" />
     <Content Include="Notes\TO-DO.txt" />
   </ItemGroup>

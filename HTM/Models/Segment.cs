@@ -9,34 +9,35 @@ namespace HTM.Models
     /// </summary>
     public class Segment
     {
-        private Position3D _basePosition;
+        public Position4D _basePosition;
+        public Position2D NeuronID;
         private bool _fullyConnected;
-        public string NeuronID {  get; private set; }
+        public Position4D SegmentID;
         public string ID { get; private set; }
         private uint _sumVoltage;
-        private Dictionary<Position3D, int> Connections;        
+        private Dictionary<Position4D, int> Connections;        
         private bool _hasSubSegments;
         private List<Segment> SubSegments;
         private uint _spikeCounter;
 
-        public Segment(string neuronID, string segmentID, int id, Position3D baseSegement)
+        public Segment(Position2D neuronID, Position4D segmentID, int id)
         {
             ID = segmentID + "-" + id.ToString();
             NeuronID = neuronID;
             _sumVoltage = 0;
-            Connections = new Dictionary<Position3D, int>();
+            Connections = new Dictionary<Position4D, int>();
             _hasSubSegments = false;
             _spikeCounter = 0;
             _fullyConnected = false;
         }
         
-        public bool Process(uint voltage, Position3D pos3d)
+        public bool Process(uint voltage, Position4D pos3d)
         {
             _sumVoltage += voltage;
             if(_sumVoltage > int.Parse(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]))
             {
                 //NMDA SPIKE
-                //Update pos3d strength
+                //Update pos3d strength'
                 return true;
             }
 
@@ -65,15 +66,16 @@ namespace HTM.Models
 
         private void AddNewConnection()
         {
-            Position3D pos3d = GetNextPositionForSegment();
-            Connections.Add(pos3d, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));
-            CPM.UpdateConnectionGraph(pos3d);
+            Position4D pos4d = GetNextPositionForSegment();
+            Connections.Add(pos4d, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));
+            CPM.UpdateConnectionGraph(pos4d);
         }
 
-        private Position3D GetNextPositionForSegment()
-        {//Need to figure out connection direction and all that stuff
-            Position3D pos3d = new Position3D();
-            if (CPM.CheckForSelfConnection(pos3d, NeuronID))
+        private Position4D GetNextPositionForSegment()
+        {
+            //Need to figure out connection direction and all that stuff
+            Position4D pos4d = new Position4D();
+            if (CPM.CheckForSelfConnection(pos4d, NeuronID))
             {
             }
             throw new NotImplementedException("Not Yet Implemented!!! He HE HE ");
@@ -86,7 +88,7 @@ namespace HTM.Models
                 _hasSubSegments = true;
                 SubSegments = new List<Segment>();
             }
-            Position3D baseSegment = GetNextPositionForSegment();
+            Position4D baseSegment = GetNextPositionForSegment();
             Segment newSegment = new Segment(NeuronID, ID, SubSegments.Count, baseSegment);
             SubSegments.Add(newSegment);
             
