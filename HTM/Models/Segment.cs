@@ -12,8 +12,7 @@ namespace HTM.Models
         public Position4D _basePosition;
         public Position2D NeuronID;
         private bool _fullyConnected;
-        public Position4D SegmentID;
-        public string ID { get; private set; }
+        public Position4D SegmentID { get; private set; }        
         private uint _sumVoltage;
         private Dictionary<Position4D, int> Connections;        
         private bool _hasSubSegments;
@@ -22,7 +21,7 @@ namespace HTM.Models
 
         public Segment(Position2D neuronID, Position4D segmentID, int id)
         {
-            ID = segmentID + "-" + id.ToString();
+            SegmentID = segmentID;
             NeuronID = neuronID;
             _sumVoltage = 0;
             Connections = new Dictionary<Position4D, int>();
@@ -89,10 +88,14 @@ namespace HTM.Models
                 SubSegments = new List<Segment>();
             }
             Position4D baseSegment = GetNextPositionForSegment();
-            Segment newSegment = new Segment(NeuronID, ID, SubSegments.Count, baseSegment);
+            Segment newSegment = new Segment(NeuronID, SegmentID, SubSegments.Count);
             SubSegments.Add(newSegment);
             
         }
 
+        internal bool Fire(int voltage, Position4D sourcePosition)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

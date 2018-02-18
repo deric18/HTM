@@ -2,6 +2,7 @@
 using HTM.Models;
 using System.Collections.Generic;
 using HTM.Enums;
+using System.Configuration;
 
 namespace HTM
 {
@@ -11,22 +12,21 @@ namespace HTM
         private int _breadth;
         private int _width;
         private NetworkState _state;
-        private List<Column> _columns;
+        private Column[][] _columns;
         
         private List<Position3D> _emptyPoints;
         private List<Position3D> _connectedPoints;
-        private Dictionary<Position3D, string> _pos3dToSegmentMapper;
+        private Dictionary<Position4D, Position4D> _pos4dToSegmentMapper;
 
         private List<Position2D> _temporalInput;
         private List<Position2D> _spatialInput;
-
         
         private List<Neuron> _predictedList;
         
         private bool hasTemporalSignal;
         private bool hasSpatialSignal;
-        private static Dictionary<Position2D, List<Position3D>> _temporalAxonLines;
-        private static Dictionary<Position2D, List<Position3D>> _apicalAxonLines;
+        private static Dictionary<Position2D, List<Position4D>> _temporalAxonLines;
+        private static Dictionary<Position2D, List<Position4D>> _apicalAxonLines;
 
         private CPM(int length, int breadth, int width)
         {
@@ -39,11 +39,11 @@ namespace HTM
 
             try
             {
-                for (int i = 0; i < breadth; i++)
-                    for (int j = 0; j < width; j++)
+                for (int i = 0; i < length; i++)
+                    for (int j = 0; j < breadth; j++)
                     {
-                        Column toAdd = new Column(length);
-                        _columns.Add(toAdd);
+                        Column toAdd = new Column(i, j, width);
+                        _columns[i][j] = toAdd;
                     }
             }
             catch(Exception e)
@@ -54,8 +54,8 @@ namespace HTM
                 return;
             }
         }
-
-        private static List<Neuron> Predict(SDR biasingPattern, InputPatternType pType)
+        
+        private List<Neuron> Predict(SDR biasingPattern, InputPatternType pType)
         {
             switch(pType)
             {
@@ -66,11 +66,10 @@ namespace HTM
                             List<Position4D> distributionPoints;
                             if(_temporalAxonLines.TryGetValue(pos2d, out distributionPoints))
                             {
-                                if(Fire(distributionPoints) != null)
-                                {
-                                    List<Neuron> toRetun = new List<Neuron>();
-
-                                    return toRetun;
+                                List<Neuron> precitedNeurons = Fire(distributionPoints);
+                                if (precitedNeurons != null)
+                                {                                    
+                                    return precitedNeurons;
                                 }
                             }
                         }
@@ -85,22 +84,31 @@ namespace HTM
             return null;
         }
 
-        private static List<Neuron> Fire(List<Position4D> distributionPoints)
+        private List<Neuron> Fire(List<Position4D> distributionPoints)
         {
-            foreach(var pos3d in distributionPoints)
+            List<Neuron> toReturn = new List<Neuron>();
+            foreach(var pos4d in distributionPoints)
             {
-                Segment seg = GetSegment(dist)
+                Position4D segID;
+                if(_pos4dToSegmentMapper.TryGetValue(pos4d, out segID))
+                {
+                    if(GetColumn(segID.w, segID.x).GetNeuron(pos4d.y).GetSegment(pos4d.z).Fire(int.Parse(ConfigurationManager.AppSettings["TEMPORAL_BIASING_VOLTAGE"]), pos4d))
+                    {
+                        toReturn.Add(GetColumn(segID.w, segID.x).GetNeuron(segID.y));
+                    }
+                }
             }
+            return toReturn;
         }
-
 
 
         #region HELPER METHODS 
 
-        private Segment GetSegmentFromPosition(Position4D pos4d)
-        {
+        private Segment GetSegmentFromPosition(Position4D pos4d) =>        
+            GetColumn(pos4d.x, pos4d.y).GetNeuron(pos4d.z).GetSegment(pos4d.z);                    
 
-        }
+        private Column GetColumn(int x, int y) =>        
+            _columns[x][y];        
 
         public void RegisterSegment(string segID, Position4D pos3d)
         {
