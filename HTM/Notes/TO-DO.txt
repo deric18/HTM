@@ -6,6 +6,6 @@
 Answer : Axon should be initially just one and then start to segment off after max allowed positions in different directions.
 
 Extraction of outputs temporal output / spatial output ?
-Answer : inputSDR should be in CPM that is directly one to one from input and output SDR is the state of the system and is the temporal lateral output from the system.
+we will have input sdr and output sdr defines the state of the whole system i.e all the states of the neuron
 
 Also need to account for temporal axons for incoming temporal connection and apical axons from upper layers.

@@ -44,6 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CPM.cs" />
+    <Compile Include="Enums\NeuronState.cs" />
+    <Compile Include="Enums\CPMState.cs" />
     <Compile Include="Enums\InputPatternType.cs" />
     <Compile Include="Enums\NetworkState.cs" />
     <Compile Include="Models\AxonLines.cs" />

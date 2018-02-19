@@ -1,7 +1,6 @@
-﻿
-namespace HTM.Enums
+﻿namespace HTM.Enums
 {
-    public enum NetworkState
+    public enum NeuronState
     {
         RESTING,
         PREDICTED,

@@ -11,7 +11,7 @@ namespace HTM
         private int _length;
         private int _breadth;
         private int _width;
-        private NetworkState _state;
+        private CPMState _state;
         private Column[][] _columns;
         
         private List<Position3D> _emptyPoints;
@@ -33,7 +33,7 @@ namespace HTM
             _length = length;
             _breadth = breadth;
             _width = width;
-            _state = NetworkState.RESTING;
+            _state = CPMState.RESTING;
             hasSpatialSignal = false;
             hasTemporalSignal = false;
 
@@ -55,52 +55,86 @@ namespace HTM
             }
         }
         
-        private List<Neuron> Predict(SDR biasingPattern, InputPatternType pType)
+        private void Process(SDR inputPattern, InputPatternType pType)
         {
             switch(pType)
             {
-                case InputPatternType.TEMPORAL:
+                case InputPatternType.SPATIAL:
                     {
-                        foreach (var pos2d in biasingPattern.GetActivePositions())
+                        List<Position4D> firedSynapsePoints = new List<Position4D>();
+                        foreach (var pos2d in inputPattern.GetActivePositions())
                         {
-                            List<Position4D> distributionPoints;
-                            if(_temporalAxonLines.TryGetValue(pos2d, out distributionPoints))
-                            {
-                                List<Neuron> precitedNeurons = Fire(distributionPoints);
-                                if (precitedNeurons != null)
-                                {                                    
-                                    return precitedNeurons;
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case InputPatternType.APICAL:
-                    {
+                           ProcessColumn(pos2d);
+                        }                        
+                        _state = CPMState.SPATIAL_FIRED;                        
                         break;
                     }
-            }
-
-            return null;
+                case InputPatternType.TEMPORAL:
+                    {
+                        foreach (var pos2d in inputPattern.GetActivePositions())
+                        {
+                            List<Position4D> distributionPoints;
+                            if (_temporalAxonLines.TryGetValue(pos2d, out distributionPoints))
+                            {
+                                ProcessPositionList(distributionPoints, int.Parse(ConfigurationManager.AppSettings["TEMPORAL_BIASING_VOLTAGE"]));                                
+                            }
+                        }
+                        _state = CPMState.TEMPROAL_PREDICTED;
+                        break;
+                    }                    
+                case InputPatternType.APICAL:
+                    {
+                        foreach (var pos2d in inputPattern.GetActivePositions())
+                        {
+                            List<Position4D> distributionPoints;
+                            if (_apicalAxonLines.TryGetValue(pos2d, out distributionPoints))
+                            {
+                                ProcessPositionList(distributionPoints, int.Parse(ConfigurationManager.AppSettings["APICAL_BIASING_VOLTAGE"]));                                
+                            }
+                        }
+                        _state = CPMState.APICAL_PREDICTED;
+                        break;
+                    }
+            }            
         }
 
-        private List<Neuron> Fire(List<Position4D> distributionPoints)
-        {
-            List<Neuron> toReturn = new List<Neuron>();
+        private void ProcessPositionList(List<Position4D> distributionPoints, int voltage)
+        {            
             foreach(var pos4d in distributionPoints)
             {
                 Position4D segID;
                 if(_pos4dToSegmentMapper.TryGetValue(pos4d, out segID))
                 {
-                    if(GetColumn(segID.w, segID.x).GetNeuron(pos4d.y).GetSegment(pos4d.z).Fire(int.Parse(ConfigurationManager.AppSettings["TEMPORAL_BIASING_VOLTAGE"]), pos4d))
+                    Segment predictedSegment = GetColumn(segID.w, segID.x).GetNeuron(pos4d.y).GetSegment(pos4d.z);
+                    if (predictedSegment.Fire(voltage, pos4d))
                     {
-                        toReturn.Add(GetColumn(segID.w, segID.x).GetNeuron(segID.y));
+                        Neuron n = GetColumn(segID.w, segID.x).GetNeuron(segID.y);
+                        n.ChangeStateToPredicted();
+                        _predictedList.Add(n);                        
                     }
                 }
-            }
-            return toReturn;
+            }            
         }
 
+        private void ProcessColumn(Position2D pos2d)
+        {
+            //check for predicted cells in the column
+            //pick cells and fire
+            //return List of positions 
+            List<Position4D> toFire = new List<Position4D>();
+            for(int i = 0; i < _width; i++)
+            {
+                if(GetColumn(pos2d.X, pos2d.Y).GetNeuron(i).GetState() == NeuronState.PREDICTED)
+                {
+                    toFire.AddRange(GetColumn(pos2d.X, pos2d.Y).GetNeuron(i).Fire());
+                }
+            }
+
+            if(toFire.Count > 0)
+            {
+                ProcessPositionList(toFire, int.Parse(ConfigurationManager.AppSettings["SPATIAL_FIRING_VOLTAGE"]));
+            }            
+        }
 
         #region HELPER METHODS 
 
