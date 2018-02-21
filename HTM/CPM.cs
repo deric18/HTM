@@ -13,10 +13,8 @@ namespace HTM
         private int _width;
         private CPMState _state;
         private Column[][] _columns;
-        
-        private List<Position3D> _emptyPoints;
-        private List<Position3D> _connectedPoints;
-        private Dictionary<Position4D, Position4D> _pos4dToSegmentMapper;
+                    
+        private Dictionary<Position4D, Position4D> _pos4dToSegmentMapper;               //Maps Synapses to connected Segment.
 
         private List<Position2D> _temporalInput;
         private List<Position2D> _spatialInput;
@@ -54,8 +52,15 @@ namespace HTM
                 return;
             }
         }
+
+        public SDR Predict()
+        {
+            SDR toReturn = new SDR();
+
+            return toReturn;
+        }
         
-        private void Process(SDR inputPattern, InputPatternType pType)
+        public void Process(SDR inputPattern, InputPatternType pType)
         {
             switch(pType)
             {
@@ -97,18 +102,19 @@ namespace HTM
                     }
             }            
         }
+        
 
-        private void ProcessPositionList(List<Position4D> distributionPoints, int voltage)
+        private void ProcessPositionList(List<Position4D> firedSynapses, int voltage)
         {            
-            foreach(var pos4d in distributionPoints)
+            foreach(var pos4d in firedSynapses)
             {
-                Position4D segID;
-                if(_pos4dToSegmentMapper.TryGetValue(pos4d, out segID))
+                Position4D segmentID;
+                if(_pos4dToSegmentMapper.TryGetValue(pos4d, out segmentID))
                 {
-                    Segment predictedSegment = GetColumn(segID.w, segID.x).GetNeuron(pos4d.y).GetSegment(pos4d.z);
+                    Segment predictedSegment = GetColumn(segmentID.w, segmentID.x).GetNeuron(pos4d.y).GetSegment(pos4d.z);
                     if (predictedSegment.Fire(voltage, pos4d))
                     {
-                        Neuron n = GetColumn(segID.w, segID.x).GetNeuron(segID.y);
+                        Neuron n = GetColumn(segmentID.w, segmentID.x).GetNeuron(segmentID.y);
                         n.ChangeStateToPredicted();
                         _predictedList.Add(n);                        
                     }
@@ -116,7 +122,7 @@ namespace HTM
             }            
         }
 
-        private void ProcessColumn(Position2D pos2d)
+        private void ProcessColumn(Position2D corticalColumn)
         {
             //check for predicted cells in the column
             //pick cells and fire
@@ -124,9 +130,9 @@ namespace HTM
             List<Position4D> toFire = new List<Position4D>();
             for(int i = 0; i < _width; i++)
             {
-                if(GetColumn(pos2d.X, pos2d.Y).GetNeuron(i).GetState() == NeuronState.PREDICTED)
+                if(GetColumn(corticalColumn.X, corticalColumn.Y).GetNeuron(i).GetState() == NeuronState.PREDICTED)
                 {
-                    toFire.AddRange(GetColumn(pos2d.X, pos2d.Y).GetNeuron(i).Fire());
+                    toFire.AddRange(GetColumn(corticalColumn.X, corticalColumn.Y).GetNeuron(i).Fire());
                 }
             }
 
@@ -137,6 +143,16 @@ namespace HTM
         }
 
         #region HELPER METHODS 
+
+        private bool CheckIfPositionIsConnected(Position4D connectionPoint)
+        {
+            Position4D SegmentID = null;
+            if(_pos4dToSegmentMapper.TryGetValue(connectionPoint,out SegmentID))
+            {
+                return true;
+            }
+            return false;
+        }
 
         private Segment GetSegmentFromPosition(Position4D pos4d) =>        
             GetColumn(pos4d.x, pos4d.y).GetNeuron(pos4d.z).GetSegment(pos4d.z);                    

@@ -9,3 +9,7 @@ Extraction of outputs temporal output / spatial output ?
 we will have input sdr and output sdr defines the state of the whole system i.e all the states of the neuron
 
 Also need to account for temporal axons for incoming temporal connection and apical axons from upper layers.
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+-Doing Predict Functionality
