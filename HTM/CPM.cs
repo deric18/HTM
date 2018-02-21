@@ -46,7 +46,7 @@ namespace HTM
             }
             catch(Exception e)
             {
-                Console.WriteLine("Out Of Memory! , Please reduce the dimensions of the Neuroblock Length : " + length + " Breadth : " + breadth + " Width : " + width);
+                Console.WriteLine("Out Of Memory Allocated for the Service via Operating System! , Please reduce the dimensions of the Neuroblock \n Length : " + length + "\nBreadth : " + breadth + "\nWidth : " + width);
                 Console.WriteLine(e.Message);
                 Console.ReadKey();
                 return;
@@ -55,6 +55,8 @@ namespace HTM
 
         public SDR Predict()
         {
+            //Get current predicted list
+            //Generate SDR with this as firing pattern and return it..
             SDR toReturn = new SDR();
 
             return toReturn;

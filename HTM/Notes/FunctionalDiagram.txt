@@ -9,6 +9,15 @@
 	2.Process workcycle.
 -Supports some analysis functions for network analysis.
 
-CPM
-{
-}
+
+Launcher:
+-Workflow management of CPM : 
+1.Initialise
+2.Process input from SP.
+3.Update SP
+4.Process output of SP to CPM
+5.Update CPM
+6.Process TP/AP (if any) on CPM
+6.Store output of CPM and Update CPM.
+7.Send Output of CPM to Higher Connected Regions.
+
