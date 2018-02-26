@@ -10,6 +10,7 @@ namespace HTM.Models
     public class Neuron
     {
         private NeuronState _state;
+        private List<Position4D> basalConnections;
         private Dictionary<int, Segment> _segments;
         private List<Position4D> AxonList;
 
@@ -37,10 +38,11 @@ namespace HTM.Models
             return AxonList;
         }
 
-        internal void Grow()
+        internal void Grow(Position4D segmentId)
         {
-
-        }
+            Segment s = GetSegment(segmentId.z);
+            s.Grow(segmentId);
+        }       
 
         internal NeuronState GetState()
         {

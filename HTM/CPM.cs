@@ -14,12 +14,12 @@ namespace HTM
         private CPMState _state;
         private Column[][] _columns;
                     
-        private Dictionary<Position4D, Position4D> _pos4dToSegmentMapper;               //Maps Synapses to connected Segment.
+        private Dictionary<Position4D, Position4D> segmentMapper;               //Maps Synapses to connected Segment.
 
         private List<Position2D> _temporalInput;
         private List<Position2D> _spatialInput;
         
-        private List<Neuron> _predictedList;
+        private List<Position4D> _predictedList;
         
         private bool hasTemporalSignal;
         private bool hasSpatialSignal;
@@ -83,7 +83,7 @@ namespace HTM
                             List<Position4D> distributionPoints;
                             if (_temporalAxonLines.TryGetValue(pos2d, out distributionPoints))
                             {
-                                ProcessPositionList(distributionPoints, int.Parse(ConfigurationManager.AppSettings["TEMPORAL_BIASING_VOLTAGE"]));                                
+                                ProcessPositionList(distributionPoints, uint.Parse(ConfigurationManager.AppSettings["TEMPORAL_BIASING_VOLTAGE"]));                                
                             }
                         }
                         _state = CPMState.TEMPROAL_PREDICTED;
@@ -96,7 +96,7 @@ namespace HTM
                             List<Position4D> distributionPoints;
                             if (_apicalAxonLines.TryGetValue(pos2d, out distributionPoints))
                             {
-                                ProcessPositionList(distributionPoints, int.Parse(ConfigurationManager.AppSettings["APICAL_BIASING_VOLTAGE"]));                                
+                                ProcessPositionList(distributionPoints, uint.Parse(ConfigurationManager.AppSettings["APICAL_BIASING_VOLTAGE"]));                                
                             }
                         }
                         _state = CPMState.APICAL_PREDICTED;
@@ -106,19 +106,20 @@ namespace HTM
         }
         
 
-        private void ProcessPositionList(List<Position4D> firedSynapses, int voltage)
+        private void ProcessPositionList(List<Position4D> firedSynapses, uint voltage)
         {            
             foreach(var pos4d in firedSynapses)
             {
                 Position4D segmentID;
-                if(_pos4dToSegmentMapper.TryGetValue(pos4d, out segmentID))
+                if(segmentMapper.TryGetValue(pos4d, out segmentID))
                 {
                     Segment predictedSegment = GetColumn(segmentID.w, segmentID.x).GetNeuron(pos4d.y).GetSegment(pos4d.z);
-                    if (predictedSegment.Fire(voltage, pos4d))
+                    if (predictedSegment.Process(voltage, pos4d))
                     {
                         Neuron n = GetColumn(segmentID.w, segmentID.x).GetNeuron(segmentID.y);
-                        n.ChangeStateToPredicted();
-                        _predictedList.Add(n);                        
+                        n.ChangeStateToPredicted();                       
+                        _predictedList.Add(predictedSegment.SegmentID);
+                        n.Grow(pos4d);                                                                         //Send Grow Signal
                     }
                 }
             }            
@@ -140,16 +141,22 @@ namespace HTM
 
             if(toFire.Count > 0)
             {
-                ProcessPositionList(toFire, int.Parse(ConfigurationManager.AppSettings["SPATIAL_FIRING_VOLTAGE"]));
+                ProcessPositionList(toFire, uint.Parse(ConfigurationManager.AppSettings["SPATIAL_FIRING_VOLTAGE"]));
             }            
         }
 
         #region HELPER METHODS 
 
+        private static uint RandomNumberGenerator(int limit)
+        {
+            Random rand = new Random();
+            return (uint)(rand.Next(1, limit));
+        }
+
         private bool CheckIfPositionIsConnected(Position4D connectionPoint)
         {
             Position4D SegmentID = null;
-            if(_pos4dToSegmentMapper.TryGetValue(connectionPoint,out SegmentID))
+            if(segmentMapper.TryGetValue(connectionPoint,out SegmentID))
             {
                 return true;
             }
@@ -162,9 +169,9 @@ namespace HTM
         private Column GetColumn(int x, int y) =>        
             _columns[x][y];        
 
-        public void RegisterSegment(string segID, Position4D pos3d)
+        public void UpdateSegmentMapper(string segID, Position4D pos3d)
         {
-            return;
+            throw new NotImplementedException();
         }
 
         public static bool CheckForSelfConnection(Position4D pos3d, Position2D neuronID)

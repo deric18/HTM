@@ -9,17 +9,18 @@ namespace HTM.Models
     /// </summary>
     public class Segment
     {
-        public Position4D _basePosition;
+        public Position4D BasePosition { private set;  get; }
         public Position2D NeuronID;
-        private bool _fullyConnected;
+        private List<Position4D> _firingSynapses;
         public Position4D SegmentID { get; private set; }        
         private uint _sumVoltage;
-        private Dictionary<Position4D, int> Connections;        
+        private Dictionary<Position4D, int> Connections;                
         private bool _hasSubSegments;
         private List<Segment> SubSegments;
         private uint _spikeCounter;
+        private bool _fullyConnected;
 
-        public Segment(Position2D neuronID, Position4D segmentID, int id)
+        public Segment(Position2D neuronID, Position4D segmentID)
         {
             SegmentID = segmentID;
             NeuronID = neuronID;
@@ -27,23 +28,29 @@ namespace HTM.Models
             Connections = new Dictionary<Position4D, int>();
             _hasSubSegments = false;
             _spikeCounter = 0;
-            _fullyConnected = false;
+            _firingSynapses = new List<Position4D>();
         }
         
-        public bool Process(uint voltage, Position4D pos3d)
+        public bool Process(uint voltage, Position4D pos4d)
         {
-            _sumVoltage += voltage;
+            _sumVoltage += voltage;            
             if(_sumVoltage > int.Parse(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]))
             {
                 //NMDA SPIKE
                 //Update pos3d strength'
+                StrengthenConnections(_firingSynapses);                
                 return true;
             }
 
             return false;
         }
 
-        public void Grow()
+        private void StrengthenConnections(List<Position4D> firingSynapses)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void internalGrow(Position4D lastFiredSynapse)
         {
             //Make sure you are not connecting to an axon of your own neuron
             //If already bracnhed and maxed out on MAXBRANCH , dont branch and add new position to the highest spiking branch
@@ -63,9 +70,31 @@ namespace HTM.Models
             }            
         }
 
+        public void Grow(Position4D synapse)
+        {
+            int s = 99999;
+            Connections.TryGetValue(synapse, out s);
+            if (s != 99999)
+            {
+                internalGrow(synapse);
+            }
+            else
+            {
+                if (_hasSubSegments)
+                {
+                    foreach (var segment in SubSegments)
+                    {
+                        segment.Grow(synapse);                        
+                    }
+                }
+            }
+
+            return;
+        }
+
         private void AddNewConnection()
         {
-            Position4D pos4d = GetNextPositionForSegment();
+            Position4D pos4d = GetNextPositionForSegment(100);
             Connections.Add(pos4d, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));
             CPM.UpdateConnectionGraph(pos4d);
         }
@@ -76,6 +105,7 @@ namespace HTM.Models
             Position4D pos4d = new Position4D();
             if (CPM.CheckForSelfConnection(pos4d, NeuronID))
             {
+                //Need to do something.
             }
             throw new NotImplementedException("Not Yet Implemented!!! He HE HE ");
         }
@@ -87,15 +117,26 @@ namespace HTM.Models
                 _hasSubSegments = true;
                 SubSegments = new List<Segment>();
             }
-            Position4D baseSegment = GetNextPositionForSegment();
-            Segment newSegment = new Segment(NeuronID, SegmentID, SubSegments.Count);
+            Position4D baseSegmentPosition = GetNextPositionForSegment();
+            Segment newSegment = new Segment(NeuronID, baseSegmentPosition);
             SubSegments.Add(newSegment);
             
-        }
+        }        
 
-        internal bool Fire(int voltage, Position4D sourcePosition)
+        /// <summary>
+        /// Return "1" if the fire is coming from segment else Returns "0" if the fire is coming from one of the connected synapses.
+        /// </summary>
+        /// <param name="sourcePosition"></param>
+        /// <returns>bool</returns>
+        private bool SegmentFire(Position4D source)
         {
-            throw new NotImplementedException();
+           foreach(Segment s in SubSegments)
+            {
+                if (s.SegmentID.Equals(source))
+                    return true;
+            }
+
+            return false;
         }
     }
 }

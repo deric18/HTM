@@ -11,5 +11,7 @@ we will have input sdr and output sdr defines the state of the whole system i.e 
 Also need to account for temporal axons for incoming temporal connection and apical axons from upper layers.
 
 ----------------------------------------------------------------------------------------------------------------------------------------
-
--Doing Predict Functionality
+TODO : 
+-Doing Predict Functionality ----------------------------------------------------------------------------------------Done.
+-Complete fire implementation for neurons and segments 
+-Complete GetNextNeuron and neural growth mehanism.
