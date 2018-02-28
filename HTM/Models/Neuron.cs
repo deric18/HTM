@@ -14,10 +14,10 @@ namespace HTM.Models
         private Dictionary<int, Segment> _segments;
         private List<Position4D> AxonList;
 
-        public Segment GetSegment(int z)
+        public Segment GetSegment(uint z)
         {
             Segment seg;
-            if(_segments.TryGetValue(z, out seg))
+            if(_segments.TryGetValue((int)z, out seg))
             {
                 return seg;
             }
@@ -40,7 +40,7 @@ namespace HTM.Models
 
         internal void Grow(Position4D segmentId)
         {
-            Segment s = GetSegment(segmentId.z);
+            Segment s = GetSegment((segmentId.Z));
             s.Grow(segmentId);
         }       
 

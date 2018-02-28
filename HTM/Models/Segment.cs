@@ -8,8 +8,7 @@ namespace HTM.Models
     /// Process, Grow
     /// </summary>
     public class Segment
-    {
-        public Position4D BasePosition { private set;  get; }
+    {        
         public Position2D NeuronID;
         private List<Position4D> _firingSynapses;
         public Position4D SegmentID { get; private set; }        
@@ -28,7 +27,7 @@ namespace HTM.Models
             Connections = new Dictionary<Position4D, int>();
             _hasSubSegments = false;
             _spikeCounter = 0;
-            _firingSynapses = new List<Position4D>();
+            _firingSynapses = new List<Position4D>();            
         }
         
         public bool Process(uint voltage, Position4D pos4d)
@@ -94,21 +93,10 @@ namespace HTM.Models
 
         private void AddNewConnection()
         {
-            Position4D pos4d = GetNextPositionForSegment(100);
+            Position4D pos4d = CPM.GetNextPositionForSegment();
             Connections.Add(pos4d, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));
             CPM.UpdateConnectionGraph(pos4d);
-        }
-
-        private Position4D GetNextPositionForSegment()
-        {
-            //Need to figure out connection direction and all that stuff
-            Position4D pos4d = new Position4D();
-            if (CPM.CheckForSelfConnection(pos4d, NeuronID))
-            {
-                //Need to do something.
-            }
-            throw new NotImplementedException("Not Yet Implemented!!! He HE HE ");
-        }
+        }        
 
         private void CreateNewBranch()
         {
@@ -117,7 +105,7 @@ namespace HTM.Models
                 _hasSubSegments = true;
                 SubSegments = new List<Segment>();
             }
-            Position4D baseSegmentPosition = GetNextPositionForSegment();
+            Position4D baseSegmentPosition = CPM.GetNextPositionForSegment();
             Segment newSegment = new Segment(NeuronID, baseSegmentPosition);
             SubSegments.Add(newSegment);
             

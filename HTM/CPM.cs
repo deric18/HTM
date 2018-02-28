@@ -7,41 +7,61 @@ using System.Configuration;
 namespace HTM
 {
     public class CPM
-    {        
-        private int _length;
-        private int _breadth;
-        private int _width;
-        private CPMState _state;
-        private Column[][] _columns;
-                    
-        private Dictionary<Position4D, Position4D> segmentMapper;               //Maps Synapses to connected Segment.
+    {
+        public const int CubeConstant = 100;
+        public static volatile CPM instance;
+        public static object syncRoot = new object();
 
-        private List<Position2D> _temporalInput;
-        private List<Position2D> _spatialInput;
+        private CPM() { }
+
+        public static CPM Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    lock (syncRoot)
+                    {
+                        if (instance == null)
+                            instance = new CPM();
+                    }
+                }
+
+                return instance;
+            }
+        }
+
+        public int Length { get; private set; }
+        public int Breadth { get; private set; }
+        public int Width { get; private set; }
+        public CPMState State { get; private set; }
+        public Column[][] Columns { get; private set; }        
+                    
+        private Dictionary<Position4D, Position4D> segmentMapper;               //Maps Synapses to connected Segment.        
         
         private List<Position4D> _predictedList;
         
-        private bool hasTemporalSignal;
-        private bool hasSpatialSignal;
-        private static Dictionary<Position2D, List<Position4D>> _temporalAxonLines;
-        private static Dictionary<Position2D, List<Position4D>> _apicalAxonLines;
+        public bool HasTemporalSignal { get; private set; }
+        public bool HasSpatialSignal { get; private set; }
+        public Dictionary<Position2D, List<Position4D>> TemporalAxonLines { get; private set; }
+        public Dictionary<Position2D, List<Position4D>> ApicalAxonLines { get; private set; }
 
-        private CPM(int length, int breadth, int width)
+        public static void Initialize(int length, int breadth, int width)
         {
-            _length = length;
-            _breadth = breadth;
-            _width = width;
-            _state = CPMState.RESTING;
-            hasSpatialSignal = false;
-            hasTemporalSignal = false;
+            instance.Length = length;
+            instance.Breadth = breadth;
+            instance.Width = width;
+            instance.State = CPMState.RESTING;
+            instance.HasSpatialSignal = false;
+            instance.HasTemporalSignal = false;
 
             try
             {
-                for (int i = 0; i < length; i++)
-                    for (int j = 0; j < breadth; j++)
+                for (uint i = 0; i < length; i++)
+                    for (uint j = 0; j < breadth; j++)
                     {
                         Column toAdd = new Column(i, j, width);
-                        _columns[i][j] = toAdd;
+                        instance.Columns[i][j] = toAdd;
                     }
             }
             catch(Exception e)
@@ -73,7 +93,7 @@ namespace HTM
                         {
                            ProcessColumn(pos2d);
                         }                        
-                        _state = CPMState.SPATIAL_FIRED;                        
+                        instance.State = CPMState.SPATIAL_FIRED;                        
                         break;
                     }
                 case InputPatternType.TEMPORAL:
@@ -81,12 +101,12 @@ namespace HTM
                         foreach (var pos2d in inputPattern.GetActivePositions())
                         {
                             List<Position4D> distributionPoints;
-                            if (_temporalAxonLines.TryGetValue(pos2d, out distributionPoints))
+                            if (instance.TemporalAxonLines.TryGetValue(pos2d, out distributionPoints))
                             {
                                 ProcessPositionList(distributionPoints, uint.Parse(ConfigurationManager.AppSettings["TEMPORAL_BIASING_VOLTAGE"]));                                
                             }
                         }
-                        _state = CPMState.TEMPROAL_PREDICTED;
+                        instance.State = CPMState.TEMPROAL_PREDICTED;
                         break;
                     }                    
                 case InputPatternType.APICAL:
@@ -94,12 +114,12 @@ namespace HTM
                         foreach (var pos2d in inputPattern.GetActivePositions())
                         {
                             List<Position4D> distributionPoints;
-                            if (_apicalAxonLines.TryGetValue(pos2d, out distributionPoints))
+                            if (instance.ApicalAxonLines.TryGetValue(pos2d, out distributionPoints))
                             {
                                 ProcessPositionList(distributionPoints, uint.Parse(ConfigurationManager.AppSettings["APICAL_BIASING_VOLTAGE"]));                                
                             }
                         }
-                        _state = CPMState.APICAL_PREDICTED;
+                        instance.State = CPMState.APICAL_PREDICTED;
                         break;
                     }
             }            
@@ -113,10 +133,10 @@ namespace HTM
                 Position4D segmentID;
                 if(segmentMapper.TryGetValue(pos4d, out segmentID))
                 {
-                    Segment predictedSegment = GetColumn(segmentID.w, segmentID.x).GetNeuron(pos4d.y).GetSegment(pos4d.z);
+                    Segment predictedSegment = GetColumn(segmentID.W, segmentID.X).GetNeuron((int)pos4d.Y).GetSegment(pos4d.Z);
                     if (predictedSegment.Process(voltage, pos4d))
                     {
-                        Neuron n = GetColumn(segmentID.w, segmentID.x).GetNeuron(segmentID.y);
+                        Neuron n = GetColumn(segmentID.W, segmentID.X).GetNeuron((int)segmentID.Y);
                         n.ChangeStateToPredicted();                       
                         _predictedList.Add(predictedSegment.SegmentID);
                         n.Grow(pos4d);                                                                         //Send Grow Signal
@@ -131,7 +151,7 @@ namespace HTM
             //pick cells and fire
             //return List of positions 
             List<Position4D> toFire = new List<Position4D>();
-            for(int i = 0; i < _width; i++)
+            for(int i = 0; i < instance.Width; i++)
             {
                 if(GetColumn(corticalColumn.X, corticalColumn.Y).GetNeuron(i).GetState() == NeuronState.PREDICTED)
                 {
@@ -146,11 +166,15 @@ namespace HTM
         }
 
         #region HELPER METHODS 
+        public static Position4D GetNextPositionForSegment()
+        {
+            return CPM.GetNextRandomPosition(instance.Length, instance.Width, instance.Width, CubeConstant);
+        }
 
-        private static uint RandomNumberGenerator(int limit)
+        private static Position4D GetNextRandomPosition(int limitW, int limitX,int limitY,int limitZ)
         {
             Random rand = new Random();
-            return (uint)(rand.Next(1, limit));
+            return new Position4D((uint)rand.Next(limitW), (uint)rand.Next(limitX), (uint)rand.Next(limitY), (uint)rand.Next(limitZ));
         }
 
         private bool CheckIfPositionIsConnected(Position4D connectionPoint)
@@ -164,10 +188,10 @@ namespace HTM
         }
 
         private Segment GetSegmentFromPosition(Position4D pos4d) =>        
-            GetColumn(pos4d.x, pos4d.y).GetNeuron(pos4d.z).GetSegment(pos4d.z);                    
+            GetColumn(pos4d.W, pos4d.X).GetNeuron((int)pos4d.Y).GetSegment(pos4d.Z);                    
 
-        private Column GetColumn(int x, int y) =>        
-            _columns[x][y];        
+        private Column GetColumn(uint x, uint y) =>        
+            instance.Columns[x][y];        
 
         public void UpdateSegmentMapper(string segID, Position4D pos3d)
         {
