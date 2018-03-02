@@ -1,1 +1,12 @@
 ﻿1.Every Neuron tried to express itself as much as possible over the whole network , Every Neuron tends to connect to as many accidental good connections as possible to express itself on the whole network.
+
+
+Types of Growths:
+1.Neuronal Growth : Every neuron as time progress , grows its dendrites adding more connections to its belt , in the process it will keep on finding new possible connections (synaptogenesis) and keep the ones that
+survive and remove ones that do not survive. such growth mechanism does not need a specific position of growth they randomly get connected with firing neurons/ biasing axon lines.
+2.Connection Update: In this type of growth a particular connection point/synapse that is firing often will grow more and more stronger.
+
+
+Thought Process for Justification:
+-AddNewConnection under Segment should not have position4d parameter becuase then CPM will need to do processing to find out the best position to add to the segment , the segment should figure out which connection
+will be better for it.

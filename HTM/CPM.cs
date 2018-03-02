@@ -166,6 +166,7 @@ namespace HTM
         }
 
         #region HELPER METHODS 
+
         public static Position4D GetNextPositionForSegment()
         {
             return CPM.GetNextRandomPosition(instance.Length, instance.Width, instance.Width, CubeConstant);
