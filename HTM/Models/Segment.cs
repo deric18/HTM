@@ -9,22 +9,27 @@ namespace HTM.Models
     /// </summary>
     public class Segment
     {        
-        public Position2D NeuronID;
+        public Position4D CoreSSegmentId { get; private set; }
+        public Position3D NeuronID;
         private Dictionary<Position4D, int> _firingSynapses;
         public Position4D SegmentID { get; private set; }        
         private uint _sumVoltage;
-        private Dictionary<Position4D, int> Connections;                    //Gets updated every time after the growth cycle.
+        private Dictionary<Position4D, int> _positionConnections;
+        private Dictionary<Position4D, int> _segmentConnections;                    //Gets updated every time after the growth cycle.
         private bool _hasSubSegments;
         private List<Segment> SubSegments;
         private uint _spikeCounter;
+        private bool IsCore;
         private bool _fullyConnected;
 
-        public Segment(Position2D neuronID, Position4D segmentID)
+        public Segment(Position3D neuronID, Position4D segmentID)
         {
             SegmentID = segmentID;
             NeuronID = neuronID;
             _sumVoltage = 0;
-            Connections = new Dictionary<Position4D, int>();
+            IsCore = false;
+            _positionConnections = new Dictionary<Position4D, int>();
+            _segmentConnections = new Dictionary<Position4D, int>();
             _hasSubSegments = false;
             _spikeCounter = 0;
             _firingSynapses = new Dictionary<Position4D, int>();            
@@ -63,7 +68,7 @@ namespace HTM.Models
 
         private void UpdateLocalConnectionTable()
         {
-            //Access _firingSynpapses and update strengths and flush _connectionStrength
+            //Access _positionConnections and update strengths and flush _connectionStrength
             throw new NotImplementedException();
         }
 
@@ -73,7 +78,7 @@ namespace HTM.Models
             //If position is new position and already branched and maxed out on MAXBRANCH , dont branch , set flag fullyconnected to true and add new position as a new connection
             //If not branched and position is noand check if segment has max positions , add this position to a possibility list for future connection when the neuron losses and non used connection else if not max position then add new position,
             //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.
-            if (Connections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"]))
+            if (_segmentConnections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"]))
             {
                 AddNewConnection();                                
             }
@@ -95,39 +100,45 @@ namespace HTM.Models
         /// -Recieves a new synapse and connects to it in the hope of more firing and should also grow the most NMDA'ing segment.(Growth percent should be based on merit.)
         /// </summary>
         /// <param name="synapse"></param>
-        public void Grow(Position4D synapse)
-        {
+        public void Grow()
+        {            
             UpdateLocalConnectionTable();
-            GrowSubSegments();
-            int s = 99999;
-            Connections.TryGetValue(synapse, out s);
-            if (s != 99999)
-            {
-                AddNewConnection();
-            }
-            else
-            {
-                if (_hasSubSegments)
-                {
-                    foreach (var segment in SubSegments)
-                    {
-                        segment.Grow(synapse);                        
-                    }
-                }
-            }
+            GrowSubSegments();            
 
             return;
         }
 
+        private int GetSegmentalWorthiness(int growthPotential)
+        {
+            throw new NotImplementedException();
+        }
+
+        private int GetLocalWorthiness(int growthPotential)
+        {
+            throw new NotImplementedException();
+        }
+
+        private int CalculateSelfWorthiness(int maxfired)
+        {
+            throw new NotImplementedException();
+        }
+
         private void GrowSubSegments()
         {
+            if (_hasSubSegments)
+            {                
+                foreach (var segment in SubSegments)
+                {
+                    segment.Grow();
+                }
+            }
             throw new NotImplementedException();
         }
 
         private void AddConnection()
         {
             Position4D pos4d = CPM.GetNextPositionForSegment();
-            Connections.Add(pos4d, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));
+            _segmentConnections.Add(pos4d, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));
             CPM.UpdateConnectionGraph(pos4d);
         }        
 
@@ -143,22 +154,43 @@ namespace HTM.Models
             SubSegments.Add(newSegment);
             
         }        
-
-        /// <summary>
-        /// Return "1" if the fire is coming from segment else Returns "0" if the fire is coming from one of the connected synapses.
-        /// </summary>
-        /// <param name="sourcePosition"></param>
-        /// <returns>bool</returns>
-        private bool SegmentFire(Position4D source)
+        
+        private int GetMaxFiringSegmentCount()
         {
-           foreach(Segment s in SubSegments)
+            //Figure out the highest firing subsegment fro _firingSynapses and send the highest firer measure;
+            Position4D maxfirePosition;
+            int maxCounter = 0;
+
+            foreach(var pos in _firingSynapses)
             {
-                if (s.SegmentID.Equals(source))
-                    return true;
+                if(pos.Value > maxCounter)
+                {
+                    maxfirePosition = pos.Key;
+                    maxCounter = pos.Value;
+                }
             }
 
-            return false;
+            return maxCounter;
         }
+
+        private int GetMaxPositionCount()
+        {
+            //Figure out the highest firing subsegment fro _firingSynapses and send the highest firer measure;
+            Position4D maxfirePosition;
+            int maxCounter = 0;
+
+            foreach (var pos in _firingSynapses)
+            {
+                if (pos.Value > maxCounter)
+                {
+                    maxfirePosition = pos.Key;
+                    maxCounter = pos.Value;
+                }
+            }
+
+            return maxCounter;
+        }
+
 
         private string PrintPosition(Position4D pos4d)
         {

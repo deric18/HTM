@@ -37,7 +37,7 @@ namespace HTM
         public CPMState State { get; private set; }
         public Column[][] Columns { get; private set; }        
                     
-        private Dictionary<Position4D, Position4D> segmentMapper;               //Maps Synapses to connected Segment.        
+        private Dictionary<Position4D, Position4D> SegmentMapper;               //Maps Synapses to connected Segment.        
         
         private List<Position4D> _predictedList;
         
@@ -54,6 +54,7 @@ namespace HTM
             instance.State = CPMState.RESTING;
             instance.HasSpatialSignal = false;
             instance.HasTemporalSignal = false;
+            instance.SegmentMapper = new Dictionary<Position4D, Position4D>();
 
             try
             {
@@ -125,21 +126,26 @@ namespace HTM
             }            
         }
         
+        private void Grow()
+        {
+            //Give a predict
+        }
 
         private void ProcessPositionList(List<Position4D> firedSynapses, uint voltage)
         {            
             foreach(var pos4d in firedSynapses)
             {
                 Position4D segmentID;
-                if(segmentMapper.TryGetValue(pos4d, out segmentID))
+                if(SegmentMapper.TryGetValue(pos4d, out segmentID))
                 {
-                    Segment predictedSegment = GetColumn(segmentID.W, segmentID.X).GetNeuron((int)pos4d.Y).GetSegment(pos4d.Z);
+                    Segment predictedSegment = GetColumn(segmentID.W, segmentID.X).GetNeuron((int)segmentID.Y).GetSegment(segmentID.Z);
                     if (predictedSegment.Process(voltage, pos4d))
                     {
-                        Neuron n = GetColumn(segmentID.W, segmentID.X).GetNeuron((int)segmentID.Y);
-                        n.ChangeStateToPredicted();                       
-                        _predictedList.Add(predictedSegment.SegmentID);
-                        n.Grow(pos4d);                                                                         //Send Grow Signal
+                        Position3D nId = predictedSegment.NeuronID;
+                        Neuron n = GetColumn((uint)nId.X, (uint)nId.Y).GetNeuron((int)nId.Z);
+                        n.ChangeStateToPredicted();
+                        n.UpdateLocal(segmentID);
+                        _predictedList.Add(predictedSegment.SegmentID);                                                
                     }
                 }
             }            
@@ -153,7 +159,7 @@ namespace HTM
             List<Position4D> toFire = new List<Position4D>();
             for(int i = 0; i < instance.Width; i++)
             {
-                if(GetColumn(corticalColumn.X, corticalColumn.Y).GetNeuron(i).GetState() == NeuronState.PREDICTED)
+                if(GetColumn(corticalColumn.X, corticalColumn.Y).GetNeuron(i).State == NeuronState.PREDICTED)
                 {
                     toFire.AddRange(GetColumn(corticalColumn.X, corticalColumn.Y).GetNeuron(i).Fire());
                 }
@@ -166,6 +172,18 @@ namespace HTM
         }
 
         #region HELPER METHODS 
+
+        public static bool RegisterPosition(Position4D pos4d, Position4D segId)
+        {
+            Position4D s;
+            if(!instance.SegmentMapper.TryGetValue(pos4d, out segId))
+            {
+                instance.SegmentMapper.Add(pos4d, segId);
+                return true;
+            }
+
+            return false;
+        }
 
         public static Position4D GetNextPositionForSegment()
         {
@@ -181,7 +199,7 @@ namespace HTM
         private bool CheckIfPositionIsConnected(Position4D connectionPoint)
         {
             Position4D SegmentID = null;
-            if(segmentMapper.TryGetValue(connectionPoint,out SegmentID))
+            if(SegmentMapper.TryGetValue(connectionPoint,out SegmentID))
             {
                 return true;
             }

@@ -9,44 +9,56 @@ namespace HTM.Models
     /// </summary>
     public class Neuron
     {
-        private NeuronState _state;
-        private List<Position4D> basalConnections;
-        private Dictionary<int, Segment> _segments;
+        public Position3D NeuronID { get; private set; }
+        public NeuronState State { get; private set; }
+        public Dictionary<int, Segment> Segments { get; private set; }
+        private List<Position4D> _firedSegments;
+        private Dictionary<Position4D, int> Weights { get; set; }
         private List<Position4D> AxonList;
 
         public Segment GetSegment(uint z)
         {
             Segment seg;
-            if(_segments.TryGetValue((int)z, out seg))
+            if(Segments.TryGetValue((int)z, out seg))
             {
                 return seg;
             }
             //log error;
             return null;
-        }
-
-        internal void ChangeStateToPredicted()
-        {
-            if(_state != NeuronState.FIRED)
-            {
-                _state = NeuronState.PREDICTED;
-            }            
-        }
+        }        
 
         internal List<Position4D> Fire()
         {
             return AxonList;
         }
-
-        internal void Grow(Position4D segmentId)
+        
+        internal void Grow(Position4D pos4d)
         {
-            Segment s = GetSegment((segmentId.Z));
-            s.Grow(segmentId);
-        }       
 
-        internal NeuronState GetState()
+        }
+
+        internal void Grow()
+        {        
+            foreach(var kvp in Segments)
+            {
+                kvp.Value.Grow();
+            }
+        }               
+
+        internal void ChangeStateToPredicted()
         {
-            return _state;
+            if (State != NeuronState.FIRED)
+            {
+                State = NeuronState.PREDICTED;
+            }
+        }
+
+        internal void UpdateLocal(Position4D segmentID)
+        {
+            if(!_firedSegments.Contains(segmentID))
+            {
+                _firedSegments.Add(segmentID);
+            }
         }
     }
 }
