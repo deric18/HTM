@@ -16,3 +16,4 @@ gets decided by the local segment and not CPM.
 Thought Process for Justification:
 -AddNewConnection under Segment should not have position4d parameter becuase then CPM will need to do processing to find out the best position to add to the segment , the segment should figure out which connection
 will be better for it.
+-All segments must maintain a local table of firing rate of the all of its sub components including typical single synapses and sub segments and after timelapse should update weights accordingly.

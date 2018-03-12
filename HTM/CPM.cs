@@ -217,7 +217,7 @@ namespace HTM
             throw new NotImplementedException();
         }
 
-        public static bool CheckForSelfConnection(Position4D pos3d, Position2D neuronID)
+        public static bool CheckForSelfConnection(Position4D pos3d, Position3D neuronID)
         {
             return false;
         }

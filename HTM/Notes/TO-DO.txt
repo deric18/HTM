@@ -13,5 +13,7 @@ Also need to account for temporal axons for incoming temporal connection and api
 ----------------------------------------------------------------------------------------------------------------------------------------
 TODO : 
 -Doing Predict Functionality ----------------------------------------------------------------------------------------Done.
--Complete fire implementation for neurons and segments 
+-Complete fire implementation for neurons and segments.
+	--Major Logic----------------------------------------------------------------------------------------------------Done.
+	--Handle Adding New Connection for Segment growth.
 -Complete GetNextNeuron and neural growth mehanism.
