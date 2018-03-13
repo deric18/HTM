@@ -15,5 +15,5 @@ TODO :
 -Doing Predict Functionality ----------------------------------------------------------------------------------------Done.
 -Complete fire implementation for neurons and segments.
 	--Major Logic----------------------------------------------------------------------------------------------------Done.
-	--Handle Adding New Connection for Segment growth.
+	--Handle Adding New Connection for Segment growth. (AddNewConnection() and GEtNextPosition())
 -Complete GetNextNeuron and neural growth mehanism.

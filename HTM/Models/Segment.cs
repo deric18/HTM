@@ -109,7 +109,7 @@ namespace HTM.Models
 
         private void AddNewLocalConnection(Position4D newPosition)
         {
-            //Maintain a Random number object local
+            //Maintain a Random number object local 
             throw new NotImplementedException();
         }
 
