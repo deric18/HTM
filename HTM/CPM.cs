@@ -185,9 +185,16 @@ namespace HTM
             return false;
         }
 
-        public static Position4D GetNextPositionForSegment()
+        public static Position4D GetNextPositionForSegment(Position4D pos4d)
         {
+            //should return the nearby frequent firing position by euclidian distance
             return CPM.GetNextRandomPosition(instance.Length, instance.Width, instance.Width, CubeConstant);
+        }
+
+        private int GetEuclidianDistance(Position4D source, Position4D target)
+        {
+            throw new NotImplementedException();
+            return 1;
         }
 
         private static Position4D GetNextRandomPosition(int limitW, int limitX,int limitY,int limitZ)
