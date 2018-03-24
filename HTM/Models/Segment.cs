@@ -82,7 +82,8 @@ namespace HTM.Models
             }
             throw new NotImplementedException();
         }
-
+        /'
+        
         private void InternalGrowth()
         {
             ///Should decide on its own to whether to add a new connection or not ?
@@ -137,6 +138,7 @@ namespace HTM.Models
         private void GrowSubSegments()
         {
             if (_hasSubSegments)
+
             {                
                 foreach(var segment in SubSegments)
                 {
@@ -166,6 +168,8 @@ namespace HTM.Models
             
         }        
         
+
+        //Dont Use : Bad Tech
         private int GetMaxFiringSegmentCount()
         {
             //Figure out the highest firing subsegment fro _firingSynapses and send the highest firer measure;
@@ -190,7 +194,7 @@ namespace HTM.Models
             Position4D maxfirePosition;
             int maxCounter = 0;
 
-            foreach (var pos in _lastTimeStampFiringSynapses)
+            foreach(var pos in _lastTimeStampFiringSynapses)
             {
                 if (pos.Value > maxCounter)
                 {

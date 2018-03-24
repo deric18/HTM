@@ -15,5 +15,6 @@ gets decided by the local segment and not CPM.
 
 Thought Process for Justification:
 -AddNewConnection under Segment should not have position4d parameter becuase then CPM will need to do processing to find out the best position to add to the segment , the segment should figure out which connection
-will be better for it.
+will be better for it. This idea is not that good
+CONNECTION METHODOLOGY : A Neuron doesnt give a fuck about connectivity and how many connections it makes , all it cares about is expressing its own shape , it will keep on growing and growing and express its shape.
 -All segments must maintain a local table of firing rate of the all of its sub components including typical single synapses and sub segments and after timelapse should update weights accordingly.

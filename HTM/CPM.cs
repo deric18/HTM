@@ -8,7 +8,7 @@ namespace HTM
 {
     public class CPM
     {
-        public const int CubeConstant = 100;
+        public const int CubeConstant = 100;        
         public static volatile CPM instance;
         public static object syncRoot = new object();
 
@@ -39,7 +39,7 @@ namespace HTM
                     
         private Dictionary<Position4D, Position4D> SegmentMapper;               //Maps Synapses to connected Segment.        
         
-        private List<Position4D> _predictedList;
+        private List<Position4D> _predictedList;        
         
         public bool HasTemporalSignal { get; private set; }
         public bool HasSpatialSignal { get; private set; }
@@ -184,7 +184,7 @@ namespace HTM
 
             return false;
         }
-
+        
         public static Position4D GetNextPositionForSegment()
         {
             return CPM.GetNextRandomPosition(instance.Length, instance.Width, instance.Width, CubeConstant);
