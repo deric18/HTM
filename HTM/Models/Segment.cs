@@ -150,7 +150,7 @@ namespace HTM.Models
 
         private void AddConnection()
         {
-            Position4D pos4d = CPM.GetNextPositionForSegment();
+            Position4D pos4d = CPM.GetNextPositionForSegment(CoreSegmentId);
             _segmentConnections.Add(pos4d, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));
             CPM.UpdateConnectionGraph(pos4d);
         }        
@@ -162,7 +162,7 @@ namespace HTM.Models
                 _hasSubSegments = true;
                 SubSegments = new List<Segment>();
             }
-            Position4D baseSegmentPosition = CPM.GetNextPositionForSegment();
+            Position4D baseSegmentPosition = CPM.GetNextPositionForSegment(CoreSegmentId);
             Segment newSegment = new Segment(NeuronID, baseSegmentPosition);
             SubSegments.Add(newSegment);
             
