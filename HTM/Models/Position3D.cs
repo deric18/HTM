@@ -1,16 +1,9 @@
-﻿using System;
-
-namespace HTM.Models
+﻿namespace HTM.Models
 {
     public class Position3D
     {
-        public int X;
-        public int Y;
-        public int Z;
-
-        public int GetDistance(Position3D pos3d)
-        {
-            throw new NotImplementedException();
-        }
+        public int X { get; private set; }
+        public int Y { get; private set; }
+        public int Z { get; private set; }
     }
 }

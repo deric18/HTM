@@ -30,8 +30,8 @@ namespace HTM.Models
         {
             List<Position2D> toReturn = new List<Position2D>();            
 
-            for (int i=0; i < Length; i++)
-                for(int j=0; j < Breadth; j++)
+            for (uint i=0; i < Length; i++)
+                for(uint j=0; j < Breadth; j++)
                 {
                     Position2D p = new Position2D();
                     if (Contents[i][j])
