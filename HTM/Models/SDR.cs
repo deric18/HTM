@@ -33,11 +33,10 @@ namespace HTM.Models
             for (uint i=0; i < Length; i++)
                 for(uint j=0; j < Breadth; j++)
                 {
-                    Position2D p = new Position2D();
+                    Position2D p;
                     if (Contents[i][j])
                     {
-                        p.X = i;
-                        p.Y = j;
+                        p = new Position2D(i, j);
                         toReturn.Add(p);
                     }
                 }

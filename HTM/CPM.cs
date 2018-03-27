@@ -35,10 +35,7 @@ namespace HTM
         public int Breadth { get; private set; }
         public int Width { get; private set; }
         public CPMState State { get; private set; }
-        public Column[][] Columns { get; private set; }        
-                            
-        
-        private List<string> _predictedList;        
+        public Column[][] Columns { get; private set; }                                                    
         
         public bool HasTemporalSignal { get; private set; }
         public bool HasSpatialSignal { get; private set; }        
@@ -113,8 +110,13 @@ namespace HTM
             
         }
 
+        internal static Position3D GetBound()
+        {
+            return new Position3D(int.Parse(ConfigurationManager.AppSettings["SEGMENT_XBOUND"]), int.Parse(ConfigurationManager.AppSettings["SEGMENT_YBOUND"]), int.Parse(ConfigurationManager.AppSettings["SEGMENT_ZBOUND"]));
+        }
+
         #region HELPER METHODS 
-        
+
         #endregion
     }
 }

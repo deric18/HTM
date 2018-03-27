@@ -11,8 +11,7 @@ namespace HTM.Models
         public Column(uint x, uint y, int size)
         {
             _size = size;
-            ID.X = x;
-            ID.Y = y;
+            ID = new Position2D(x, y);
             for(int i=0;i< _size; i++)
             {
                 Neuron n = new Neuron();

@@ -8,31 +8,36 @@ namespace HTM.Models
     /// Process, Grow
     /// </summary>
     public class Segment
-    {                
-        private Dictionary<Position3D, int> _segmentConnections;    //strength
-        private List<Position3D> __lastTimeStampFiringConnections;
-        public string SegmentID { get; private set; }        
+    {        
+        public Position3D NeuronID { get; private set; }
+        public Position3D BaseConnection { get; private set; }
         private uint _sumVoltage;
-        private Dictionary<int, Segment> _subSegment;           //subsegment index   
+        public string SegmentID { get; private set; }
         private bool _hasSubSegments;
-        private List<Segment> SubSegments;                
+        private List<Segment> SubSegments;
         private bool _fullyConnected;
+        private int _seed;
 
-        public Segment(string segmentID)
+        private Dictionary<Position3D, int> _segmentConnections;    //strength
+        private List<Position3D> __lastTimeStampFiringConnections;                        
+
+        public Segment(Position3D neuronId, string segmentID, Position3D baseConnection, int seed)
         {
+            NeuronID = neuronId;
             SegmentID = segmentID;            
             _sumVoltage = 0;                  
             _hasSubSegments = false;
             _segmentConnections = new Dictionary<Position3D, int>();
             __lastTimeStampFiringConnections = new List<Position3D>();
+            BaseConnection = baseConnection;
+            _seed = seed;
         }
 
         internal Segment GetSegment(int v)
         {
-            Segment seg;
-            if(_subSegment.TryGetValue(v,out seg))
+            if(v < SubSegments.Count)
             {
-                return seg;
+                return SubSegments[v];
             }
 
             throw new InvalidOperationException("seg ID : " + v.ToString() + " is not present");
@@ -64,11 +69,32 @@ namespace HTM.Models
             return false;
         }
 
-        internal void FlushVoltage()
+        /// <summary>
+        /// -Method gets called at every growth cycle
+        /// -UpdateLocalConnectionTable : Update all local : Connection Tables
+        /// -GrowSubSegments            : Updates all subsegments based on merit
+        /// -InternalGrowth             : Decides if a new connection could be added , adds it if it can otherwise grows an existing nicely firing connection.
+        /// </summary>
+        /// <param name="synapse"></param>
+        public void Grow()
         {
-            _sumVoltage = 0;
-            __lastTimeStampFiringConnections = new List<Position3D>();
-        }        
+            AddNewLocalConnection();
+            GrowSubSegments();
+            return;
+        }
+
+        private void GrowSubSegments()
+        {
+            if (_hasSubSegments)
+
+            {
+                foreach (var segment in SubSegments)
+                {
+                    segment.Grow();
+                }
+            }
+            throw new NotImplementedException();
+        }              
         
 
         /// <summary>
@@ -85,72 +111,88 @@ namespace HTM.Models
             */
             //If not branched and position is noand check if segment has max positions , add this position to a possibility list for future connection when the neuron losses and non used connection else if not max position then add new position,
             //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.  
-            Position3D newPosition = new Position3D();
+            Position3D segmentBound = CPM.GetBound();
+            Position3D newPosition = GetNewPositionFromBound(segmentBound);
 
-            if (_segmentConnections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"]))
+            if ((_segmentConnections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition) )
             {
                 AddConnection(newPosition);
             }
-            else if(SubSegments?.Count < int.Parse(ConfigurationManager.AppSettings["MAX_SEGMENTS_PER_NEURON"]))
+            else if(SubSegments?.Count < int.Parse(ConfigurationManager.AppSettings["MAX_SEGMENTS_PER_NEURON"]) && !DoesSubSegmentExist(newPosition))
             {                
-                CreateSubSegment();
+                CreateSubSegment(newPosition);
             }
             else
             {
+                Console.WriteLine("Segment " + PrintPosition(NeuronID) + SegmentID + " is Over Connected");
+                Console.ReadKey();
                 _fullyConnected = true;
                 //log Information with details , Segment has reached a peak connection pathway , this is essentially a crucial segment for the whole region.
             }            
-        }        
-
-        /// <summary>
-        /// -Method gets called at every growth cycle
-        /// -UpdateLocalConnectionTable : Update all local : Connection Tables
-        /// -GrowSubSegments            : Updates all subsegments based on merit
-        /// -InternalGrowth             : Decides if a new connection could be added , adds it if it can otherwise grows an existing nicely firing connection.
-        /// </summary>
-        /// <param name="synapse"></param>
-        public void Grow()
-        {
-            AddNewLocalConnection();
-            GrowSubSegments();            
-            return;
-        }        
-
-        private void GrowSubSegments()
-        {
-            if (_hasSubSegments)
-
-            {                
-                foreach(var segment in SubSegments)
-                {
-                    segment.Grow();
-                }
-            }
-            throw new NotImplementedException();
         }
 
-        private void AddConnection(Position3D newPosition)
-        {            
-            _segmentConnections.Add(newPosition, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));
-            CPM.UpdateConnectionGraph(newPosition);
-        }        
+        private bool SelfConnection(Position3D newPosition)
+        {
+            if (NeuronID.Equals(newPosition))
+                return true;
 
-        private void CreateSubSegment()
+            return false;
+        }
+
+        private Position3D GetNewPositionFromBound(Position3D segmentBound)
+        {
+            Random r = new Random(_seed);
+            return new Position3D(r.Next(BaseConnection.X, segmentBound.X), r.Next(BaseConnection.Y, segmentBound.Y), r.Next(BaseConnection.Z, segmentBound.Z));
+        }                   
+
+        private void AddConnection(Position3D newPosition) =>        
+            _segmentConnections.Add(newPosition, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));                    
+
+        private void CreateSubSegment(Position3D basePosition)
         {
             if (!_hasSubSegments)
             {
                 _hasSubSegments = true;
                 SubSegments = new List<Segment>();
             }
-            Position4D baseSegmentPosition = CPM.GetNextPositionForSegment(CoreSegmentId);
-            Segment newSegment = new Segment(NeuronID, baseSegmentPosition);
-            SubSegments.Add(newSegment);
             
-        }                       
+            string newSegId = SegmentID + "-" + SubSegments.Count.ToString();
+            Segment newSegment = new Segment(NeuronID, newSegId, basePosition, SubSegments.Count);
+            SubSegments.Add(newSegment);            
+        }
+
+        internal void FlushVoltage()
+        {
+            _sumVoltage = 0;
+            __lastTimeStampFiringConnections = new List<Position3D>();
+        }
 
         private string PrintPosition(Position3D pos3d)
         {
             return " X: " + pos3d.X.ToString() + " Y:" + pos3d.Y.ToString() + " Z:" + pos3d.Z.ToString();
+        }
+
+        private bool DoesSubSegmentExist(Position3D newPosition)
+        {
+            foreach(var seg in SubSegments)
+            {
+                if(seg.BaseConnection.Equals(newPosition))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool DoesConnectionExist(Position3D pos)
+        {
+            int val;
+            if(_segmentConnections.TryGetValue(pos, out val))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
