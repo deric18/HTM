@@ -1,1 +1,21 @@
 ﻿1.Every Neuron tried to express itself as much as possible over the whole network , Every Neuron tends to connect to as many accidental good connections as possible to express itself on the whole network.
+2.BRAINS ARE AMAZINGLY AND NATURALLY FAULT TOLERANT , THEY WORK AMAZINGLY WELL IN THE MIDST OF A LOT OF NOISE.
+
+
+GROWTH MECHANISM : 
+
+Types of Growths:
+1.Neuronal Growth : Every neuron as time progress , grows its dendrites adding more connections to its belt , in the process it will keep on finding new possible connections (synaptogenesis) and keep the ones that
+survive and remove ones that do not survive. such growth mechanism does not need a specific position of growth they randomly get connected with firing neurons/ biasing axon lines.
+	The process of synaptogenesis has two possible methodologies to be followed , the nupic HTM model follows a totally random number generator technique for connecting dendrites to axons and another methodology 
+is dendrites will have a higher probability of connecting nearby axons which fire more often and are closer to the growing dendrite if the dendrite couldnt find such spots it just keeps growing ahead and the position4d
+gets decided by the local segment and not CPM.
+
+2.Connection Update: In this type of growth a particular connection point/synapse that is firing often will grow more and more stronger.
+
+
+Thought Process for Justification:
+-AddNewConnection under Segment should not have position4d parameter becuase then CPM will need to do processing to find out the best position to add to the segment , the segment should figure out which connection
+will be better for it. This idea is not that good
+CONNECTION METHODOLOGY : A Neuron doesnt give a fuck about connectivity and how many connections it makes , all it cares about is expressing its own shape , it will keep on growing and growing and express its shape.
+-All segments must maintain a local table of firing rate of the all of its sub components including typical single synapses and sub segments and after timelapse should update weights accordingly.

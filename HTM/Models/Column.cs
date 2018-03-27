@@ -2,13 +2,13 @@
 
 namespace HTM.Models
 {
-    class Column
+    public class Column
     {
         List<Neuron> Neurons;
         Position2D ID;
         private int _size;
 
-        public Column(int x, int y, int size)
+        public Column(uint x, uint y, int size)
         {
             _size = size;
             ID.X = x;
