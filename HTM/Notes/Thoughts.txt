@@ -1,4 +1,5 @@
 ﻿1.Every Neuron tried to express itself as much as possible over the whole network , Every Neuron tends to connect to as many accidental good connections as possible to express itself on the whole network.
+2.BRAINS ARE AMAZINGLY AND NATURALLY FAULT TOLERANT , THEY WORK AMAZINGLY WELL IN THE MIDST OF A LOT OF NOISE.
 
 
 GROWTH MECHANISM : 

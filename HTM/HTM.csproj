@@ -43,7 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConnectionAlgorithm.cs" />
     <Compile Include="CPM.cs" />
     <Compile Include="Enums\NeuronState.cs" />
     <Compile Include="Enums\CPMState.cs" />

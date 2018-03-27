@@ -70,7 +70,12 @@ namespace HTM.Models
             __lastTimeStampFiringConnections = new List<Position3D>();
         }        
         
-        private void InternalGrowth()
+
+        /// <summary>
+        /// Boxed Growth : Direction and boxed random connection
+        /// 1.A Segment should have direction it grows and by default will have limits set to how far away the segment can predict its new connection.
+        /// </summary>
+        private void AddNewLocalConnection()
         {
             ///Should decide on its own to whether to add a new connection or not ?
             //Make sure you are not connecting to an axon of your own neuron if its a new position
@@ -79,33 +84,23 @@ namespace HTM.Models
              * else grow a new connection locally randomly.
             */
             //If not branched and position is noand check if segment has max positions , add this position to a possibility list for future connection when the neuron losses and non used connection else if not max position then add new position,
-            //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.                        
+            //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.  
+            Position3D newPosition = new Position3D();
+
             if (_segmentConnections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"]))
             {
-                AddNewLocalConnection(newPosition);
+                AddConnection(newPosition);
             }
             else if(SubSegments?.Count < int.Parse(ConfigurationManager.AppSettings["MAX_SEGMENTS_PER_NEURON"]))
             {                
-                CreateNewBranch();
+                CreateSubSegment();
             }
             else
             {
                 _fullyConnected = true;
-                //log Information with details
+                //log Information with details , Segment has reached a peak connection pathway , this is essentially a crucial segment for the whole region.
             }            
-        }
-
-        private void AddNewLocalConnection(Position4D newPosition)
-        {
-            //Maintain a Random number object local 
-            throw new NotImplementedException();
-        }
-
-        private Position4D GetNextPosition()
-        {
-            throw new NotImplementedException();
-        }
-
+        }        
 
         /// <summary>
         /// -Method gets called at every growth cycle
@@ -115,8 +110,8 @@ namespace HTM.Models
         /// </summary>
         /// <param name="synapse"></param>
         public void Grow()
-        {                        
-            InternalGrowth();
+        {
+            AddNewLocalConnection();
             GrowSubSegments();            
             return;
         }        
@@ -134,14 +129,13 @@ namespace HTM.Models
             throw new NotImplementedException();
         }
 
-        private void AddConnection()
-        {
-            Position4D pos4d = CPM.GetNextPositionForSegment(CoreSegmentId);
-            _segmentConnections.Add(pos4d, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));
-            CPM.UpdateConnectionGraph(pos4d);
+        private void AddConnection(Position3D newPosition)
+        {            
+            _segmentConnections.Add(newPosition, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));
+            CPM.UpdateConnectionGraph(newPosition);
         }        
 
-        private void CreateNewBranch()
+        private void CreateSubSegment()
         {
             if (!_hasSubSegments)
             {
@@ -152,50 +146,11 @@ namespace HTM.Models
             Segment newSegment = new Segment(NeuronID, baseSegmentPosition);
             SubSegments.Add(newSegment);
             
-        }        
-        
+        }                       
 
-        //Dont Use : Bad Tech
-        private int GetMaxFiringSegmentCount()
+        private string PrintPosition(Position3D pos3d)
         {
-            //Figure out the highest firing subsegment fro _firingSynapses and send the highest firer measure;
-            Position4D maxfirePosition;
-            int maxCounter = 0;
-
-            foreach(var pos in _lastTimeStampFiringSynapses)
-            {
-                if(pos.Value > maxCounter)
-                {
-                    maxfirePosition = pos.Key;
-                    maxCounter = pos.Value;
-                }
-            }
-
-            return maxCounter;
-        }
-
-        private int GetMaxPositionCount()
-        {
-            //Figure out the highest firing subsegment fro _firingSynapses and send the highest firer measure;
-            Position4D maxfirePosition;
-            int maxCounter = 0;
-
-            foreach(var pos in _lastTimeStampFiringSynapses)
-            {
-                if (pos.Value > maxCounter)
-                {
-                    maxfirePosition = pos.Key;
-                    maxCounter = pos.Value;
-                }
-            }
-
-            return maxCounter;
-        }
-
-
-        private string PrintPosition(Position4D pos4d)
-        {
-            return pos4d.W.ToString() + " " + pos4d.X.ToString() + " " + pos4d.Y.ToString() + " " + pos4d.Z.ToString();
+            return " X: " + pos3d.X.ToString() + " Y:" + pos3d.Y.ToString() + " Z:" + pos3d.Z.ToString();
         }
     }
 }
