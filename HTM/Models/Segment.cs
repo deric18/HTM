@@ -8,91 +8,78 @@ namespace HTM.Models
     /// Process, Grow
     /// </summary>
     public class Segment
-    {        
-        public Position4D CoreSegmentId { get; private set; }
-        public Position3D NeuronID;
-        private Dictionary<Position4D, int> _lastTimeStampFiringSynapses;
-        private Position4D _candidateNewBranchPosition;
-        public Position4D SegmentID { get; private set; }        
+    {                
+        private Dictionary<Position3D, int> _segmentConnections;    //strength
+        private List<Position3D> __lastTimeStampFiringConnections;
+        public string SegmentID { get; private set; }        
         private uint _sumVoltage;
-        private Dictionary<Position4D, int> _positionConnections;
-        private Dictionary<Position4D, int> _segmentConnections;                    //Gets updated every time after the growth cycle.
+        private Dictionary<int, Segment> _subSegment;           //subsegment index   
         private bool _hasSubSegments;
-        private List<Segment> SubSegments;
-        private uint _spikeCounter;
-        private bool IsCore;
+        private List<Segment> SubSegments;                
         private bool _fullyConnected;
 
-        public Segment(Position3D neuronID, Position4D segmentID)
+        public Segment(string segmentID)
         {
-            SegmentID = segmentID;
-            NeuronID = neuronID;
-            _sumVoltage = 0;
-            IsCore = false;
-            _positionConnections = new Dictionary<Position4D, int>();
-            _segmentConnections = new Dictionary<Position4D, int>();
+            SegmentID = segmentID;            
+            _sumVoltage = 0;                  
             _hasSubSegments = false;
-            _spikeCounter = 0;
-            _lastTimeStampFiringSynapses = new Dictionary<Position4D, int>();            
+            _segmentConnections = new Dictionary<Position3D, int>();
+            __lastTimeStampFiringConnections = new List<Position3D>();
         }
-        
+
+        internal Segment GetSegment(int v)
+        {
+            Segment seg;
+            if(_subSegment.TryGetValue(v,out seg))
+            {
+                return seg;
+            }
+
+            throw new InvalidOperationException("seg ID : " + v.ToString() + " is not present");
+        }
+
         /// <summary>
-        /// Processes Individual 4D Position
+        /// Predict if the segment will fire or not based incoming voltage
         /// </summary>
         /// <param name="voltage"></param>
-        /// <param name="pos4d"></param>
+        /// <param name="firingNeuronId"></param>
         /// <returns></returns>
-        public bool Process(uint voltage, Position4D pos4d)
-        {
-            int spikeCounter = 0;
-            _lastTimeStampFiringSynapses.TryGetValue(pos4d, out spikeCounter);
-            if(spikeCounter != 0)
-            {
-                _lastTimeStampFiringSynapses.Remove(pos4d);
-                _lastTimeStampFiringSynapses.Add(pos4d, ++spikeCounter);
-            }
-            else
-            {
-                Console.WriteLine("This should never happen : Position4d :" + PrintPosition(pos4d) + " is not connected to the Segment : " + PrintPosition(SegmentID));
-                throw new Exception();
-            }
+        public bool Predict(uint voltage, Position3D firingNeuronId)
+        {            
             _sumVoltage += voltage;            
             if(_sumVoltage > int.Parse(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]))
             {
-                //NMDA SPIKE (alert CPM that this neuron will fire and CPM will in-turn alert the neuron about this semgnets fire for future update of its growth factor for the next growth cycle)
-                //Increment counter                           
+                //NMDA Spike
+                //Strengthen firing Neuron Connection.
+                int connectionStrength;
+                if(_segmentConnections.TryGetValue(firingNeuronId, out connectionStrength))
+                {
+                    if (connectionStrength > int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTION_STRENGTH"]))
+                        return true;
+                    _segmentConnections[firingNeuronId]++;
+                }
                 return true;
             }
 
             return false;
         }
 
-        private void UpdateLocalConnectionTable()
+        internal void FlushVoltage()
         {
-            //Access _positionConnections and update strengths and flush _connectionStrength
-            if(_lastTimeStampFiringSynapses.Count == 0)
-            {
-                //log info nothing to fire
-                return;
-            }
-
-            foreach(var connection in _lastTimeStampFiringSynapses)
-            {
-
-            }
-            throw new NotImplementedException();
-        }
-        /'
+            _sumVoltage = 0;
+            __lastTimeStampFiringConnections = new List<Position3D>();
+        }        
         
         private void InternalGrowth()
         {
             ///Should decide on its own to whether to add a new connection or not ?
             //Make sure you are not connecting to an axon of your own neuron if its a new position
-            //If position is new position and already branched and maxed out on MAXBRANCH , dont branch , set flag fullyconnected to true and add new position as a new connection
+            /*Decide how to add new connection : Check if there is any sub segments performing really well , if yes send grow signal to it
+             * else check for any local connections to the segment which is performing really well 
+             * else grow a new connection locally randomly.
+            */
             //If not branched and position is noand check if segment has max positions , add this position to a possibility list for future connection when the neuron losses and non used connection else if not max position then add new position,
-            //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.
-            Position4D newPosition = GetNextPosition();
-            CPM.CheckForSelfConnection(newPosition, NeuronID);
+            //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.                        
             if (_segmentConnections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"]))
             {
                 AddNewLocalConnection(newPosition);
@@ -128,8 +115,7 @@ namespace HTM.Models
         /// </summary>
         /// <param name="synapse"></param>
         public void Grow()
-        {            
-            UpdateLocalConnectionTable();
+        {                        
             InternalGrowth();
             GrowSubSegments();            
             return;

@@ -54,7 +54,6 @@
     <Compile Include="Models\Neuron.cs" />
     <Compile Include="Models\Position2D.cs" />
     <Compile Include="Models\Position3D.cs" />
-    <Compile Include="Models\Position4D.cs" />
     <Compile Include="Models\SDR.cs" />
     <Compile Include="Models\Segment.cs" />
     <Compile Include="Program.cs" />

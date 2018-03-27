@@ -11,54 +11,62 @@ namespace HTM.Models
     {
         public Position3D NeuronID { get; private set; }
         public NeuronState State { get; private set; }
-        public Dictionary<int, Segment> Segments { get; private set; }
-        private List<Position4D> _firedSegments;
-        private Dictionary<Position4D, int> Weights { get; set; }
-        private List<Position4D> AxonList;
+        public Dictionary<int, Segment> Segments { get; private set; }      //index of each connection
+        private List<Segment> _predictedSegments;        
+        private List<string> AxonList;
+        private const uint NEURONAL_FIRE_VOLTAGE = 10;
 
-        public Segment GetSegment(uint z)
+        public Segment GetSegment(string segID)
         {
             Segment seg;
-            if(Segments.TryGetValue((int)z, out seg))
+            if(segID.Contains("-"))
             {
-                return seg;
+                var items = segID.Split('-');
+                int baseSeg = int.Parse(items[0]);
+                if(Segments.TryGetValue(baseSeg, out seg))
+                {                    
+                    for(int i=1; i < items.Length; i++)
+                    {
+                        seg = seg.GetSegment(int.Parse(items[i]));
+                    }
+                    return seg;
+                }             
             }
-            //log error;
-            return null;
+            throw new InvalidOperationException("seg ID : " + segID.ToString() + " is not present");
         }        
 
-        internal List<Position4D> Fire()
+        internal List<string> Fire()
         {
+            //return all the connected segment ids
             return AxonList;
-        }
-        
-        internal void Grow(Position4D pos4d)
-        {
+        }               
 
+        internal bool Predict(string segID, Position3D firingNeuron)
+        {
+            Segment s = GetSegment(segID);
+            if(s.Predict(NEURONAL_FIRE_VOLTAGE, firingNeuron))
+            {
+                _predictedSegments.Add(s);
+                s.FlushVoltage();                
+                return true;
+            }
+            return false;
         }
 
         internal void Grow()
         {        
-            foreach(var kvp in Segments)
-            {
-                kvp.Value.Grow();
-            }
+            //Update Local
+            //Send GROW signal to all connected segments
         }               
 
-        internal void ChangeStateToPredicted()
+        internal void ChangeState(NeuronState state)
         {
-            if (State != NeuronState.FIRED)
-            {
-                State = NeuronState.PREDICTED;
-            }
+            State = state;
         }
 
-        internal void UpdateLocal(Position4D segmentID)
+        internal void UpdateLocal()
         {
-            if(!_firedSegments.Contains(segmentID))
-            {
-                _firedSegments.Add(segmentID);
-            }
+            //Update the strengths for all fired segments on previous timestamp            
         }
     }
 }
