@@ -1,0 +1,7 @@
+C:\HTM\HTM\obj\Debug\HTM.csprojResolveAssemblyReference.cache
+C:\HTM\HTM\obj\Debug\HTM.csproj.CoreCompileInputs.cache
+C:\HTM\HTM\bin\Debug\HTM.exe.config
+C:\HTM\HTM\bin\Debug\HTM.exe
+C:\HTM\HTM\bin\Debug\HTM.pdb
+C:\HTM\HTM\obj\Debug\HTM.exe
+C:\HTM\HTM\obj\Debug\HTM.pdb

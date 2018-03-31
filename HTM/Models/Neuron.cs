@@ -36,7 +36,7 @@ namespace HTM.Models
         }        
 
         internal List<string> Fire()
-        {
+        { 
             //return all the connected segment ids
             return AxonList;
         }               
@@ -53,16 +53,20 @@ namespace HTM.Models
             return false;
         }
 
-        internal void Grow()
+        internal void PruneConnections()
+        {
+            foreach(var s in Segments.Values)
+            {
+                s.Prune();
+            }
+        }
+
+        internal void Update()
         {        
             //Update Local
             //Send GROW signal to all connected segments
-        }               
-
-        internal void ChangeState(NeuronState state)
-        {
-            State = state;
-        }
+            //Prune Segments that have not fired for the time interval
+        }                       
 
         internal void UpdateLocal()
         {
