@@ -33,7 +33,7 @@ namespace HTM.Models
             BaseConnection = baseConnection;
             _seed = seed;
         }
-         
+        
         internal Segment GetSegment(int v)
         {
             if(v < SubSegments.Count)
@@ -71,17 +71,14 @@ namespace HTM.Models
         }
 
         /// <summary>
-        /// -Method gets called at every growth cycle
-        /// -UpdateLocalConnectionTable : Update all local : Connection Tables
+        /// -Method gets called at every growth cycle        
         /// -GrowSubSegments            : Updates all subsegments based on merit
         /// -InternalGrowth             : Decides if a new connection could be added , adds it if it can otherwise grows an existing nicely firing connection.
-        /// </summary>
-        /// <param name="synapse"></param>
-        public void Update()
+        /// </summary>        
+        public void Grow()
         {
             AddNewLocalConnection();
-            GrowSubSegments();            
-            return;
+            GrowSubSegments();                        
         }       
 
         /// <summary>
@@ -98,10 +95,10 @@ namespace HTM.Models
             */
             //If not branched and position is noand check if segment has max positions , add this position to a possibility list for future connection when the neuron losses and non used connection else if not max position then add new position,
             //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.  
-            Position3D segmentBound = CPM.GetBound();
-            Position3D newPosition = GetNewPositionFromBound(segmentBound);
+            Position3D bounds = CPM.GetBound();
+            Position3D newPosition = GetNewPositionFromBound(bounds);            
 
-            if ((_synapticConnections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition) )
+            if ((_synapticConnections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition))
             {
                 AddConnection(newPosition);
             }
@@ -124,25 +121,27 @@ namespace HTM.Models
             {
                 foreach (var segment in SubSegments)
                 {
-                    segment.Update();
+                    segment.Grow();
                 }
             }                    
         }
 
         public void Prune()
         {
-            //Skim through all the connections and remove the oldest with least firing rate
-            //Also remove segments which havent fired in a while
+            //Run through synaptic list to eliminate neurons with lowest connection strength
             foreach(var s in _synapticConnections)
             {
-                if(s.Value <= int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]))
+                if(s.Value <= int.Parse(ConfigurationManager.AppSettings["PRUNE_THRESHOLD"]))
                 {
+                    Console.WriteLine("Removing synapse to Neuron" + PrintPosition(s.Key));
                     _synapticConnections.Remove(s.Key);
                 }
+            }            
+
+            foreach(var segment in SubSegments)
+            {
+                segment.Prune();
             }
-
-
-            throw new NotImplementedException();
         }
 
         private bool SelfConnection(Position3D newPosition)
@@ -160,7 +159,7 @@ namespace HTM.Models
         }                   
 
         private void AddConnection(Position3D newPosition) =>
-            _synapticConnections.Add(newPosition, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));                    
+            _synapticConnections.Add(newPosition, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));                            
 
         private void CreateSubSegment(Position3D basePosition)
         {

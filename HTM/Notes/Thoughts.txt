@@ -19,3 +19,6 @@ Thought Process for Justification:
 will be better for it. This idea is not that good
 CONNECTION METHODOLOGY : A Neuron doesnt give a fuck about connectivity and how many connections it makes , all it cares about is expressing its own shape , it will keep on growing and growing and express its shape.
 -All segments must maintain a local table of firing rate of the all of its sub components including typical single synapses and sub segments and after timelapse should update weights accordingly.
+
+Problem : How to make regions and neurons accept basal , temporal and apical  ?
+Answer : Every Neuron in the region will have a certain percent of there dendritic segments dedicated to a specific signal type , like apical dendrites will only connect to apical inputs and temporal to temporal and so on
