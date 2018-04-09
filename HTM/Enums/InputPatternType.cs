@@ -4,6 +4,7 @@
     {
         SPATIAL,
         TEMPORAL,
-        APICAL
+        APICAL,
+        NONE
     }
 }

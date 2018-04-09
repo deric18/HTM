@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using System.Collections.Generic;
 using System;
+using HTM.Enums;
 
 namespace HTM.Models
 {
@@ -11,7 +12,10 @@ namespace HTM.Models
     {        
         public Position3D NeuronID { get; private set; }
         public Position3D BaseConnection { get; private set; }
+        private SegmentType sType;
         private uint _sumVoltage;
+        private uint _temporalVoltage;
+        private uint _apicalVoltage;
         public string SegmentID { get; private set; }
         private bool _hasSubSegments;        
         private bool _fullyConnected;
@@ -24,8 +28,10 @@ namespace HTM.Models
         public Segment(Position3D neuronId, string segmentID, Position3D baseConnection, int seed)
         {
             NeuronID = neuronId;
-            SegmentID = segmentID;            
-            _sumVoltage = 0;                  
+            SegmentID = segmentID;
+            _sumVoltage = 0;
+            _temporalVoltage = 0;
+            _apicalVoltage = 0;
             _hasSubSegments = false;
             _fullyConnected = false;
             _synapticConnections = new Dictionary<Position3D, int>();
@@ -50,9 +56,25 @@ namespace HTM.Models
         /// <param name="voltage"></param>
         /// <param name="firingNeuronId"></param>
         /// <returns></returns>
-        public bool Predict(uint voltage, Position3D firingNeuronId)
-        {            
+        public bool Process(uint voltage, Position3D firingNeuronId, InputPatternType iType)
+        {
+            switch (iType)
+            {                
+                case InputPatternType.TEMPORAL:
+                    {
+                        _temporalVoltage += voltage;
+                        break;
+                    }
+                case InputPatternType.APICAL:
+                    {
+                        _apicalVoltage += voltage;
+                        break;
+                    }
+                default:break;
+            }
+
             _sumVoltage += voltage;            
+
             if(_sumVoltage > int.Parse(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]))
             {
                 //NMDA Spike

@@ -35,7 +35,9 @@ namespace HTM
         public int Breadth { get; private set; }
         public int Width { get; private set; }
         public CPMState State { get; private set; }
-        public Column[][] Columns { get; private set; }                                                    
+        public Column[][] Columns { get; private set; }
+        private List<Neuron> _longPredictedList;
+        private List<Neuron> _shortPredictedList;
         
         public bool HasTemporalSignal { get; private set; }
         public bool HasSpatialSignal { get; private set; }        
@@ -67,30 +69,38 @@ namespace HTM
             }
         }
 
-        public SDR Process(SDR input)
+        /// <summary>
+        /// Process incoming signal 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public SDR Predict(SDR input, )
         {
             //Get current predicted list
             //Generate SDR with this as firing pattern and return it..
-            SDR toReturn = new SDR();
+            List<Position2D> _firingColumns = GetColumnsToProcess(input);
 
-            return toReturn;
+            throw new NotImplementedException();                        
         }
         
-        public void Predict(SDR inputPattern, InputPatternType iType)
+        public void Process(SDR inputPattern, InputPatternType iType)
         {
             switch(iType)
             {
                 case InputPatternType.SPATIAL:
-                    {                                        
+                    {             
+                        //Fetch the columns to fire and decide if to burst the whole column or fire specific neurons
+                        //Fire the neurons and update predicted list
                         break;
                     }
                 case InputPatternType.TEMPORAL:
                     {
-                        
+                        //Fetch , Fire , Update
                         break;
                     }                    
                 case InputPatternType.APICAL:
-                    {                        
+                    {
+                        //Fetch , Fire , Update
                         break;
                     }
             }            
@@ -116,6 +126,14 @@ namespace HTM
         }
 
         #region HELPER METHODS 
+
+        private List<Position2D> GetColumnsToProcess(SDR input)
+        {
+            List<Position2D> toReturn = new List<Position2D>;
+
+            return toReturn;
+        }
+
 
         #endregion
     }
