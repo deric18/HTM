@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using HTM.Enums;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HTM.Models
 {
@@ -23,5 +25,7 @@ namespace HTM.Models
         {
             return Neurons[z];
         }
+
+        public List<Neuron> GetPredictedCells => Neurons.Where(pos => pos.State == NeuronState.PREDICTED).ToList();        
     }
 }

@@ -13,7 +13,7 @@ namespace HTM.Models
         public NeuronState State { get; private set; }
         public Dictionary<int, Segment> Segments { get; private set; }      //index of each connection
         private List<Segment> _predictedSegments;        
-        private List<string> AxonList;
+        private List<Position3D> AxonList;
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
 
         public Segment GetSegment(string segID)
@@ -35,7 +35,7 @@ namespace HTM.Models
             throw new InvalidOperationException("seg ID : " + segID.ToString() + " is not present");
         }        
 
-        internal List<string> Fire()
+        internal List<Position3D> Fire()
         { 
             //return all the connected segment ids
             return AxonList;

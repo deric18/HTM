@@ -48,6 +48,7 @@
     <Compile Include="Enums\CPMState.cs" />
     <Compile Include="Enums\InputPatternType.cs" />
     <Compile Include="Enums\NetworkState.cs" />
+    <Compile Include="Enums\SegmentType.cs" />
     <Compile Include="Models\AxonLines.cs" />
     <Compile Include="Models\Column.cs" />
     <Compile Include="Models\Neuron.cs" />

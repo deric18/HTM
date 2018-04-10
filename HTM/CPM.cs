@@ -67,30 +67,28 @@ namespace HTM
                 Console.ReadKey();
                 return;
             }
-        }
+        }       
+        
 
         /// <summary>
-        /// Process incoming signal 
+        /// All the Firing modules update the predicted list , changing the current state of the system.
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        public SDR Predict(SDR input, )
-        {
-            //Get current predicted list
-            //Generate SDR with this as firing pattern and return it..
-            List<Position2D> _firingColumns = GetColumnsToProcess(input);
-
-            throw new NotImplementedException();                        
-        }
-        
+        /// <param name="inputPattern"></param>
+        /// <param name="iType"></param>
         public void Process(SDR inputPattern, InputPatternType iType)
         {
             switch(iType)
             {
                 case InputPatternType.SPATIAL:
-                    {             
+                    {
                         //Fetch the columns to fire and decide if to burst the whole column or fire specific neurons
                         //Fire the neurons and update predicted list
+                        List<Position2D> firingColumns = inputPattern.GetActivePositions();
+
+                        foreach(var col in firingColumns)
+                        {
+                            ProcessColumn(col);
+                        }
                         break;
                     }
                 case InputPatternType.TEMPORAL:
@@ -112,11 +110,29 @@ namespace HTM
         }
         
 
-        private void ProcessColumn(Column col)
+        private void ProcessColumn(Position2D pos)
         {
             //check for predicted cells in the column and decide whther to burst or not
             //pick cells and fire
             //return List of positions 
+            Column col = GetColumn(pos);
+
+            List<Neuron> predictedCells = col.GetPredictedCells;
+
+            if(predictedCells.Count > 0 )
+            {
+                //Regular Fire
+                foreach(var neuron in predictedCells)
+                {
+                    _longPredictedList.AddRange(neuron.Fire());
+                }
+            }
+            else
+            {
+                //Bursting
+            }
+
+
             
         }
 
@@ -127,13 +143,7 @@ namespace HTM
 
         #region HELPER METHODS 
 
-        private List<Position2D> GetColumnsToProcess(SDR input)
-        {
-            List<Position2D> toReturn = new List<Position2D>;
-
-            return toReturn;
-        }
-
+        private Column GetColumn(Position2D position) => Columns[position.X][position.Y];
 
         #endregion
     }
