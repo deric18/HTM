@@ -110,30 +110,59 @@ namespace HTM
         }
         
 
-        private void ProcessColumn(Position2D pos)
+        private void ProcessColumn(Position2D pos, InputPatternType iType)
         {
             //check for predicted cells in the column and decide whther to burst or not
             //pick cells and fire
             //return List of positions 
-            Column col = GetColumn(pos);
-
-            List<Neuron> predictedCells = col.GetPredictedCells;
-
-            if(predictedCells.Count > 0 )
+            switch(iType)
             {
-                //Regular Fire
-                foreach(var neuron in predictedCells)
-                {
-                    _longPredictedList.AddRange(neuron.Fire());
-                }
-            }
-            else
+                case InputPatternType.SPATIAL:
+                    {
+                        Column col = GetColumn(pos);
+
+                        List<Neuron> predictedCells = col.GetPredictedCells;
+
+                        if (predictedCells.Count > 0)
+                        {
+                            //Regular Fire
+                            foreach (var neuron in predictedCells)
+                            {
+                                _longPredictedList.AddRange(GetNeuronsFromPositions(neuron.Fire()));
+                            }
+                        }
+                        else
+                        {
+                            //Bursting
+                        }
+                        break;
+                    }
+                case InputPatternType.TEMPORAL:
+                    {
+                        //Bursts all the time
+                        //Travel through the axonal line laterally and add them to longpredicted list , give them temporal voltage
+                        break;
+                    }
+                case InputPatternType.APICAL:
+                    {
+                        //Bursts all the time
+                        //Travel through the apical lines and add them to longpredictedlist , give them apical voltage.
+                        break;
+                    }
+                default:break;
+            }                        
+        }
+
+        private IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
+        {
+            List<Neuron> toReturn = new List<Neuron>();
+
+            foreach(var pos in list)
             {
-                //Bursting
+                toReturn.Add(GetNeuronFromPosition(pos));
             }
 
-
-            
+            return toReturn;
         }
 
         internal static Position3D GetBound()
@@ -144,6 +173,8 @@ namespace HTM
         #region HELPER METHODS 
 
         private Column GetColumn(Position2D position) => Columns[position.X][position.Y];
+
+        private Neuron GetNeuronFromPosition(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
 
         #endregion
     }
