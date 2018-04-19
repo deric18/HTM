@@ -118,6 +118,11 @@ namespace HTM
             }            
         }
 
+        private void ComputeFire()
+        {
+            //Order the cells wrt the highest potential and pick the ones at the top.
+        }
+
         public string Predict()
         {
             string toReturn = null;
