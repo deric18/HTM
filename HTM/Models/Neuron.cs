@@ -41,10 +41,10 @@ namespace HTM.Models
             return AxonList;
         }               
 
-        internal bool Predict(string segID, Position3D firingNeuron)
+        internal bool Process(string segID, Position3D firingNeuron, InputPatternType iType)
         {
             Segment s = GetSegment(segID);
-            if(s.Predict(NEURONAL_FIRE_VOLTAGE, firingNeuron))
+            if(s.Process(NEURONAL_FIRE_VOLTAGE, firingNeuron, iType))
             {
                 _predictedSegments.Add(s);
                 s.FlushVoltage();                

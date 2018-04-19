@@ -42,7 +42,7 @@ namespace HTM.Models
                 }
 
             return toReturn;
-        }
+        }        
 
         public bool IsUnionTo(SDR sdr)
         {

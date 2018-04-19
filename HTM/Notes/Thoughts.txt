@@ -23,7 +23,11 @@ CONNECTION METHODOLOGY : A Neuron doesnt give a fuck about connectivity and how 
 Problem : How to make regions and neurons accept basal , temporal and apical  ?
 Answer : Every Neuron in the region will have a certain percent of there dendritic segments dedicated to a specific signal type , like apical dendrites will only connect to apical inputs and temporal to temporal and so on
 
-
+1. Read the problem several times until you can explain it to someone else
+2. Solve the problem manually
+3. Make your manual solution better
+4. Write pseudo code
+5. Replace pseudo-code with real code
 
 WorkFlow:
 

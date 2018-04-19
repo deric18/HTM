@@ -124,13 +124,7 @@ namespace HTM
             {
                 foreach(var column in columnArray)
                 {
-                    foreach(var neuron in column.Neurons)
-                    {
-                        if(neuron.State.Equals(NeuronState.FIRED)
-                        {
-                            toReturn += "1";
-                        }
-                    }
+                    toReturn += column.GetFiringCellRepresentation();
                 }
             }
 
@@ -139,7 +133,8 @@ namespace HTM
         
         private void Grow()
         {
-            //Give a predict
+            //Give a GROW SIGNAL around the network 
+            //Can always be tweaked and policies may be constructed for sending these signals based on how much a neuron/Segment has contributed.
         }
         
          
@@ -181,11 +176,12 @@ namespace HTM
                     {
                         //Bursts all the time
                         //Travel through the apical lines and add them to longpredictedlist , give them apical voltage.
+
                         break;
                     }
                 default:break;
             }                        
-        }
+        }       
 
         private IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
         {
@@ -209,6 +205,11 @@ namespace HTM
         private Column GetSpatialColumn(Position2D position) => Columns[position.X][position.Y];
 
         private Neuron GetNeuronFromPosition(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
+
+        private Column GetTemporalColumn(Position2D pos)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
     }

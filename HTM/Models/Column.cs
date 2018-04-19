@@ -27,5 +27,22 @@ namespace HTM.Models
         }
 
         public List<Neuron> GetPredictedCells => Neurons.Where(pos => pos.State == NeuronState.PREDICTED).ToList();        
+
+        public string GetFiringCellRepresentation()
+        {
+            string toReturn = null;
+            foreach(var neuron in Neurons)
+            {
+                if(neuron.State.Equals(NeuronState.FIRED))
+                {
+                    toReturn += "1";
+                }
+                else
+                {
+                    toReturn += "0";
+                }
+            }
+            return toReturn;
+        }
     }
 }
