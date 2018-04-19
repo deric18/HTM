@@ -83,25 +83,58 @@ namespace HTM
                     {
                         //Fetch the columns to fire and decide if to burst the whole column or fire specific neurons
                         //Fire the neurons and update predicted list
-                        List<Position2D> firingColumns = inputPattern.GetActivePositions();
+                        List<Position2D> firingPositions = inputPattern.GetActivePositions();
 
-                        foreach(var col in firingColumns)
-                        {
-                            ProcessColumn(col);
-                        }
+                        foreach(var col in firingPositions)
+                        {                            
+                            instance.ProcessColumn(col, iType);
+                        } 
                         break;
                     }
                 case InputPatternType.TEMPORAL:
                     {
                         //Fetch , Fire , Update
+                        List<Position2D> firingPositions = inputPattern.GetActivePositions();
+
+                        foreach (var col in firingPositions)
+                        {
+                            instance.ProcessColumn(col, iType);
+                        }
                         break;
                     }                    
                 case InputPatternType.APICAL:
                     {
                         //Fetch , Fire , Update
+                        List<Position2D> firingPositions = inputPattern.GetActivePositions();
+
+                        foreach (var col in firingPositions)
+                        {
+                            instance.ProcessColumn(col, iType);
+                        }
                         break;
                     }
             }            
+        }
+
+        public string Predict()
+        {
+            string toReturn = null;
+
+            foreach(var columnArray in Columns)
+            {
+                foreach(var column in columnArray)
+                {
+                    foreach(var neuron in column.Neurons)
+                    {
+                        if(neuron.State.Equals(NeuronState.FIRED)
+                        {
+                            toReturn += "1";
+                        }
+                    }
+                }
+            }
+
+            return toReturn;
         }
         
         private void Grow()
@@ -109,7 +142,7 @@ namespace HTM
             //Give a predict
         }
         
-
+         
         private void ProcessColumn(Position2D pos, InputPatternType iType)
         {
             //check for predicted cells in the column and decide whther to burst or not
@@ -119,7 +152,7 @@ namespace HTM
             {
                 case InputPatternType.SPATIAL:
                     {
-                        Column col = GetColumn(pos);
+                        Column col = GetSpatialColumn(pos);
 
                         List<Neuron> predictedCells = col.GetPredictedCells;
 
@@ -141,6 +174,7 @@ namespace HTM
                     {
                         //Bursts all the time
                         //Travel through the axonal line laterally and add them to longpredicted list , give them temporal voltage
+                        Column col = GetTemporalColumn(pos);
                         break;
                     }
                 case InputPatternType.APICAL:
@@ -172,7 +206,7 @@ namespace HTM
 
         #region HELPER METHODS 
 
-        private Column GetColumn(Position2D position) => Columns[position.X][position.Y];
+        private Column GetSpatialColumn(Position2D position) => Columns[position.X][position.Y];
 
         private Neuron GetNeuronFromPosition(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
 
