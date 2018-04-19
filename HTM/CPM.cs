@@ -49,7 +49,9 @@ namespace HTM
             instance.Width = width;
             instance.State = CPMState.RESTING;
             instance.HasSpatialSignal = false;
-            instance.HasTemporalSignal = false;            
+            instance.HasTemporalSignal = false;
+            instance._longPredictedList = new List<Neuron>();
+            instance._shortPredictedList = new List<Neuron>();
 
             try
             {
@@ -214,3 +216,4 @@ namespace HTM
         #endregion
     }
 }
+    
