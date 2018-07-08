@@ -9,6 +9,13 @@
 	2.Process workcycle.
 -Supports some analysis functions for network analysis.
 
+-Neuron:
+	1.Should be able to accept input(spatial,apical /temporal) and update its internal state
+	2.Update internal connections after each fire and send grow signals to all segments.
+
+-Segment:
+	1.
+
 
 Launcher:
 -Workflow management of CPM : 

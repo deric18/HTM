@@ -9,6 +9,7 @@ namespace HTM.Models
     /// </summary>
     public class Neuron
     {
+        private uint _voltage;
         public Position3D NeuronID { get; private set; }
         public NeuronState State { get; private set; }
         public Dictionary<int, Segment> Segments { get; private set; }      //index of each connection
@@ -36,8 +37,9 @@ namespace HTM.Models
         }        
 
         internal List<Position3D> Fire()
-        { 
-            //return all the connected segment ids
+        {
+            //return all the connected segment ids     
+            _voltage = 0;
             return AxonList;
         }               
 

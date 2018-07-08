@@ -116,13 +116,8 @@ namespace HTM
                         break;
                     }
             }            
-        }
-
-        private void ComputeFire()
-        {
-            //Order the cells wrt the highest potential and pick the ones at the top.
-        }
-
+        }        
+        
         public string Predict()
         {
             string toReturn = null;
@@ -139,7 +134,7 @@ namespace HTM
         }
         
         private void Grow()
-        {
+        {//ToDo
             //Give a GROW SIGNAL around the network 
             //Can always be tweaked and policies may be constructed for sending these signals based on how much a neuron/Segment has contributed.
         }
