@@ -118,15 +118,15 @@ namespace HTM
             }            
         }        
         
-        public string Predict()
+        public SDR Predict()
         {
-            string toReturn = null;
+            SDR toReturn = null;
 
             foreach(var columnArray in Columns)
             {
                 foreach(var column in columnArray)
                 {
-                    toReturn += column.GetFiringCellRepresentation();
+                    //toReturn += column.GetFiringCellRepresentation();
                 }
             }
 

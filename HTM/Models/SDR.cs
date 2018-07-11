@@ -6,7 +6,8 @@ namespace HTM.Models
     {
         public int Length { get; private set; }
         public int Breadth { get; private set; }
-        public bool[][] Contents { get; private set; }
+        public bool[][] _contents {get; private set; }
+        public List<Position2D> GetActivePositions { get; private set; }
 
         public int Size()
         {
@@ -23,38 +24,39 @@ namespace HTM.Models
             SDR toReturn = new SDR();
             toReturn.Length = length;
             toReturn.Breadth = breadth;
-            Contents = new bool[length][];
+            _contents = new bool[length][];
+            GetActivePositions = new List<Position2D>();
+        }       
+
+        public SDR(string s,int length, int breadth)
+        {
+            Length = length;
+            Breadth = breadth;
+            _contents = new bool[length][];
+            GetActivePositions = new List<Position2D>();
+            for (int i = 0; i < length; i++)
+                for (int j = 0; j < breadth; j++)
+                {
+                    _contents[i][j] = s[i + j].Equals(0) ? false : true; GetActivePositions.Add(new Position2D((uint)i, (uint)j));
+                }
         }
 
-        public List<Position2D> GetActivePositions()
+        public bool IsUnionTo(SDR sdr1, SDR sdr2)
         {
-            List<Position2D> toReturn = new List<Position2D>();            
-
-            for (uint i=0; i < Length; i++)
-                for(uint j=0; j < Breadth; j++)
+            if (sdr1.Length != sdr2.Length || sdr1.Breadth != sdr2.Breadth)
+            {
+                throw new System.Exception("Invalid SDR- Dimensions");
+            }                        
+            
+            foreach(var pos in sdr1.GetActivePositions)
+            {
+                if(!sdr2._contents[pos.X][pos.Y])
                 {
-                    Position2D p;
-                    if (Contents[i][j])
-                    {
-                        p = new Position2D(i, j);
-                        toReturn.Add(p);
-                    }
+                    return false;
                 }
+            }
 
-            return toReturn;
-        }        
-
-        public bool IsUnionTo(SDR sdr)
-        {
-            bool flag = true;
-            for(int i = 0; i < sdr.Length; i++)
-                for(int j = 0; j < sdr.Breadth; j++)
-                    if(sdr.Contents[i][j])
-                    {
-                        if (!Contents[i][j])
-                            flag = false;
-                    }
-            return flag;
+            return true;
         }        
     }
 }
