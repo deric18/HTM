@@ -38,6 +38,9 @@ namespace HTM
         public Column[][] Columns { get; private set; }
         private List<Neuron> _longPredictedList;
         private List<Neuron> _shortPredictedList;
+        private bool _readySpatial;
+        private bool _readyTemporal;
+        private bool _readyApical;
         
         public bool HasTemporalSignal { get; private set; }
         public bool HasSpatialSignal { get; private set; }        
@@ -52,6 +55,9 @@ namespace HTM
             instance.HasTemporalSignal = false;
             instance._longPredictedList = new List<Neuron>();
             instance._shortPredictedList = new List<Neuron>();
+            instance._readyApical = false;
+            instance._readyTemporal = true;
+            instance._readySpatial = false;
 
             try
             {
@@ -85,34 +91,48 @@ namespace HTM
                     {
                         //Fetch the columns to fire and decide if to burst the whole column or fire specific neurons
                         //Fire the neurons and update predicted list
-                        List<Position2D> firingPositions = inputPattern.GetActivePositions();
+                        if (!_readySpatial)
+                            throw new Exception("Invalid Input Pattern Type");
+
+                        List<Position2D> firingPositions = inputPattern.GetActivePositions;
 
                         foreach(var col in firingPositions)
                         {                            
-                            instance.ProcessColumn(col, iType);
-                        } 
+                            instance.ProcessSpatialColumn(col, iType);
+                        }
+                        _readySpatial = false;
+                        _readyApical = true;
                         break;
                     }
                 case InputPatternType.TEMPORAL:
                     {
                         //Fetch , Fire , Update
-                        List<Position2D> firingPositions = inputPattern.GetActivePositions();
+                        if (!_readyTemporal)
+                            throw new Exception("Invalid Input Pattern Type");
+                        List<Position2D> firingPositions = inputPattern.GetActivePositions;
 
                         foreach (var col in firingPositions)
                         {
-                            instance.ProcessColumn(col, iType);
+                            instance.ProcessTemporalColumn(col, iType);
                         }
+                        _readySpatial = true;
+                        _readyTemporal = false;
                         break;
                     }                    
                 case InputPatternType.APICAL:
                     {
                         //Fetch , Fire , Update
-                        List<Position2D> firingPositions = inputPattern.GetActivePositions();
+                        if (!_readyApical)
+                            throw new Exception("Invalid Input Pattern Type");
+
+                        List<Position2D> firingPositions = inputPattern.GetActivePositions;
 
                         foreach (var col in firingPositions)
                         {
-                            instance.ProcessColumn(col, iType);
+                            instance.ProcessSpatialColumn(col, iType);
                         }
+                        _readyApical = false;
+                        _readyTemporal = true;
                         break;
                     }
             }            
