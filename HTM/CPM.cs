@@ -85,7 +85,7 @@ namespace HTM
                     {
                         //Fetch the columns to fire and decide if to burst the whole column or fire specific neurons
                         //Fire the neurons and update predicted list
-                        List<Position2D> firingPositions = inputPattern.GetActivePositions();
+                        List<Position2D> firingPositions = inputPattern.GetActivePositions;
 
                         foreach(var col in firingPositions)
                         {                            
@@ -96,7 +96,7 @@ namespace HTM
                 case InputPatternType.TEMPORAL:
                     {
                         //Fetch , Fire , Update
-                        List<Position2D> firingPositions = inputPattern.GetActivePositions();
+                        List<Position2D> firingPositions = inputPattern.GetActivePositions;
 
                         foreach (var col in firingPositions)
                         {
@@ -107,7 +107,7 @@ namespace HTM
                 case InputPatternType.APICAL:
                     {
                         //Fetch , Fire , Update
-                        List<Position2D> firingPositions = inputPattern.GetActivePositions();
+                        List<Position2D> firingPositions = inputPattern.GetActivePositions;
 
                         foreach (var col in firingPositions)
                         {
@@ -132,9 +132,14 @@ namespace HTM
 
             return toReturn;
         }
+
+        private List<Neuron> GetTemporalColumn(Position2D pos)
+        {
+
+        }
         
         private void Grow()
-        {//ToDo
+        {   //ToDo
             //Give a GROW SIGNAL around the network 
             //Can always be tweaked and policies may be constructed for sending these signals based on how much a neuron/Segment has contributed.
         }

@@ -21,11 +21,7 @@ namespace HTM.Models
             }
         }
 
-        public Neuron GetNeuron(int z)
-        {
-            return Neurons[z];
-        }
-
+        public Neuron GetNeuron(int z) => Neurons[z];               
 
         public List<Neuron> GetPredictedCells => Neurons.Where(pos => pos.State == NeuronState.PREDICTED).ToList();        
 

@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using HTM.Interfaces;
-using HTM.Models;
+﻿using HTM.Models;
+using System.Collections.Generic;
 
-namespace HTM
+namespace HTM.Encoders
 {
     public class IntegerEncoder : IEncode
     {

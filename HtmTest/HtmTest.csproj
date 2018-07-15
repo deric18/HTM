@@ -55,9 +55,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HTM\HTM.csproj">
+    <ProjectReference Include="..\HTM\HTMDomain.csproj">
       <Project>{7ec372d8-af97-46e4-b94b-ad1415c7bfd7}</Project>
-      <Name>HTM</Name>
+      <Name>HTMDomain</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

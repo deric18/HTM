@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HTM", "HTM\HTM.csproj", "{7EC372D8-AF97-46E4-B94B-AD1415C7BFD7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HTMDomain", "HTM\HTMDomain.csproj", "{7EC372D8-AF97-46E4-B94B-AD1415C7BFD7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmTest", "HtmTest\HtmTest.csproj", "{FBEB44DD-8D63-431C-AD53-FFB930D9FE48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HTMService", "HTMService\HTMService.csproj", "{0A9A4EAE-E8AC-4E2E-9FED-CD5059D6BA6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{FBEB44DD-8D63-431C-AD53-FFB930D9FE48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBEB44DD-8D63-431C-AD53-FFB930D9FE48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBEB44DD-8D63-431C-AD53-FFB930D9FE48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A9A4EAE-E8AC-4E2E-9FED-CD5059D6BA6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A9A4EAE-E8AC-4E2E-9FED-CD5059D6BA6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A9A4EAE-E8AC-4E2E-9FED-CD5059D6BA6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A9A4EAE-E8AC-4E2E-9FED-CD5059D6BA6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
