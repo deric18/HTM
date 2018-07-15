@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CPM.cs" />
-    <Compile Include="Encoders\BaseEncoder.cs" />
     <Compile Include="Encoders\IntegerEncoder.cs" />
     <Compile Include="Enums\NeuronState.cs" />
     <Compile Include="Enums\CPMState.cs" />
@@ -54,6 +53,7 @@
     <Compile Include="Enums\NetworkState.cs" />
     <Compile Include="Enums\SegmentType.cs" />
     <Compile Include="IEncode.cs" />
+    <Compile Include="Interfaces\IEncode.cs" />
     <Compile Include="Models\Column.cs" />
     <Compile Include="Models\Neuron.cs" />
     <Compile Include="Models\Position2D.cs" />

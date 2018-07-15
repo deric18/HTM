@@ -31,28 +31,23 @@ namespace HTM
             }
         }
 
-        public int Length { get; private set; }
-        public int Breadth { get; private set; }
-        public int Width { get; private set; }
+        public uint NumRows { get; private set; }
+        public uint NumColumns{ get; private set; }
+        public uint NumFiles { get; private set; }
         public CPMState State { get; private set; }
         public Column[][] Columns { get; private set; }
         private List<Neuron> _longPredictedList;
         private List<Neuron> _shortPredictedList;
         private bool _readySpatial;
         private bool _readyTemporal;
-        private bool _readyApical;
-        
-        public bool HasTemporalSignal { get; private set; }
-        public bool HasSpatialSignal { get; private set; }        
+        private bool _readyApical;                      
 
-        public static void Initialize(int length, int breadth, int width)
+        public static void Initialize(uint length, uint breadth, uint width)
         {
-            instance.Length = length;
-            instance.Breadth = breadth;
-            instance.Width = width;
-            instance.State = CPMState.RESTING;
-            instance.HasSpatialSignal = false;
-            instance.HasTemporalSignal = false;
+            instance.NumRows = length;
+            instance.NumColumns = breadth;
+            instance.NumFiles = width;
+            instance.State = CPMState.RESTING;            
             instance._longPredictedList = new List<Neuron>();
             instance._shortPredictedList = new List<Neuron>();
             instance._readyApical = false;
@@ -70,7 +65,7 @@ namespace HTM
             }
             catch(Exception e)
             {
-                Console.WriteLine("Out Of Memory Allocated for the Service via Operating System! , Please reduce the dimensions of the Neuroblock \n Length : " + length + "\nBreadth : " + breadth + "\nWidth : " + width);
+                Console.WriteLine("Out Of Memory Allocated for the Service via Operating System! , Please reduce the dimensions of the Neuroblock \n NumRows : " + length + "\n NumColumns : " + breadth + "\n NumFiles : " + width);
                 Console.WriteLine(e.Message);
                 Console.ReadKey();
                 return;
@@ -153,12 +148,7 @@ namespace HTM
             }
 
             return toReturn;
-        }
-
-        private List<Neuron> GetTemporalColumn(Position2D pos)
-        {
-
-        }
+        }        
         
         private void Grow()
         {   //ToDo
@@ -198,7 +188,8 @@ namespace HTM
                     {
                         //Bursts all the time
                         //Travel through the axonal line laterally and add them to longpredicted list , give them temporal voltage
-                        Column col = GetTemporalColumn(pos);
+                        List<Neuron> temporalColumn = GetTemporalColumn(pos);
+
                         break;
                     }
                 case InputPatternType.APICAL:
@@ -226,18 +217,27 @@ namespace HTM
 
         internal static Position3D GetBound()
         {
-            return new Position3D(int.Parse(ConfigurationManager.AppSettings["SEGMENT_XBOUND"]), int.Parse(ConfigurationManager.AppSettings["SEGMENT_YBOUND"]), int.Parse(ConfigurationManager.AppSettings["SEGMENT_ZBOUND"]));
+            return new Position3D(uint.Parse(ConfigurationManager.AppSettings["SEGMENT_XBOUND"]), uint.Parse(ConfigurationManager.AppSettings["SEGMENT_YBOUND"]), uint.Parse(ConfigurationManager.AppSettings["SEGMENT_ZBOUND"]));
         }
 
         #region HELPER METHODS 
 
         private Column GetSpatialColumn(Position2D position) => Columns[position.X][position.Y];
 
-        private Neuron GetNeuronFromPosition(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
+        private Neuron GetNeuronFromPosition(uint x, uint y, uint z) => Columns[x][y].GetNeuron(z);
 
-        private Column GetTemporalColumn(Position2D pos)
+        private Neuron GetNeuronFromPosition(Position3D pos3d) => Columns[pos3d.X][pos3d.Y].GetNeuron(pos3d.Z);
+
+        private List<Neuron> GetTemporalColumn(Position2D position2D)
         {
-            throw new NotImplementedException();
+            List<Neuron> toReturn = new List<Neuron>();
+
+            for(uint i=0; i<instance.NumColumns; i++)
+            {
+                toReturn.Add(GetNeuronFromPosition(position2D.X, i, position2D.Y));
+            }
+
+            return toReturn;
         }
 
         #endregion

@@ -14,11 +14,11 @@ namespace HTM
             CPM cpm = CPM.Instance;
 
             Console.WriteLine("Enter X:");
-            int x = Convert.ToInt32(Console.ReadLine());
+            uint x = Convert.ToUInt32(Console.ReadLine());
             Console.WriteLine("Enter Y:");
-            int y = Convert.ToInt32(Console.ReadLine());
+            uint y = Convert.ToUInt32(Console.ReadLine());
             Console.WriteLine("Enter Z:");
-            int z = Convert.ToInt32(Console.ReadLine());
+            uint z = Convert.ToUInt32(Console.ReadLine());
 
             Console.WriteLine("Initializing...");
             CPM.Initialize(x, y, z);

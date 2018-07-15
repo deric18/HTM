@@ -2,13 +2,13 @@
 {
     public class Position3D
     {       
-        public int X { get; private set; }
-        public int Y { get; private set; }
-        public int Z { get; private set; }
+        public uint X { get; private set; }
+        public uint Y { get; private set; }
+        public uint Z { get; private set; }
 
         public Position3D() { }
 
-        public Position3D(int x, int y, int z)
+        public Position3D(uint x, uint y, uint z)
         {
             X = x;
             Y = y;

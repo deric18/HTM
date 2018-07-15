@@ -1,0 +1,17 @@
+C:\HTM\HtmTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
+C:\HTM\HtmTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
+C:\HTM\HtmTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+C:\HTM\HtmTest\bin\Debug\HtmTest.dll
+C:\HTM\HtmTest\bin\Debug\HtmTest.pdb
+C:\HTM\HtmTest\bin\Debug\HTM.exe
+C:\HTM\HtmTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.dll
+C:\HTM\HtmTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll
+C:\HTM\HtmTest\bin\Debug\HTM.pdb
+C:\HTM\HtmTest\bin\Debug\HTM.exe.config
+C:\HTM\HtmTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.xml
+C:\HTM\HtmTest\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml
+C:\HTM\HtmTest\obj\Debug\HtmTest.csprojAssemblyReference.cache
+C:\HTM\HtmTest\obj\Debug\HtmTest.csproj.CoreCompileInputs.cache
+C:\HTM\HtmTest\obj\Debug\HtmTest.csproj.CopyComplete
+C:\HTM\HtmTest\obj\Debug\HtmTest.dll
+C:\HTM\HtmTest\obj\Debug\HtmTest.pdb

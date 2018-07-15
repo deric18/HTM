@@ -8,9 +8,9 @@ namespace HTM.Models
     {
         public List<Neuron> Neurons { get; private set; }
         public Position2D ID { get; private set; }
-        public int Size { get; private set; }
+        public uint Size { get; private set; }
 
-        public Column(uint x, uint y, int size)
+        public Column(uint x, uint y, uint size)
         {
             Size = size;
             ID = new Position2D(x, y);
@@ -21,7 +21,7 @@ namespace HTM.Models
             }
         }
 
-        public Neuron GetNeuron(int z) => Neurons[z];               
+        public Neuron GetNeuron(uint z) => Neurons[(int)z];               
 
         public List<Neuron> GetPredictedCells => Neurons.Where(pos => pos.State == NeuronState.PREDICTED).ToList();        
 

@@ -4,12 +4,12 @@ namespace HTM.Models
 {
     public class SDR
     {
-        public int Length { get; private set; }
-        public int Breadth { get; private set; }
+        public uint Length { get; private set; }
+        public uint Breadth { get; private set; }
         public bool[][] _contents {get; private set; }
         public List<Position2D> GetActivePositions { get; private set; }
 
-        public int Size()
+        public uint Size()
         {
             return Length * Breadth;
         }
@@ -19,7 +19,7 @@ namespace HTM.Models
 
         }
 
-        public SDR(int length, int breadth)
+        public SDR(uint length, uint breadth)
         {
             SDR toReturn = new SDR();
             toReturn.Length = length;
@@ -28,7 +28,7 @@ namespace HTM.Models
             GetActivePositions = new List<Position2D>();
         }       
 
-        public SDR(string s,int length, int breadth)
+        public SDR(string s, uint length, uint breadth)
         {
             Length = length;
             Breadth = breadth;

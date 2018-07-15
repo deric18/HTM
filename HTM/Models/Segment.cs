@@ -177,7 +177,7 @@ namespace HTM.Models
         private Position3D GetNewPositionFromBound(Position3D segmentBound)
         {
             Random r = new Random(_seed);
-            return new Position3D(r.Next(BaseConnection.X, segmentBound.X), r.Next(BaseConnection.Y, segmentBound.Y), r.Next(BaseConnection.Z, segmentBound.Z));
+            return new Position3D((uint)r.Next((int)BaseConnection.X, (int)segmentBound.X), (uint)r.Next((int)BaseConnection.Y, (int)segmentBound.Y), (uint)r.Next((int)BaseConnection.Z, (int)segmentBound.Z));
         }                   
 
         private void AddConnection(Position3D newPosition) =>
