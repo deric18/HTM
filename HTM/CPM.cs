@@ -91,17 +91,14 @@ namespace HTM
                     {
                         //Fetch the columns to fire and decide if to burst the whole column or fire specific neurons
                         //Fire the neurons and update predicted list
-<<<<<<< HEAD
-=======
                         if (!_readySpatial)
                             throw new Exception("Invalid Input Pattern Type");
 
->>>>>>> 76b967a14eb2a55acd19a6050bc570891d071cb9
                         List<Position2D> firingPositions = inputPattern.GetActivePositions;
 
                         foreach(var col in firingPositions)
                         {                            
-                            instance.ProcessSpatialColumn(col, iType);
+                            instance.ProcessColumn(col, iType);
                         }
                         _readySpatial = false;
                         _readyApical = true;
@@ -110,16 +107,14 @@ namespace HTM
                 case InputPatternType.TEMPORAL:
                     {
                         //Fetch , Fire , Update
-<<<<<<< HEAD
-=======
                         if (!_readyTemporal)
                             throw new Exception("Invalid Input Pattern Type");
->>>>>>> 76b967a14eb2a55acd19a6050bc570891d071cb9
+
                         List<Position2D> firingPositions = inputPattern.GetActivePositions;
 
                         foreach (var col in firingPositions)
                         {
-                            instance.ProcessTemporalColumn(col, iType);
+                            instance.ProcessColumn(col, iType);
                         }
                         _readySpatial = true;
                         _readyTemporal = false;
@@ -128,17 +123,15 @@ namespace HTM
                 case InputPatternType.APICAL:
                     {
                         //Fetch , Fire , Update
-<<<<<<< HEAD
-=======
+
                         if (!_readyApical)
                             throw new Exception("Invalid Input Pattern Type");
 
->>>>>>> 76b967a14eb2a55acd19a6050bc570891d071cb9
                         List<Position2D> firingPositions = inputPattern.GetActivePositions;
 
                         foreach (var col in firingPositions)
                         {
-                            instance.ProcessSpatialColumn(col, iType);
+                            instance.ProcessColumn(col, iType);
                         }
                         _readyApical = false;
                         _readyTemporal = true;
