@@ -1,6 +1,3 @@
-./HTM/.vs/*
-./HTM/obj/*
-./HTMService/.vs/*
-./HTMService/obj/*
-./HTMTest/.vs/*
-./HTMTest/obj/*
+**/obj
+**/bin
+**/.vs
