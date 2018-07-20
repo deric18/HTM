@@ -1,7 +1,0 @@
-C:\HTM\HTM\obj\Debug\HTMDomain.csprojAssemblyReference.cache
-C:\HTM\HTM\obj\Debug\HTMDomain.csproj.CoreCompileInputs.cache
-C:\HTM\HTM\obj\Debug\HTM.exe
-C:\HTM\HTM\obj\Debug\HTM.pdb
-C:\HTM\HTM\bin\Debug\HTM.exe.config
-C:\HTM\HTM\bin\Debug\HTM.exe
-C:\HTM\HTM\bin\Debug\HTM.pdb
