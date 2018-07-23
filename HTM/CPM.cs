@@ -12,7 +12,7 @@ namespace HTM
         public static volatile CPM instance;
         public static object syncRoot = new object();
 
-        private CPM() { }
+        public CPM() { }
 
         public static CPM Instance
         {
