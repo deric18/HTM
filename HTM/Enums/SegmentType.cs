@@ -2,7 +2,7 @@
 {
     public enum SegmentType
     {
-        Temporal,
-        Apical
+        Proximal,
+        Distal
     }
 }

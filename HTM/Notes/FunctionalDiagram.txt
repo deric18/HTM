@@ -14,7 +14,10 @@
 	2.Update internal connections after each fire and send grow signals to all segments.
 
 -Segment:
-	1.
+	1.Using a proximity localized random number generator creates connections with neigbhouring neurons.
+	2.updates its weights after every process , predict cycle to all its connections.
+	3.Creates new sub segments based on growth potential.
+	4.Maintains a expoenential potentiation spike to its neuron on simultaneous localised firing of its dendrites and subsegments.
 
 
 Launcher:

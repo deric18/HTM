@@ -12,17 +12,16 @@ namespace HTM.Models
     {        
         public Position3D NeuronID { get; private set; }
         public Position3D BaseConnection { get; private set; }
-        private SegmentType sType;
+        private SegmentType _isProximal;
         private uint _sumVoltage;
         private uint _temporalVoltage;
         private uint _apicalVoltage;
         public string SegmentID { get; private set; }
         private bool _hasSubSegments;        
         private bool _fullyConnected;
-        private int _seed;        
-        
+        private int _seed;                
         private List<Segment> SubSegments;
-        private Dictionary<Position3D, int> _synapticConnections;    //strength
+        private Dictionary<Position3D, int> _synapticStrength;    //strength
         private List<Position3D> __lastTimeStampFiringConnections;        
 
         public Segment(Position3D neuronId, string segmentID, Position3D baseConnection, int seed)
@@ -34,7 +33,7 @@ namespace HTM.Models
             _apicalVoltage = 0;
             _hasSubSegments = false;
             _fullyConnected = false;
-            _synapticConnections = new Dictionary<Position3D, int>();
+            _synapticStrength = new Dictionary<Position3D, int>();
             __lastTimeStampFiringConnections = new List<Position3D>();
             BaseConnection = baseConnection;
             _seed = seed;
@@ -80,11 +79,11 @@ namespace HTM.Models
                 //NMDA Spike
                 //Strengthen firing Neuron Connection.
                 int connectionStrength;
-                if(_synapticConnections.TryGetValue(firingNeuronId, out connectionStrength))
+                if(_synapticStrength.TryGetValue(firingNeuronId, out connectionStrength))
                 {
                     if (connectionStrength > int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTION_STRENGTH"]))
                         return true;
-                    _synapticConnections[firingNeuronId]++;
+                    _synapticStrength[firingNeuronId]++;
                 }
                 return true;
             }
@@ -120,7 +119,7 @@ namespace HTM.Models
             Position3D bounds = CPM.GetBound();
             Position3D newPosition = GetNewPositionFromBound(bounds);            
 
-            if ((_synapticConnections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition))
+            if ((_synapticStrength.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition))
             {
                 AddConnection(newPosition);
             }
@@ -151,12 +150,12 @@ namespace HTM.Models
         public void Prune()
         {
             //Run through synaptic list to eliminate neurons with lowest connection strength
-            foreach(var s in _synapticConnections)
+            foreach(var s in _synapticStrength)
             {
                 if(s.Value <= int.Parse(ConfigurationManager.AppSettings["PRUNE_THRESHOLD"]))
                 {
                     Console.WriteLine("Removing synapse to Neuron" + PrintPosition(s.Key));
-                    _synapticConnections.Remove(s.Key);
+                    _synapticStrength.Remove(s.Key);
                 }
             }            
 
@@ -181,7 +180,7 @@ namespace HTM.Models
         }                   
 
         private void AddConnection(Position3D newPosition) =>
-            _synapticConnections.Add(newPosition, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));                            
+            _synapticStrength.Add(newPosition, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));                            
 
         private void CreateSubSegment(Position3D basePosition)
         {
@@ -223,7 +222,7 @@ namespace HTM.Models
         private bool DoesConnectionExist(Position3D pos)
         {
             int val;
-            if(_synapticConnections.TryGetValue(pos, out val))
+            if(_synapticStrength.TryGetValue(pos, out val))
             {
                 return true;
             }
