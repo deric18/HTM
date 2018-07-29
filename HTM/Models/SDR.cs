@@ -4,11 +4,12 @@ namespace HTM.Models
 {
     public class SDR
     {
-        public int Length { get; private set; }
-        public int Breadth { get; private set; }
-        public bool[][] Contents { get; private set; }
+        public uint Length { get; private set; }
+        public uint Breadth { get; private set; }
+        public bool[][] _contents {get; private set; }
+        public List<Position2D> GetActivePositions { get; private set; }
 
-        public int Size()
+        public uint Size()
         {
             return Length * Breadth;
         }
@@ -18,44 +19,44 @@ namespace HTM.Models
 
         }
 
-        public SDR(int length, int breadth)
+        public SDR(uint length, uint breadth)
         {
             SDR toReturn = new SDR();
             toReturn.Length = length;
             toReturn.Breadth = breadth;
-            Contents = new bool[length][];
-        }
+            _contents = new bool[length][];
+            GetActivePositions = new List<Position2D>();
+        }       
 
-        public List<Position2D> GetActivePositions()
+        public SDR(string s, uint length, uint breadth)
         {
-            List<Position2D> toReturn = new List<Position2D>();            
-
-            for (uint i=0; i < Length; i++)
-                for(uint j=0; j < Breadth; j++)
+            Length = length;
+            Breadth = breadth;
+            _contents = new bool[length][];
+            GetActivePositions = new List<Position2D>();
+            for (int i = 0; i < length; i++)
+                for (int j = 0; j < breadth; j++)
                 {
-                    Position2D p = new Position2D();
-                    if (Contents[i][j])
-                    {
-                        p.X = i;
-                        p.Y = j;
-                        toReturn.Add(p);
-                    }
+                    _contents[i][j] = s[i + j].Equals(0) ? false : true; GetActivePositions.Add(new Position2D((uint)i, (uint)j));
                 }
-
-            return toReturn;
         }
 
-        public bool IsUnionTo(SDR sdr)
+        public bool IsUnionTo(SDR sdr1, SDR sdr2)
         {
-            bool flag = true;
-            for(int i = 0; i < sdr.Length; i++)
-                for(int j = 0; j < sdr.Breadth; j++)
-                    if(sdr.Contents[i][j])
-                    {
-                        if (!Contents[i][j])
-                            flag = false;
-                    }
-            return flag;
+            if (sdr1.Length != sdr2.Length || sdr1.Breadth != sdr2.Breadth)
+            {
+                throw new System.Exception("Invalid SDR- Dimensions");
+            }                        
+            
+            foreach(var pos in sdr1.GetActivePositions)
+            {
+                if(!sdr2._contents[pos.X][pos.Y])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }        
     }
 }

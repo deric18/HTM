@@ -1,28 +1,45 @@
-﻿using System.Collections.Generic;
+﻿using HTM.Enums;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HTM.Models
 {
     public class Column
     {
-        List<Neuron> Neurons;
-        Position2D ID;
-        private int _size;
+        public List<Neuron> Neurons { get; private set; }
+        public Position2D ID { get; private set; }
+        public uint Size { get; private set; }
 
-        public Column(uint x, uint y, int size)
+        public Column(uint x, uint y, uint size)
         {
-            _size = size;
-            ID.X = x;
-            ID.Y = y;
-            for(int i=0;i< _size; i++)
+            Size = size;
+            ID = new Position2D(x, y);
+            for(int i=0;i< Size; i++)
             {
                 Neuron n = new Neuron();
                 Neurons.Add(n);
             }
         }
 
-        public Neuron GetNeuron(int z)
+        public Neuron GetNeuron(uint z) => Neurons[(int)z];               
+
+        public List<Neuron> GetPredictedCells => Neurons.Where(pos => pos.State == NeuronState.PREDICTED).ToList();        
+
+        public string GetFiringCellRepresentation()
         {
-            return Neurons[z];
+            string toReturn = null;
+            foreach(var neuron in Neurons)
+            {
+                if(neuron.State.Equals(NeuronState.FIRED))
+                {
+                    toReturn += "1";
+                }
+                else
+                {
+                    toReturn += "0";
+                }
+            }
+            return toReturn;
         }
     }
 }

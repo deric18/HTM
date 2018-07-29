@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HTM.Models
+namespace HTMService
 {
-    public class AxonLines
+    public class Program
     {
-
+        public static void Main(string[] args)
+        {
+        }
     }
 }

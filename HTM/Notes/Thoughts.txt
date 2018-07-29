@@ -19,3 +19,19 @@ Thought Process for Justification:
 will be better for it. This idea is not that good
 CONNECTION METHODOLOGY : A Neuron doesnt give a fuck about connectivity and how many connections it makes , all it cares about is expressing its own shape , it will keep on growing and growing and express its shape.
 -All segments must maintain a local table of firing rate of the all of its sub components including typical single synapses and sub segments and after timelapse should update weights accordingly.
+
+Problem : How to make regions and neurons accept basal , temporal and apical  ?
+Answer : Every Neuron in the region will have a certain percent of there dendritic segments dedicated to a specific signal type , like apical dendrites will only connect to apical inputs and temporal to temporal and so on
+
+1. Read the problem several times until you can explain it to someone else
+2. Solve the problem manually
+3. Make your manual solution better
+4. Write pseudo code
+5. Replace pseudo-code with real code
+
+WorkFlow:
+
+TimeStamp Based Workflow:
+1.Temporal and Apical patterns come in and cells in those columns will be added to longpredicted list and will be given temporal and apical potential respectively.
+2.Spatial Patterns comes in and picks the hottest and most ready neurons in the columns picked by spatial pattern
+3.Learning happens and Repeats.

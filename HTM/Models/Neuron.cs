@@ -9,11 +9,12 @@ namespace HTM.Models
     /// </summary>
     public class Neuron
     {
+        private uint _voltage;
         public Position3D NeuronID { get; private set; }
         public NeuronState State { get; private set; }
         public Dictionary<int, Segment> Segments { get; private set; }      //index of each connection
         private List<Segment> _predictedSegments;        
-        private List<string> AxonList;
+        private List<Position3D> AxonList;
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
 
         public Segment GetSegment(string segID)
@@ -35,16 +36,17 @@ namespace HTM.Models
             throw new InvalidOperationException("seg ID : " + segID.ToString() + " is not present");
         }        
 
-        internal List<string> Fire()
+        internal List<Position3D> Fire()
         {
-            //return all the connected segment ids
+            //return all the connected segment ids     
+            _voltage = 0;
             return AxonList;
         }               
 
-        internal bool Predict(string segID, Position3D firingNeuron)
+        internal bool Process(string segID, Position3D firingNeuron, InputPatternType iType)
         {
             Segment s = GetSegment(segID);
-            if(s.Predict(NEURONAL_FIRE_VOLTAGE, firingNeuron))
+            if(s.Process(NEURONAL_FIRE_VOLTAGE, firingNeuron, iType))
             {
                 _predictedSegments.Add(s);
                 s.FlushVoltage();                
@@ -53,16 +55,20 @@ namespace HTM.Models
             return false;
         }
 
-        internal void Grow()
+        internal void PruneConnections()
+        {
+            foreach(var s in Segments.Values)
+            {
+                s.Prune();
+            }
+        }
+
+        internal void Update()
         {        
             //Update Local
             //Send GROW signal to all connected segments
-        }               
-
-        internal void ChangeState(NeuronState state)
-        {
-            State = state;
-        }
+            //Prune Segments that have not fired for the time interval
+        }                       
 
         internal void UpdateLocal()
         {

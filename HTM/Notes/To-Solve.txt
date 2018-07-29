@@ -1,0 +1,5 @@
+﻿1.Dimensionality Demultiplexing and Dimensionality Multiplexing (when inputs from a lower layer has to be fed to a higer layer is solved.
+Answer : There is no input Multiplexing and demultiplexing , this is the base concept of Sparse Distributed Representation where you dont have to choose too many connections to get the flavour of the SDR).
+
+
+2.Exponential Dendritic Segment Potentiation is not yet implemented.
