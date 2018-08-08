@@ -46,7 +46,7 @@ namespace HTM.Models
                 return SubSegments[v];
             }
 
-            throw new InvalidOperationException("seg ID : " + v.ToString() + " is not present");
+            return null;
         }
 
         /// <summary>
