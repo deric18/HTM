@@ -14,11 +14,11 @@ namespace HTM
             CPM cpm = CPM.GetInstance;
             Encoder intEncoder = new Encoder();
 
-            Console.WriteLine("Enter X:");
+            Console.WriteLine("Enter lenth of the block:");
             uint x = Convert.ToUInt32(Console.ReadLine());
-            Console.WriteLine("Enter Y:");
+            Console.WriteLine("Enter breadth of the block:");
             uint y = Convert.ToUInt32(Console.ReadLine());
-            Console.WriteLine("Enter Z:");
+            Console.WriteLine("Enter width of the block:");
             uint z = Convert.ToUInt32(Console.ReadLine());
 
             Console.WriteLine("Initializing...");
@@ -32,17 +32,16 @@ namespace HTM
             //Set Up Apical Input Pattern Source
 
 
-            Bitmap B = new Bitmap("../../Pictures/a.png");
+            Bitmap B = GetInput();
 
             int size = B.Width * B.Height;
             int connectionfraction = Convert.ToInt32(ConfigurationSettings.AppSettings.Get("ConnectionFraction"));
-
-            SDR inputsdr = new SDR(x,y);
 
             /*
              -Join - Associate each of the pixel with its nearby neibhours in its SDR 
              -Set - Associate each of the pixel value in the image to its corresponding attached bits in SDR              
             */
+
 
       
             for (int i = 0; i < B.Width; i++)
@@ -69,10 +68,7 @@ namespace HTM
                                         0,
                                         0,
                                         Screen.PrimaryScreen.Bounds.Size,
-                                        CopyPixelOperation.SourceCopy);
-
-            // Save the screenshot to the specified path that the user has chosen.
-            //bmpScreenshot.Save("Screenshot.png", ImageFormat.Png);
+                                        CopyPixelOperation.SourceCopy);                        
 
             return bmpScreenshot;
         }
