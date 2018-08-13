@@ -14,7 +14,7 @@ namespace HTM
 
         public CPM() { }
 
-        public static CPM Instance
+        public static CPM GetInstance
         {
             get
             {

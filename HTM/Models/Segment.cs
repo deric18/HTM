@@ -107,30 +107,26 @@ namespace HTM.Models
         /// 1.A Segment should have direction it grows and by default will have limits set to how far away the segment can predict its new connection.
         /// </summary>
         private void AddNewLocalConnection()
-        {
-            ///Should decide on its own to whether to add a new connection or not ?
+        {            
             //Make sure you are not connecting to an axon of your own neuron if its a new position
-            /*Decide how to add new connection : Check if there is any sub segments performing really well , if yes send grow signal to it
-             * else check for any local connections to the segment which is performing really well 
-             * else grow a new connection locally randomly.
+            /*Decide how to add new connection : Randomly pick connections from the segments local visibility radius and connect.
             */
             //If not branched and position is noand check if segment has max positions , add this position to a possibility list for future connection when the neuron losses and non used connection else if not max position then add new position,
             //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.  
             Position3D bounds = CPM.GetBound();
             Position3D newPosition = GetNewPositionFromBound(bounds);            
 
-            if ((_synapticStrength.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition))
+            if (!_fullyConnected && (_synapticStrength.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition))
             {
                 AddConnection(newPosition);
             }
-            else if(SubSegments?.Count < int.Parse(ConfigurationManager.AppSettings["MAX_SEGMENTS_PER_NEURON"]) && !DoesSubSegmentExist(newPosition))
+            else if(!_fullyConnected && SubSegments?.Count < int.Parse(ConfigurationManager.AppSettings["MAX_SEGMENTS_PER_NEURON"]) && !DoesSubSegmentExist(newPosition))
             {                
                 CreateSubSegment(newPosition);
             }
             else
             {
-                Console.WriteLine("Segment " + PrintPosition(NeuronID) + SegmentID + " is Over Connected");
-                Console.ReadKey();
+                Console.WriteLine("Segment " + PrintPosition(NeuronID) + "-" + SegmentID + " is Over Connected");                
                 _fullyConnected = true;
                 //log Information with details , Segment has reached a peak connection pathway , this is essentially a crucial segment for the whole region.
             }            

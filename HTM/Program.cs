@@ -11,7 +11,8 @@ namespace HTM
     {
         static void Main(string[] args)
         {
-            CPM cpm = CPM.Instance;
+            CPM cpm = CPM.GetInstance;
+            Encoder intEncoder = new Encoder();
 
             Console.WriteLine("Enter X:");
             uint x = Convert.ToUInt32(Console.ReadLine());
