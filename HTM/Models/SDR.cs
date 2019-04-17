@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using HTM.Enums;
+using System.Collections.Generic;
 
 namespace HTM.Models
 {
@@ -6,7 +7,8 @@ namespace HTM.Models
     {
         public uint Length { get; private set; }
         public uint Breadth { get; private set; }
-        public bool[][] _contents {get; private set; }
+        public bool[][] _contents { get; private set; }
+        public InputPatternType iType { get; private set; }
         public List<Position2D> GetActivePositions { get; private set; }
 
         public uint Size()

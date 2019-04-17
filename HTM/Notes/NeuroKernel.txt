@@ -14,3 +14,4 @@ SEQUENCE MEMORY:
 CONFIGURABLE NETWORKS : You can configure the number of neurons in the cube.
 
 FLEXIBLE : Killing off few neurons wont hurt the system, unless you remove a sizeable say 40% of the neuronal network.
+

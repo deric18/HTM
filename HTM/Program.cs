@@ -3,7 +3,6 @@ using System.Configuration;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using HTM.Models;
 
 namespace HTM
 {
@@ -11,8 +10,7 @@ namespace HTM
     {
         static void Main(string[] args)
         {
-            CPM cpm = CPM.GetInstance;
-            Encoder intEncoder = new Encoder();
+            CPM cpm = CPM.GetInstance;            
 
             Console.WriteLine("Enter lenth of the block:");
             uint x = Convert.ToUInt32(Console.ReadLine());
@@ -48,9 +46,7 @@ namespace HTM
                 for (int j = 0; j < B.Height; j++)
                 {
 
-                }
-
-            Bitmap bmp = GetInput();
+                }            
         }
 
         public static Bitmap GetInput()

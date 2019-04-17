@@ -78,9 +78,9 @@ namespace HTM
         /// </summary>
         /// <param name="inputPattern"></param>
         /// <param name="iType"></param>
-        public void Process(SDR inputPattern, InputPatternType iType)
+        public void Process(SDR inputPattern)
         {
-            switch(iType)
+            switch(inputPattern.iType)
             {
                 case InputPatternType.SPATIAL:
                     {
@@ -93,7 +93,7 @@ namespace HTM
 
                         foreach(var col in firingPositions)
                         {                            
-                            instance.ProcessColumn(col, iType);
+                            instance.ProcessColumn(col, inputPattern.iType);
                         }
                         _readySpatial = false;
                         _readyApical = true;
@@ -109,7 +109,7 @@ namespace HTM
 
                         foreach (var col in firingPositions)
                         {
-                            instance.ProcessColumn(col, iType);
+                            instance.ProcessColumn(col, inputPattern.iType);
                         }
                         _readySpatial = true;
                         _readyTemporal = false;
@@ -126,7 +126,7 @@ namespace HTM
 
                         foreach (var col in firingPositions)
                         {
-                            instance.ProcessColumn(col, iType);
+                            instance.ProcessColumn(col, inputPattern.iType);
                         }
                         _readyApical = false;
                         _readyTemporal = true;
