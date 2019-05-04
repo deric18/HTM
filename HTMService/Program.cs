@@ -13,15 +13,15 @@ namespace HTMService
         {
             CPM cpm = CPM.GetInstance;
 
-            Console.WriteLine("Enter lenth of the block:");
-            uint x = Convert.ToUInt32(Console.ReadLine());
-            Console.WriteLine("Enter breadth of the block:");
-            uint y = Convert.ToUInt32(Console.ReadLine());
-            Console.WriteLine("Enter width of the block:");
-            uint z = Convert.ToUInt32(Console.ReadLine());
+            //Console.WriteLine("Enter lenth of the block:");
+            //uint x = Convert.ToUInt32(Console.ReadLine());
+            //Console.WriteLine("Enter breadth of the block:");
+            //uint y = Convert.ToUInt32(Console.ReadLine());
+            //Console.WriteLine("Enter width of the block:");
+            //uint z = Convert.ToUInt32(Console.ReadLine());
 
-            Console.WriteLine("Initializing...");
-            CPM.Initialize(x, y, z);
+            //Console.WriteLine("Initializing...");
+            //CPM.Initialize(x, y, z);
             Console.WriteLine("Done.");
 
             //Set Up Spatial Input pattern Source
@@ -32,6 +32,8 @@ namespace HTMService
 
 
             Bitmap B = GetInput();
+            Color c = B.GetPixel(10, 10);
+            
 
             int size = B.Width * B.Height;
             int connectionfraction = Convert.ToInt32(ConfigurationSettings.AppSettings.Get("ConnectionFraction"));
@@ -71,4 +73,4 @@ namespace HTMService
         }
     }
 }
-}
+

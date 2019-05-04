@@ -7,16 +7,12 @@ namespace HTM.Models
     {
         public uint Length { get; private set; }
         public uint Breadth { get; private set; }
-        public bool[][] _contents { get; private set; }
-        public InputPatternType iType { get; private set; }
-        public List<Position2D> GetActivePositions { get; private set; }
+        public List<Position2D> ActiveBits { get; private set; }
+        public InputPatternType iType { get; private set; }        
 
-        public uint Size()
-        {
-            return Length * Breadth;
-        }
+        public uint Size() => Length * Breadth;        
 
-        public SDR()
+        private SDR()
         {
 
         }
@@ -26,33 +22,29 @@ namespace HTM.Models
             SDR toReturn = new SDR();
             toReturn.Length = length;
             toReturn.Breadth = breadth;
-            _contents = new bool[length][];
-            GetActivePositions = new List<Position2D>();
+            ActiveBits = new List<Position2D>();            
         }       
 
         public SDR(string s, uint length, uint breadth)
         {
             Length = length;
             Breadth = breadth;
-            _contents = new bool[length][];
-            GetActivePositions = new List<Position2D>();
+            ActiveBits = new List<Position2D>();            
             for (int i = 0; i < length; i++)
                 for (int j = 0; j < breadth; j++)
                 {
-                    _contents[i][j] = s[i + j].Equals(0) ? false : true; GetActivePositions.Add(new Position2D((uint)i, (uint)j));
+                    
                 }
         }
 
         public bool IsUnionTo(SDR sdr1, SDR sdr2)
         {
-            if (sdr1.Length != sdr2.Length || sdr1.Breadth != sdr2.Breadth)
-            {
-                throw new System.Exception("Invalid SDR- Dimensions");
-            }                        
+            if (sdr1.Length != sdr2.Length || sdr1.Breadth != sdr2.Breadth)           
+                return false;          
             
-            foreach(var pos in sdr1.GetActivePositions)
+            foreach(var pos in ActiveBits)
             {
-                if(!sdr2._contents[pos.X][pos.Y])
+                if(!sdr2.ActiveBits[pos.X][pos.Y])
                 {
                     return false;
                 }

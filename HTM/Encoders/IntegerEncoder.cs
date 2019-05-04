@@ -1,12 +1,11 @@
-﻿using HTM.Interfaces;
-using HTM.Models;
+﻿using HTM.Models;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 
 namespace HTM.Encoders
 {
-    public class PixelEncoder
+    public class IntegerEncoder
     {
         private int _numberOfPossibilities;
         private int _sdrLengthRequired;
@@ -14,15 +13,14 @@ namespace HTM.Encoders
         private CPM _cpm;
         private Random rnd;
 
-        public PixelEncoder()
+        public IntegerEncoder()
         {
             _cpm = CPM.GetInstance;
             rnd = new Random();
         }
 
-        public SDR SparsifyInput(List<Color> inputs)
-        {
-            SDR toReturn = new SDR();
+        public SDR SparsifyInput(List<uint> inputs)
+        {            
             throw new System.NotImplementedException();
         }
     }

@@ -1,0 +1,3 @@
+﻿Encoders are responsible for taking scalar values like integer , char , bool or string to diverse potential space
+----------------------------------------------------------------------------------------
+potential space size

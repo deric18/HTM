@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Notes\Architecture.txt" />
+    <Content Include="Notes\Encoder.txt" />
     <Content Include="Notes\FunctionalDiagram.txt" />
     <Content Include="Notes\NeuroKernel.txt" />
     <Content Include="Notes\Regional_api_guidelines.txt" />
