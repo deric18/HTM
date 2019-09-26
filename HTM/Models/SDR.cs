@@ -37,9 +37,9 @@ namespace HTM.Models
                 }
         }
 
-        public bool IsUnionTo(SDR sdr1, SDR sdr2)
+        public bool IsUnionTo(SDR uniounTo, SDR uniounFrom)
         {
-            if (sdr1.Length != sdr2.Length || sdr1.Breadth != sdr2.Breadth)           
+            if (uniounTo.Length != uniounFrom.Length || uniounTo.Breadth != uniounFrom.Breadth)           
                 return false;          
             
             foreach(var pos in ActiveBits)

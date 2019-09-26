@@ -23,7 +23,7 @@ namespace HTM
                     lock (syncRoot)
                     {
                         if (instance == null)
-                            instance = new CPM();
+                            instance = new CPM();   
                     }
                 }
 

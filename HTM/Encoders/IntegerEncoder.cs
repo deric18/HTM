@@ -6,20 +6,20 @@ using System.Drawing;
 namespace HTM.Encoders
 {
     public class IntegerEncoder
-    {
-        private int _numberOfPossibilities;
-        private int _sdrLengthRequired;
-        private SDR _outputSdr;
-        private CPM _cpm;
+    {        
+        private int _w;
+        private int _r;
+        private SDR _outputSdr;        
         private Random rnd;
 
-        public IntegerEncoder()
+        public IntegerEncoder(int W, int R)
         {
-            _cpm = CPM.GetInstance;
+            _w = W;
+            _r = R;
             rnd = new Random();
         }
 
-        public SDR SparsifyInput(List<uint> inputs)
+        public SDR SparsifyInput(uint inputs)
         {            
             throw new System.NotImplementedException();
         }
