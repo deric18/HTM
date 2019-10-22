@@ -7,15 +7,15 @@ namespace HTM.Encoders
 {
     public class IntegerEncoder
     {        
+        private int _n
         private int _w;
-        private int _r;
         private SDR _outputSdr;        
         private Random rnd;
 
-        public IntegerEncoder(int W, int R)
+        public IntegerEncoder(int N, int W)
         {
+            _n = N;
             _w = W;
-            _r = R;
             rnd = new Random();
         }
 

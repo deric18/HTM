@@ -1,4 +1,8 @@
-﻿Connection Point Manager :
+﻿Neuron :
+Segment :
+Synapse :
+
+Connection Point Manager :
 -Connection Point Management: 
 	1.Maintains list of all the connection points present in the system , total dendrite points and total connection points / synapse points.
 	2.Supports functionalities like processing spatial input , processing temporal or apical inputs, processing neuronal fires.
