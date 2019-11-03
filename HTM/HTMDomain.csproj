@@ -66,6 +66,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Notes\Algorithms.txt" />
     <Content Include="Notes\Encoder.txt" />
     <Content Include="Notes\FunctionalDiagram.txt" />
     <Content Include="Notes\Thoughts.txt" />

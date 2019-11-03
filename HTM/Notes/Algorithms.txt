@@ -1,0 +1,11 @@
+﻿Segment Growth Mechanism
+
+
+Algorithm :
+-The segments should follow a binary division , average space
+
+
+
+
+API:
+- j

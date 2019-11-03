@@ -93,13 +93,11 @@ namespace HTM.Models
 
         /// <summary>
         /// -Method gets called at every growth cycle        
-        /// -GrowSubSegments            : Updates all subsegments based on merit
-        /// -InternalGrowth             : Decides if a new connection could be added , adds it if it can otherwise grows an existing nicely firing connection.
+        /// 
         /// </summary>        
         public void Grow()
         {
-            AddNewLocalConnection();
-            GrowSubSegments();                        
+                              
         }       
 
         /// <summary>
