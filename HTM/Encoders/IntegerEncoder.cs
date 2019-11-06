@@ -6,8 +6,8 @@ using System.Drawing;
 namespace HTM.Encoders
 {
     public class IntegerEncoder
-    {        
-        private int _n
+    {
+        private int _n;
         private int _w;
         private SDR _outputSdr;        
         private Random rnd;

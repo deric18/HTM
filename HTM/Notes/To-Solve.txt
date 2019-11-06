@@ -12,7 +12,16 @@ Actual Problems:
 
 
 -Algorithm for Segment Growth and Vector overlapping forming synapses.
- -Every segment will have its median angle that is basically the amount of inclination it took from its base segment
+ --Every segment will have its median angle (i.e basically the amount of inclination it took from its base segment)
   and it will also have an inclination angle attribute that will be used for any new branchlings shooting out of the current branch.
+-How to decide whether a segment whould right split, left split or branch even ?
+ --🤔🤔🤔 (still Wondering) Needs to be Round Robin. 
+-How to decide when should a branch just add the next connection or branch ?
+ --
+
+
 
 ---------------------------------------------------------------------------------API-----------------------------------------------------------------------------------------------------------------
+
+
+  

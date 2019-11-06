@@ -15,7 +15,7 @@ TODO :
 -GET CPM Working
 	-Doing Predict Functionality ----------------------------------------------------------------------------------------Done.
 	-Complete fire implementation for neurons and segments.		
-		--Handle Adding New Connection for Segment growth. (AddNewConnection() and GEtNextPosition())
+		--Handle Adding New Connection for Segment growth. (AddNewConnection() and BranchSegment()) --
 	-Complete GetNextNeuron and neural growth mehanism.
 
 -Complete all models , Segment , CPM , Neuron

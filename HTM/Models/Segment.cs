@@ -10,8 +10,9 @@ namespace HTM.Models
     /// </summary>
     public class Segment
     {        
-        public Position3D NeuronID { get; private set; }
-        public Position3D BaseConnection { get; private set; }
+        public Position3D NeuronID { get; private set; }        
+        public Vector BaseConnection { get; private set; }
+        private BranchingTechnique _bType;
         private SegmentType _isProximal;
         private uint _sumVoltage;
         private uint _temporalVoltage;
@@ -23,11 +24,13 @@ namespace HTM.Models
         private List<Segment> SubSegments;
         private Dictionary<Position3D, int> _synapticStrength;    //strength
         private List<Position3D> __lastTimeStampFiringConnections;        
+        
 
-        public Segment(Position3D neuronId, string segmentID, Position3D baseConnection, int seed)
+        public Segment(Position3D neuronId, string segmentID, Vector baseVector, int seed)
         {
             NeuronID = neuronId;
             SegmentID = segmentID;
+            _bType = BranchingTechnique.BranchBinary;
             _sumVoltage = 0;
             _temporalVoltage = 0;
             _apicalVoltage = 0;
@@ -35,10 +38,43 @@ namespace HTM.Models
             _fullyConnected = false;
             _synapticStrength = new Dictionary<Position3D, int>();
             __lastTimeStampFiringConnections = new List<Position3D>();
-            BaseConnection = baseConnection;
+            BaseConnection = baseVector;
             _seed = seed;
         }
-        
+
+
+        #region Private Methods
+
+        /// <summary>
+        /// This is a General Grow Signal
+        /// Questions:
+        /// -When to branch and when to GetNewConnection
+        ///  --Role out a Round Robin.
+        /// </summary>        
+        private void SegmentGrow()
+        {
+            switch(_bType)
+            {
+                case BranchingTechnique.BranchBinary:
+                    _bType = BranchingTechnique.LeftBranch;
+                    break;
+                case BranchingTechnique.LeftBranch:
+                    _bType = BranchingTechnique.RightBranch;
+                    break;
+                case BranchingTechnique.RightBranch:
+                    _bType = BranchingTechnique.BranchBinary;
+                    break;
+                default:break;
+            }
+
+            foreach(var segment in SubSegments)
+            {
+                segment.SegmentGrow();
+            }
+        }
+
+        #endregion
+
         internal Segment GetSegment(int v)
         {
             if(v < SubSegments.Count)
@@ -89,16 +125,7 @@ namespace HTM.Models
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// -Method gets called at every growth cycle        
-        /// 
-        /// </summary>        
-        public void Grow()
-        {
-                              
-        }       
+        }               
 
         /// <summary>
         /// Boxed Growth : Direction and boxed random connection
@@ -128,18 +155,7 @@ namespace HTM.Models
                 _fullyConnected = true;
                 //log Information with details , Segment has reached a peak connection pathway , this is essentially a crucial segment for the whole region.
             }            
-        }
-
-        private void GrowSubSegments()
-        {
-            if(_hasSubSegments)
-            {
-                foreach (var segment in SubSegments)
-                {
-                    segment.Grow();
-                }
-            }                    
-        }
+        }       
 
         public void Prune()
         {
