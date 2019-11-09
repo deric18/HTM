@@ -7,21 +7,25 @@ Actual Problems:
 
 
 
--Class Definition of a vector ( position with direction)
+-Class Definition of a vector (position with direction)
  --Need 3 dimensional corodinated for the exact position of the point and also a median angle of the branch and the segments inclination for new outgrowth segments
 
 
--Algorithm for Segment Growth and Vector overlapping forming synapses.
+Algorithm for Segment Growth and Vector overlapping forming synapses:
  --Every segment will have its median angle (i.e basically the amount of inclination it took from its base segment)
   and it will also have an inclination angle attribute that will be used for any new branchlings shooting out of the current branch.
 -How to decide whether a segment whould right split, left split or branch even ?
  --🤔🤔🤔 (still Wondering) Needs to be Round Robin. 
--How to decide when should a branch just add the next connection or branch ?
+-How to decide when a segment should add the next connection or branch towards a new direction ?
  --
 
+ Temporal and Apical:
+ How will you implement Temporal and Apical Connections for FeedBack ?
 
 
----------------------------------------------------------------------------------API-----------------------------------------------------------------------------------------------------------------
+Things to keep in mind while designing the connector algorithm:
+1.Need to maintain a Connector graph to determine whether connection point is available or not whithout having to go through the entire neuron segment tree.( )
+2.How to implement temporal and apical axonal connections via this network ?
 
 
-  
+Answer : No general connection technique for all neurons to grow , each single neuron should  have its own connection schema , which it will follow for all growth puposes. (In the begining all will have similar mechanism which can be altered later as wish.)

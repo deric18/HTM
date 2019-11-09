@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using HTM.Models;
 
 namespace HTM.Algorithms
@@ -10,9 +11,9 @@ namespace HTM.Algorithms
             return new Vector();
         }
 
-        public static Tuple<Vector, Vector> BranchSegment(Segment s, Vector v)
+        public static List<Vector> BranchSegment(Segment s, Vector v)
         {            
-            return new Tuple<Vector, Vector>(new Vector(), new Vector());
+            return new List<Vector>();
         }
     }
 }
