@@ -28,4 +28,8 @@ Things to keep in mind while designing the connector algorithm:
 2.How to implement temporal and apical axonal connections via this network ?
 
 
-Answer : No general connection technique for all neurons to grow , each single neuron should  have its own connection schema , which it will follow for all growth puposes. (In the begining all will have similar mechanism which can be altered later as wish.)
+T:
+-No general connection technique for all neurons to grow , each single neuron should  have its own connection schema , which it will follow for all growth puposes. (In the begining all will have similar mechanism which can be altered later as wish.)
+-A region can get influenced by temporal connections from a different region and apical connection from another region these connection also have to be taken into account while processing any input(Also need to come up with mechanism to do that.)
+-Proximal Dendrites will have bounds on how much they can grow and only dital dendrites can grow based on the neural schema.
+
