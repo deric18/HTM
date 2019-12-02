@@ -6,17 +6,21 @@ using System.Threading.Tasks;
 
 namespace HTM.Models
 {
-    //2-Dimensional Cartesian cordinate system
-    class Position2D
+    public class SegmentID
     {
+        public uint ID { get; private set; }
         public uint X { get; private set; }
         public uint Y { get; private set; }
+        public uint Z { get; private set; }
 
+        public SegmentID() { }
 
-        public Position2D(uint x, uint y)
+        public SegmentID(uint x, uint y, uint z, uint segmentid)
         {
             X = x;
             Y = y;
-        }
+            Z = z;
+            ID = segmentid;
+        }       
     }
 }

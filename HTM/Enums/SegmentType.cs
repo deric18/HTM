@@ -3,6 +3,7 @@
     public enum SegmentType
     {
         Proximal,
-        Distal
+        Distal,
+        Apical
     }
 }

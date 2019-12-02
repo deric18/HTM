@@ -70,7 +70,16 @@ namespace HTM
                 Console.ReadKey();
                 return;
             }
-        }       
+        }
+
+
+        public Neuron GetNeuronFromPositionID(Position4D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
+        public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.X][segId.Y].GetNeuron(segId.Z);
+
+        public void AddConnection(SegmentID segId, Position4D pos)
+        {
+            GetNeuronFromSegmentID(segId).AddNewConnectionToSegment(pos, segId);
+        }
         
 
         /// <summary>
@@ -134,6 +143,8 @@ namespace HTM
                     }
             }            
         }        
+
+
         
         public SDR Predict()
         {
@@ -214,6 +225,8 @@ namespace HTM
 
             return toReturn;
         }
+
+
 
         internal static Position3D GetBound()
         {

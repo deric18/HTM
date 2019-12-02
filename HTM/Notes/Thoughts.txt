@@ -1,0 +1,5 @@
+﻿-Basically Neocortex is an organ mainly created for integrating different input senses like vision, smell, touch and so on to to be assembled together and analysed to produce useful behaviours for the eveolving organism and get good succes rate
+as a species for the animal.
+
+-Brains is designed using is a probability engine , the world is a full of patterns and to identify any pattern all it takes is to create situations inside the brain to create very specific firings representative of the actual situations out in the world
+there can be multiple different things going on in the real world but there can only be a very specific pattern that will be representative of it in the world.

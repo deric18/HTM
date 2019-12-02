@@ -4,6 +4,7 @@
     {
         RESTING,
         PREDICTED,
-        FIRED
+        FIRED,
+        SPIKING
     }
 }

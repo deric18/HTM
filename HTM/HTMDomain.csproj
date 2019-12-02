@@ -45,10 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithms\Coonector.cs" />
+    <Compile Include="Algorithms\ConnectionTable.cs" />
     <Compile Include="CPM.cs" />
     <Compile Include="Encoders\IntegerEncoder.cs" />
     <Compile Include="Enums\BranchingTechnique.cs" />
+    <Compile Include="Enums\ConnectionType - Copy.cs" />
+    <Compile Include="Enums\ConnectionType.cs" />
     <Compile Include="Enums\NeuronState.cs" />
     <Compile Include="Enums\CPMState.cs" />
     <Compile Include="Enums\InputPatternType.cs" />
@@ -58,9 +60,11 @@
     <Compile Include="Models\Column.cs" />
     <Compile Include="Models\Neuron.cs" />
     <Compile Include="Models\Position2D.cs" />
+    <Compile Include="Models\Position4D.cs" />
     <Compile Include="Models\Position3D.cs" />
     <Compile Include="Models\SDR.cs" />
     <Compile Include="Models\Segment.cs" />
+    <Compile Include="Models\SegmentID.cs" />
     <Compile Include="Models\Vector.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -71,6 +75,8 @@
   <ItemGroup>
     <Content Include="Notes\Encoder.txt" />
     <Content Include="Notes\FunctionalDiagram.txt" />
+    <Content Include="Notes\Paper.txt" />
+    <Content Include="Notes\Thoughts.txt" />
     <Content Include="Notes\TO-DO.txt" />
     <Content Include="Notes\To-Solve.txt" />
   </ItemGroup>

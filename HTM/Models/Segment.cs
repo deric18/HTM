@@ -6,40 +6,43 @@ using HTM.Enums;
 namespace HTM.Models
 {
     /// <summary>
-    /// Process, Grow
+    /// -If Proximal Polarization  of the system
+    /// -NMDA
+    /// -Segment Growth.
     /// </summary>
     public class Segment
-    {        
-        public Position3D NeuronID { get; private set; }        
+    {                
         public Vector BaseConnection { get; private set; }
         private BranchingTechnique _bType;
-        private SegmentType _isProximal;
+        private SegmentType sType;
         private uint _sumVoltage;
         private uint _temporalVoltage;
         private uint _apicalVoltage;
-        public string SegmentID { get; private set; }
-        private bool _hasSubSegments;        
-        private bool _fullyConnected;
-        private int _seed;                
+        private uint _internalVoltage;
+        public SegmentID SegmentId { get; private set; }        
+        private bool _fullyConnected;          
         private List<Segment> SubSegments;
-        private Dictionary<Position3D, int> _synapticStrength;    //strength
-        private List<Position3D> __lastTimeStampFiringConnections;        
+        private Dictionary<Position4D, uint> _connections;    //strength
+        private List<Position4D> _predictedSynapses;
+        private static uint NMDA_Spike_Potential;
+        private static uint MAX_Connection_Strength;
+        private static uint NEW_SYNAPSE_CONNECTION_DEF;
         
 
-        public Segment(Position3D neuronId, string segmentID, Vector baseVector, int seed)
-        {
-            NeuronID = neuronId;
-            SegmentID = segmentID;
+        public Segment(SegmentID segmentID, Vector baseVector, int seed)
+        {            
+            SegmentId = segmentID;
             _bType = BranchingTechnique.BranchBinary;
             _sumVoltage = 0;
             _temporalVoltage = 0;
-            _apicalVoltage = 0;
-            _hasSubSegments = false;
+            _apicalVoltage = 0;            
             _fullyConnected = false;
-            _synapticStrength = new Dictionary<Position3D, int>();
-            __lastTimeStampFiringConnections = new List<Position3D>();
+            _connections = new Dictionary<Position4D, uint>();
+            _predictedSynapses = new List<Position4D>();
             BaseConnection = baseVector;
-            _seed = seed;
+            NMDA_Spike_Potential = uint.Parse(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]);
+            MAX_Connection_Strength = uint.Parse(ConfigurationManager.AppSettings["MAX_CONNECTION_STRENGTH"]);
+            NEW_SYNAPSE_CONNECTION_DEF = uint.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]);
         }
 
 
@@ -85,16 +88,26 @@ namespace HTM.Models
             return null;
         }
 
+        internal void AddNewConnection(Position4D pos)
+        {
+            _connections.Add(pos, 5);
+        }
+
         /// <summary>
         /// Predict if the segment will fire or not based incoming voltage
         /// </summary>
         /// <param name="voltage"></param>
         /// <param name="firingNeuronId"></param>
         /// <returns></returns>
-        public bool Process(uint voltage, Position3D firingNeuronId, InputPatternType iType)
+        public bool Process(uint voltage, Position4D synapseId, InputPatternType iType)
         {
             switch (iType)
-            {                
+            {
+                case InputPatternType.INTERNAL:
+                    {
+                        _internalVoltage += voltage;
+                        break;
+                    }
                 case InputPatternType.TEMPORAL:
                     {
                         _temporalVoltage += voltage;
@@ -110,28 +123,29 @@ namespace HTM.Models
 
             _sumVoltage += voltage;            
 
-            if(_sumVoltage > int.Parse(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]))
+            if(_sumVoltage > NMDA_Spike_Potential)
             {
                 //NMDA Spike
                 //Strengthen firing Neuron Connection.
-                int connectionStrength;
-                if(_synapticStrength.TryGetValue(firingNeuronId, out connectionStrength))
+                uint connectionStrength;
+                if(_connections.TryGetValue(synapseId, out connectionStrength))
                 {
-                    if (connectionStrength > int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTION_STRENGTH"]))
-                        return true;
-                    _synapticStrength[firingNeuronId]++;
+                    if (connectionStrength < MAX_Connection_Strength)                        
+                        _connections[synapseId]++;
                 }
+
                 return true;
             }
-
             return false;
-        }               
+        }                    
+
+        //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
         /// <summary>
         /// Boxed Growth : Direction and boxed random connection
         /// 1.A Segment should have direction it grows and by default will have limits set to how far away the segment can predict its new connection.
         /// </summary>
-        private void AddNewLocalConnection()
+        internal void AddNewLocalConnection()
         {            
             //Make sure you are not connecting to an axon of your own neuron if its a new position
             /*Decide how to add new connection : Randomly pick connections from the segments local visibility radius and connect.
@@ -141,7 +155,7 @@ namespace HTM.Models
             Position3D bounds = CPM.GetBound();
             Position3D newPosition = GetNewPositionFromBound(bounds);            
 
-            if (!_fullyConnected && (_synapticStrength.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition))
+            if (!_fullyConnected && (_connections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition))
             {
                 AddConnection(newPosition);
             }
@@ -183,14 +197,14 @@ namespace HTM.Models
             return false;
         }
 
-        private Position3D GetNewPositionFromBound(Position3D segmentBound)
-        {
-            Random r = new Random(_seed);
-            return new Position3D((uint)r.Next((int)BaseConnection.X, (int)segmentBound.X), (uint)r.Next((int)BaseConnection.Y, (int)segmentBound.Y), (uint)r.Next((int)BaseConnection.Z, (int)segmentBound.Z));
-        }                   
+        //private Position3D GetNewPositionFromBound(Position3D segmentBound)
+        //{
+        //    Random r = new Random(_seed);
+        //    return new Position3D((uint)r.Next((int)BaseConnection.X, (int)segmentBound.X), (uint)r.Next((int)BaseConnection.Y, (int)segmentBound.Y), (uint)r.Next((int)BaseConnection.Z, (int)segmentBound.Z));
+        //}                   
 
-        private void AddConnection(Position3D newPosition) =>
-            _synapticStrength.Add(newPosition, int.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]));                            
+        private void AddConnection(Position4D newPosition) =>
+            _connections.Add(newPosition, NEW_SYNAPSE_CONNECTION_DEF);                            
 
         private void CreateSubSegment(Position3D basePosition)
         {
@@ -208,12 +222,12 @@ namespace HTM.Models
         internal void FlushVoltage()
         {
             _sumVoltage = 0;
-            __lastTimeStampFiringConnections = new List<Position3D>();
+            _predictedSynapses.Clear();
         }
 
-        private string PrintPosition(Position3D pos3d)
+        private string PrintPosition(Position4D pos4d)
         {
-            return " X: " + pos3d.X.ToString() + " Y:" + pos3d.Y.ToString() + " Z:" + pos3d.Z.ToString();
+            return " X: " + pos4d.X.ToString() + " Y:" + pos4d.Y.ToString() + " Z:" + pos4d.Z.ToString();
         }
 
         private bool DoesSubSegmentExist(Position3D newPosition)

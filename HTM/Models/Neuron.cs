@@ -10,69 +10,71 @@ namespace HTM.Models
     public class Neuron
     {
         private uint _voltage;
+        private uint _totalSegments;
         public Position3D NeuronID { get; private set; }
         public NeuronState State { get; private set; }
-        public Dictionary<int, Segment> Segments { get; private set; }      //index of each connection
-        private List<Segment> _predictedSegments;        
-        private List<Position3D> AxonList;
+        public Dictionary<uint, Segment> proximalSegments { get; private set; }      
+        private List<Segment> _predictedSegments;                
+        private Dictionary<Position4D, SegmentID> axonEndPoints; 
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
 
-        public Segment GetSegment(string segID)
+        public Neuron(Position3D pos)
+        {
+            _voltage = 0;
+            _totalSegments = 0;
+            NeuronID = pos;
+            State = NeuronState.RESTING;
+            proximalSegments = new Dictionary<uint, Segment>();
+            _predictedSegments = new List<Segment>();
+            axonEndPoints = new Dictionary<Position4D, SegmentID>();
+        }
+
+        public Segment GetSegment(SegmentID segID)
         {
             Segment seg;
-            if(segID.Contains("-"))
-            {
-                var items = segID.Split('-');
-                int baseSeg = int.Parse(items[0]);
-                if(Segments.TryGetValue(baseSeg, out seg))
-                {                    
-                    for(int i=1; i < items.Length; i++)
-                    {
-                        seg = seg.GetSegment(int.Parse(items[i]));
-                    }
-                    return seg;
-                }             
-            }
+            
             throw new InvalidOperationException("seg ID : " + segID.ToString() + " is not present");
         }        
 
-        internal List<Position3D> Fire()
+        internal void Fire()
         {
-            //return all the connected segment ids     
-            _voltage = 0;
-            return AxonList;
+            //Supply firing voltage to all the connected synapses.
+            //Always use Process method fro mthe neuron as the neuron needs to to strength updates on the segment.
+            foreach( var kvp in axonEndPoints )
+            {
+                CPM.GetInstance.GetNeuronFromPositionID(kvp.Key).Process(kvp.Value, kvp.Key, InputPatternType.INTERNAL);
+            }            
         }               
 
-        internal bool Process(string segID, Position3D firingNeuron, InputPatternType iType)
+        internal void AddNewConnection(Position4D pos, SegmentID segmentID)
+        {
+            SegmentID segid;
+            if(!axonEndPoints.TryGetValue(pos, out segid))
+            {
+                axonEndPoints.Add(pos, segmentID);
+            }
+        }
+
+        //
+        internal void Process(SegmentID segID, Position4D SynapseId, InputPatternType iType)
         {
             Segment s = GetSegment(segID);
-            if(s.Process(NEURONAL_FIRE_VOLTAGE, firingNeuron, iType))
-            {
-                _predictedSegments.Add(s);
-                s.FlushVoltage();                
-                return true;
-            }
-            return false;
+            if(s.Process(NEURONAL_FIRE_VOLTAGE, SynapseId, iType))            
+                _predictedSegments.Add(s);                                                                        
         }
 
-        internal void PruneConnections()
+        internal void Predict()
         {
-            foreach(var s in Segments.Values)
-            {
-                s.Prune();
-            }
+
         }
 
-        internal void Update()
-        {        
-            //Update Local
-            //Send GROW signal to all connected segments
-            //Prune Segments that have not fired for the time interval
-        }                       
 
-        internal void UpdateLocal()
-        {
-            //Update the strengths for all fired segments on previous timestamp            
-        }
+        //internal void PruneConnections()
+        //{
+        //    foreach(var s in Segments.Values)
+        //    {
+        //        s.Prune();
+        //    }
+        //}       
     }
 }

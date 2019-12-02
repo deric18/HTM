@@ -26,10 +26,13 @@ Algorithm for Segment Growth and Vector overlapping forming synapses:
 Things to keep in mind while designing the connector algorithm:
 1.Need to maintain a Connector graph to determine whether connection point is available or not whithout having to go through the entire neuron segment tree.( )
 2.How to implement temporal and apical axonal connections via this network ?
+--Temporal lines and Apical Dendrites.
 
 
 T:
 -No general connection technique for all neurons to grow , each single neuron should  have its own connection schema , which it will follow for all growth puposes. (In the begining all will have similar mechanism which can be altered later as wish.)
 -A region can get influenced by temporal connections from a different region and apical connection from another region these connection also have to be taken into account while processing any input(Also need to come up with mechanism to do that.)
 -Proximal Dendrites will have bounds on how much they can grow and only dital dendrites can grow based on the neural schema.
+-A Neuron based on how much spike power it takes it can fire in thre different modes , single fire , Intermittent Firing and Continuous Spiking.
 
+  

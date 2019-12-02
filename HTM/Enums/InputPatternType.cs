@@ -5,6 +5,6 @@
         SPATIAL,
         TEMPORAL,
         APICAL,
-        NONE
+        INTERNAL
     }
 }

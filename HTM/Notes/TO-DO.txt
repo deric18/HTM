@@ -1,7 +1,9 @@
-﻿Axonal and Dendritic Initial orientation and Growth Mechanism
+﻿---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+																								OBJECTIVES
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Axonal and Dendritic Initial orientation and Growth Mechanism
 -Objective should be to increase as much sparsity as possible.
 -Generate a random orientation generator to assign initial orientation
--Create a growth mechanism for axon which should changes direction if it is not finding any connections and it should also when it has grown above the limit.
 
 Answer : Axon should be initially just one and then start to segment off after max allowed positions in different directions.
 
@@ -10,20 +12,62 @@ we will have input sdr and output sdr defines the state of the whole system i.e 
 
 Also need to account for temporal axons for incoming temporal connection and apical axons from upper layers.
 
-----------------------------------------------------------------------------------------------------------------------------------------
-TODO : 
--GET CPM Working
-	-Doing Predict Functionality ----------------------------------------------------------------------------------------Done.
-	-Complete fire implementation for neurons and segments.		
-		--Handle Adding New Connection for Segment growth. (AddNewConnection() and BranchSegment()) --
-	-Complete GetNextNeuron and neural growth mehanism.
 
--Complete all models , Segment , CPM , Neuron
+============================================================================================================CONNECTION TABLE===============================================================================================================================================================
+-Finish Connection Graph and implement temporal connection lines.
+ ---Implement a three variable dictionary for lookup for connection points. (this will not work as dictionaries will have conflicts, Neither can i use a bit manipulation system to store the state of the Network as of its limitation
+ of just two states , can represent whther a CP is from an axon or a dendrite or just empty. So currently my only option is to use a char map (for 1000 points in 1sq node this will be 100 * 1000 * 8 = 800 KB) pretty descent. (Acceptable) probelm 
+ with this approach is in case if there is an axon endpoint at  the connection point then how to cache the neuron ID and segment ID. So new idea is to have Connection Table 
+ 
+ Connection Table : A Connection Table will be the core data structure of the CPM , this will be responsible for keeping track of all the connections in the region , also connection table can be easily used to create temporal lines and apical dendritic 
+ connections , Connection table sits as the core data layer of the sytem right below CPM which will act as the service layer of the sytem responsible for the API connections to other regions and will also act as the ring leader of the whole system driving 
+ the whole system. All in all Connection table + CPM = Region.
+
+ Design For Connection Table:
+ Responsbilities : -Provide an API for claiming a connection point by an axon or dendrite.
+				   -Handle the logic for the scenario when 
+				   -Provide an API for deleting a synapse.
+				   -Provide an API for unclaiming a connection point for any axonal or dendritic segment. 
+
+Problems : - Just having a single char map is causing probelm for the scenario when a segment is growing and tries to claim a synapse with a axonal CP the char map will send a connect signal but cannot inform the segment which neuron the axon is from!
+Solution : - If its an axon need to store a sepparate list of neuron ID of respective axonsand segment ID
+
+Problem: -How to represent neuron and SegmentID. (string or int or Guid )
+Solution: Need a custom new Identifier Object that will handle Hierarchical identification. Position3d and position4d
+
+Algo : The Connection table will maintain an internal character map for all the positions declaring
+'A' for occupied by a axon
+'D' for occupied by a dendrite
+'N' for Not Available ( Already Occupied)
+'a' for available.
+'t' for temporal axon line
+'p' for apical axon line
+	
+---Provide a mechanism for initializing temporal lines.
+-Complete Logic for Proximal Segment Bounds.
+-Complete Schema for Distal Dendritic Segment Growth for every neuron. 
+-Complete fire implementation for neurons and segments.		
+-Handle Adding New Connection for Segment growth. (AddNewConnection() and BranchSegment())
+-Complete GetNextNeuron and neural growth mechanism.
+
+
+Problems:
+-Implementing Apical and Distal Dendrites.-can be done with connection table
+-Implemnting Segmentation in Axonal Extensions.-can be done with connection table
+-Logic for mapping apical and temporal fire signals into neurons ? store a dict list of seg ids in connection table 
+-Position4D mapping in real space ( x,y,z indicates the block and posid represents the postion inside the block.)
+-Should Axons have segments?
+
+3 point growth stratergy
+
+
+================================================================================================================================================================================================================================================================================================
 
 -Write Some Encoders.
 
-TESTING:
-
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+																								TESTING:	
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -Write some unit tests to see if everything is working properly
 	-Similar inputs should generate similar output SDR's
 		what kind of things should i feed into it ?
@@ -47,3 +91,4 @@ Analysis : See if in windows you can move the mouse on the screen via code?
 -Create a Mouse Decoder that translates SDR's generated by HTM regions into mouse cursor movements.(will use nupic integer encoders.)
 
 -Create a launcher thread that can communicate to and launch multiple regions to which it can send these generated patterns and also help in intercommunication between the regions.
+ 
