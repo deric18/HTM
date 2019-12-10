@@ -14,9 +14,9 @@ namespace HTM.Models
         {
             Size = size;
             ID = new Position2D(x, y);
-            for(int i=0;i< Size; i++)
+            for(uint i=0;i< Size; i++)
             {
-                Neuron n = new Neuron();
+                Neuron n = new Neuron(new Position3D(x,y,i));
                 Neurons.Add(n);
             }
         }

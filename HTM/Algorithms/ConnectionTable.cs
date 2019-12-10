@@ -8,17 +8,15 @@ namespace HTM.Algorithms
     {
         private char[,][,] cMap;            //keeps track of every connection point in the 
         private ulong counter;
-        private Dictionary<SegmentID, bool> axonalEndPoints;            //True for Axon , False for Dendrite
+        private Dictionary<Position4D, SegmentID> axonalEndPoints;
         private Dictionary<Position4D, SegmentID> dendriticEndPoints;
-        private Dictionary<uint, List<SegmentID>> temporalLines;
-        private Dictionary<uint, List<SegmentID>> axonalLines;
 
         public ConnectionTable(uint w, uint x, uint y, uint z)
         {
             counter = 0;
-            axonalEndPoints = new Dictionary<SegmentID, bool>();
+            axonalEndPoints = new Dictionary<Position4D, SegmentID>();
             dendriticEndPoints = new Dictionary<Position4D, SegmentID>();
-              cMap = new char[x, y][, ];
+            cMap = new char[x, y][,];
             for (int i = 0; i < w; i++)
                 for (int j = 0; j < x; j++)
                     for (int k = 0; k < y; k++)
@@ -42,60 +40,102 @@ namespace HTM.Algorithms
         /// </summary>
         /// <param name="pos">Position that is under claim investigation</param>
         /// <param name="cType">Connection Type</param>
-        /// <returns></returns>
-        public ConnectionType ClaimPosition(Position4D pos, EndPointType eType, SegmentID claimerSegID)
+        /// <returns>Connection Result</returns>
+        public ConnectionType ClaimPosition(Position4D pos, SegmentID claimerSegID, EndPointType eType)
         {
-            switch(cMap[pos.X,pos.Y][pos.Z,pos.PosID])
+            switch (cMap[pos.X, pos.Y][pos.Z, pos.PosID])
             {
                 case 'A': //Available                   
-                    switch(eType)
+                    switch (eType)
                     {
-                        case EndPointType.Axon: AxonClaim(pos);break;
-                        case EndPointType.Dendrite: DendriteClaim(pos);break;
-                        default:break;
+                        case EndPointType.Axon:
+                            AxonClaim(pos, claimerSegID);
+                            cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'A';
+                            break;
+                        case EndPointType.Dendrite:
+                            DendriteClaim(pos, claimerSegID);
+                            cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'D';
+                            break;
+
+                        default: break;
                     }
                     break;
                 case 'D'://Dendrite
-                    switch(eType)
-                    {
-                        case EndPointType.Axon://Axon claiming a dendritc position 
-                            SegmentID seg;
-                            if(dendriticEndPoints.TryGetValue(pos, out seg))
-                            {
-                                CPM.GetInstance.AddConnection(seg, pos);
-                                CPM.GetInstance.AddConnection(claimerSegID, pos);
-                            }
-                            break;
-                        default:
-                            return ConnectionType.NotAvailable;                            
-                    }
-                    break;
-                case 'a':
                     switch (eType)
                     {
-                        //Inform both neurons of the established connection and mark the character to unavilable
+                        case EndPointType.Axon://Axon claiming a dendritc position 
+                            AxonClaim(pos, claimerSegID);
+                            cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'N';
+                            return ConnectionType.ConnectedToDendrite;
+                        default:
+                            return ConnectionType.NotAvailable;
                     }
-                    break;//Axon
-                case 'N':break;//Not Available
-                case 'T':break;//Temporal Line
-                case 'P':break;//Apical Axon Line
-            }
-        }
-        
-        public void AxonClaim(Position4D pos)
-        {
-            bool val = false;
-            if(!internalConnections.TryGetValue(pos, out val))
-            {
-                internalConnections.Add(pos, true);
+                case 'a'://Axon
+                    switch (eType)
+                    {
+                        case EndPointType.Dendrite:
+                            {
+                                DendriteClaim(pos, claimerSegID);
+                                cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'N';
+                                break;
+                            }
+                        default:
+                            return ConnectionType.NotAvailable;
+                    }
+                    break;
+                case 'T'://Temporal
+                    {
+                        switch (eType)
+                        {
+                            case EndPointType.Dendrite:
+                                {
+                                    DendriteClaim(pos, claimerSegID);
+                                    cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'N';
+                                    return ConnectionType.ConnectedToAxon;
+                                }
+                            default:
+                                return ConnectionType.NotAvailable;
+                        }
+                    }
+                case 'P'://Apical Axon Line
+                    {
+                        switch (eType)
+                        {
+                            case EndPointType.Dendrite:
+                                {
+                                    DendriteClaim(pos, claimerSegID);
+                                    cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'N';
+                                    return ConnectionType.ConnectedToAxon;
+                                }
+                            default:
+                                return ConnectionType.NotAvailable;
+                        }
+                    }
+                case 'N': return ConnectionType.NotAvailable; 
             }
         }
 
-        public void DendriteClaim(Position4D pos)
+        public void AxonClaim(Position4D pos, SegmentID claimerSegID)
         {
-            cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'D';
+            SegmentID seg;
+            if (dendriticEndPoints.TryGetValue(pos, out seg))
+            {
+                CPM.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
+                CPM.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
+            }
         }
-                   
-    
+
+        public void DendriteClaim(Position4D pos, SegmentID claimerSegID)
+        {
+            cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'N';
+            SegmentID seg;
+            if (axonalEndPoints.TryGetValue(pos, out seg))
+            {
+                CPM.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
+                CPM.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
+            }
+        }
+
+
     }
 }

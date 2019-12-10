@@ -29,18 +29,20 @@ namespace HTM.Models
             axonEndPoints = new Dictionary<Position4D, SegmentID>();
         }
 
-        public Segment GetSegment(SegmentID segID)
+        internal Segment GetSegment(SegmentID segID)
         {
             Segment seg;
-            
-            throw new InvalidOperationException("seg ID : " + segID.ToString() + " is not present");
+            if (proximalSegments.TryGetValue(segID.ID, out seg))
+                return seg;
+
+            throw new InvalidOperationException("Invalid Segment ID Access");
         }        
 
         internal void Fire()
         {
             //Supply firing voltage to all the connected synapses.
             //Always use Process method fro mthe neuron as the neuron needs to to strength updates on the segment.
-            foreach( var kvp in axonEndPoints )
+            foreach(var kvp in axonEndPoints )
             {
                 CPM.GetInstance.GetNeuronFromPositionID(kvp.Key).Process(kvp.Value, kvp.Key, InputPatternType.INTERNAL);
             }            
@@ -66,15 +68,11 @@ namespace HTM.Models
         internal void Predict()
         {
 
+        }           
+
+        internal void Grow()
+        {
+
         }
-
-
-        //internal void PruneConnections()
-        //{
-        //    foreach(var s in Segments.Values)
-        //    {
-        //        s.Prune();
-        //    }
-        //}       
     }
 }

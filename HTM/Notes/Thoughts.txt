@@ -3,3 +3,6 @@ as a species for the animal.
 
 -Brains is designed using is a probability engine , the world is a full of patterns and to identify any pattern all it takes is to create situations inside the brain to create very specific firings representative of the actual situations out in the world
 there can be multiple different things going on in the real world but there can only be a very specific pattern that will be representative of it in the world.
+
+-Emotions are neccessary at some level for Intelligence given that intelligence is a way of finding a solution satisfying all the given constraints a way of including all these constraints into the system is to create a series of emotional systems 
+and allow all the systems to communicate with each other and also with core central decision making system that comes is responsible for coming up with a solution (biologically this would be pre-frontal cortex).

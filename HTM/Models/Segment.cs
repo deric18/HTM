@@ -11,15 +11,15 @@ namespace HTM.Models
     /// -Segment Growth.
     /// </summary>
     public class Segment
-    {                
-        public Vector BaseConnection { get; private set; }
+    {                        
+        public SegmentID SegmentId { get; private set; }
+
         private BranchingTechnique _bType;
         private SegmentType sType;
         private uint _sumVoltage;
         private uint _temporalVoltage;
         private uint _apicalVoltage;
-        private uint _internalVoltage;
-        public SegmentID SegmentId { get; private set; }        
+        private uint _internalVoltage;            
         private bool _fullyConnected;          
         private List<Segment> SubSegments;
         private Dictionary<Position4D, uint> _connections;    //strength
@@ -38,45 +38,11 @@ namespace HTM.Models
             _apicalVoltage = 0;            
             _fullyConnected = false;
             _connections = new Dictionary<Position4D, uint>();
-            _predictedSynapses = new List<Position4D>();
-            BaseConnection = baseVector;
+            _predictedSynapses = new List<Position4D>();            
             NMDA_Spike_Potential = uint.Parse(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]);
             MAX_Connection_Strength = uint.Parse(ConfigurationManager.AppSettings["MAX_CONNECTION_STRENGTH"]);
             NEW_SYNAPSE_CONNECTION_DEF = uint.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]);
-        }
-
-
-        #region Private Methods
-
-        /// <summary>
-        /// This is a General Grow Signal
-        /// Questions:
-        /// -When to branch and when to GetNewConnection
-        ///  --Role out a Round Robin.
-        /// </summary>        
-        private void SegmentGrow()
-        {
-            switch(_bType)
-            {
-                case BranchingTechnique.BranchBinary:
-                    _bType = BranchingTechnique.LeftBranch;
-                    break;
-                case BranchingTechnique.LeftBranch:
-                    _bType = BranchingTechnique.RightBranch;
-                    break;
-                case BranchingTechnique.RightBranch:
-                    _bType = BranchingTechnique.BranchBinary;
-                    break;
-                default:break;
-            }
-
-            foreach(var segment in SubSegments)
-            {
-                segment.SegmentGrow();
-            }
-        }
-
-        #endregion
+        }       
 
         internal Segment GetSegment(int v)
         {
@@ -88,10 +54,8 @@ namespace HTM.Models
             return null;
         }
 
-        internal void AddNewConnection(Position4D pos)
-        {
-            _connections.Add(pos, 5);
-        }
+        internal void AddNewConnection(Position4D pos) =>        
+            _connections.Add(pos, 5);        
 
         /// <summary>
         /// Predict if the segment will fire or not based incoming voltage
@@ -243,10 +207,42 @@ namespace HTM.Models
             return true;
         }
 
-        private bool DoesConnectionExist(Position3D pos)
+        #region Private Methods
+
+        /// <summary>
+        /// This is a General Grow Signal
+        /// Questions:
+        /// -When to branch and when to GetNewConnection
+        ///  --Role out a Round Robin.
+        /// </summary>        
+        private void SegmentGrow()
         {
-            int val;
-            if(_synapticStrength.TryGetValue(pos, out val))
+            switch (_bType)
+            {
+                case BranchingTechnique.BranchBinary:
+                    _bType = BranchingTechnique.LeftBranch;
+                    break;
+                case BranchingTechnique.LeftBranch:
+                    _bType = BranchingTechnique.RightBranch;
+                    break;
+                case BranchingTechnique.RightBranch:
+                    _bType = BranchingTechnique.BranchBinary;
+                    break;
+                default: break;
+            }
+
+            foreach (var segment in SubSegments)
+            {
+                segment.SegmentGrow();
+            }
+        }
+
+        #endregion
+
+        private bool DoesConnectionExist(Position4D pos)
+        {
+            uint val;
+            if(_connections.TryGetValue(pos, out val))
             {
                 return true;
             }

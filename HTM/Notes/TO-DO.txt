@@ -56,9 +56,13 @@ Problems:
 -Implemnting Segmentation in Axonal Extensions.-can be done with connection table
 -Logic for mapping apical and temporal fire signals into neurons ? store a dict list of seg ids in connection table 
 -Position4D mapping in real space ( x,y,z indicates the block and posid represents the postion inside the block.)
--Should Axons have segments?
 
-3 point growth stratergy
+-How to handle Connection Methodology?
+--Should Axons have segments?
+--3 point growth stratergy ?? No and yes ,  use a unifrm random number generator and a boxed approach to create connection points and also pick the neighbouring three points 
+whenever you pick one.
+
+
 
 
 ================================================================================================================================================================================================================================================================================================
