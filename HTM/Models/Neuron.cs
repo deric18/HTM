@@ -11,14 +11,14 @@ namespace HTM.Models
     {
         private uint _voltage;
         private uint _totalSegments;
-        public Position3D NeuronID { get; private set; }
+        public BlockID NeuronID { get; private set; }
         public NeuronState State { get; private set; }
         public Dictionary<uint, Segment> proximalSegments { get; private set; }      
         private List<Segment> _predictedSegments;                
         private Dictionary<Position4D, SegmentID> axonEndPoints; 
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
 
-        public Neuron(Position3D pos)
+        public Neuron(BlockID pos)
         {
             _voltage = 0;
             _totalSegments = 0;

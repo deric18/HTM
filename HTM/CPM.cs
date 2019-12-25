@@ -7,8 +7,7 @@ using System.Collections.Generic;
 namespace HTM
 {
     public class CPM
-    {
-        public const int CubeConstant = 100;        
+    {        
         public static volatile CPM instance;
         public static object syncRoot = new object();
 
@@ -214,7 +213,7 @@ namespace HTM
             }                        
         }       
 
-        private IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
+        private IEnumerable<Neuron> GetNeuronsFromPositions(List<BlockID> list)
         {
             List<Neuron> toReturn = new List<Neuron>();
 
@@ -224,14 +223,7 @@ namespace HTM
             }
 
             return toReturn;
-        }
-
-
-
-        internal static Position3D GetBound()
-        {
-            return new Position3D(uint.Parse(ConfigurationManager.AppSettings["SEGMENT_XBOUND"]), uint.Parse(ConfigurationManager.AppSettings["SEGMENT_YBOUND"]), uint.Parse(ConfigurationManager.AppSettings["SEGMENT_ZBOUND"]));
-        }
+        }        
 
         #region HELPER METHODS 
 
@@ -239,7 +231,7 @@ namespace HTM
 
         private Neuron GetNeuronFromPosition(uint x, uint y, uint z) => Columns[x][y].GetNeuron(z);
 
-        private Neuron GetNeuronFromPosition(Position3D pos3d) => Columns[pos3d.X][pos3d.Y].GetNeuron(pos3d.Z);
+        private Neuron GetNeuronFromPosition(BlockID pos3d) => Columns[pos3d.X][pos3d.Y].GetNeuron(pos3d.Z);
 
         private List<Neuron> GetTemporalColumn(Position2D position2D)
         {

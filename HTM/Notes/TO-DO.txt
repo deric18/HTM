@@ -59,8 +59,11 @@ Problems:
 
 -How to handle Connection Methodology?
 --Should Axons have segments?
---3 point growth stratergy ?? No and yes ,  use a unifrm random number generator and a boxed approach to create connection points and also pick the neighbouring three points 
+--3 point growth stratergy ?? No and yes ,  use a uniform random number generator and a boxed approach to create connection points and also pick the neighbouring three points 
 whenever you pick one.
+Problem with this approach - Edge Case : Whenver there is a point which lays on the edge of the given neuronn block then defining its random bounds block becomes difficult logic wise
+Solution - Needs more imagination , figure drawing and some thorough edge case testing, some good test cases would be what if the point lies on the corner of 3 neuro blocks , how to 
+form the random bounds block then ? and also what if the position is at the top of the Inter neuron Periphery ?
 
 
 

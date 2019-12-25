@@ -45,12 +45,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithms\ConnectionPointGenerator.cs" />
     <Compile Include="Algorithms\ConnectionTable.cs" />
     <Compile Include="CPM.cs" />
     <Compile Include="Encoders\IntegerEncoder.cs" />
     <Compile Include="Enums\BranchingTechnique.cs" />
-    <Compile Include="Enums\ConnectionType - Copy.cs" />
     <Compile Include="Enums\ConnectionType.cs" />
+    <Compile Include="Enums\EndPointType.cs" />
+    <Compile Include="Enums\eType.cs" />
     <Compile Include="Enums\NeuronState.cs" />
     <Compile Include="Enums\CPMState.cs" />
     <Compile Include="Enums\InputPatternType.cs" />
@@ -73,9 +75,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Notes\Constants.txt" />
     <Content Include="Notes\Encoder.txt" />
     <Content Include="Notes\FunctionalDiagram.txt" />
-    <Content Include="Notes\Paper.txt" />
+    <Content Include="Notes\Theory.txt" />
     <Content Include="Notes\Thoughts.txt" />
     <Content Include="Notes\TO-DO.txt" />
     <Content Include="Notes\To-Solve.txt" />

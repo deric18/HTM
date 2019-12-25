@@ -113,6 +113,8 @@ namespace HTM.Algorithms
                     }
                 case 'N': return ConnectionType.NotAvailable; 
             }
+
+            return ConnectionType.NotAvailable;
         }
 
         public void AxonClaim(Position4D pos, SegmentID claimerSegID)

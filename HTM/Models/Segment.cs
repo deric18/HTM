@@ -116,8 +116,8 @@ namespace HTM.Models
             */
             //If not branched and position is noand check if segment has max positions , add this position to a possibility list for future connection when the neuron losses and non used connection else if not max position then add new position,
             //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.  
-            Position3D bounds = CPM.GetBound();
-            Position3D newPosition = GetNewPositionFromBound(bounds);            
+            BlockID bounds = CPM.GetBound();
+            BlockID newPosition = GetNewPositionFromBound(bounds);            
 
             if (!_fullyConnected && (_connections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition))
             {
@@ -153,7 +153,7 @@ namespace HTM.Models
             }
         }
 
-        private bool SelfConnection(Position3D newPosition)
+        private bool SelfConnection(BlockID newPosition)
         {
             if (NeuronID.Equals(newPosition))
                 return true;
@@ -170,7 +170,7 @@ namespace HTM.Models
         private void AddConnection(Position4D newPosition) =>
             _connections.Add(newPosition, NEW_SYNAPSE_CONNECTION_DEF);                            
 
-        private void CreateSubSegment(Position3D basePosition)
+        private void CreateSubSegment(BlockID basePosition)
         {
             if (!_hasSubSegments)
             {
@@ -194,7 +194,7 @@ namespace HTM.Models
             return " X: " + pos4d.X.ToString() + " Y:" + pos4d.Y.ToString() + " Z:" + pos4d.Z.ToString();
         }
 
-        private bool DoesSubSegmentExist(Position3D newPosition)
+        private bool DoesSubSegmentExist(BlockID newPosition)
         {
             foreach(var seg in SubSegments)
             {
