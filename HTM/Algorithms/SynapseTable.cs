@@ -4,14 +4,14 @@ using System.Collections.Generic;
 
 namespace HTM.Algorithms
 {
-    public class ConnectionTable
+    public class SynapseTable
     {
         private char[,][] cMap;            //keeps track of every connection point in the 
         private ulong counter;
         private Dictionary<Synapse, SegmentID> axonalEndPoints;
         private Dictionary<Synapse, SegmentID> dendriticEndPoints;
 
-        public ConnectionTable(uint w, uint x, uint y, uint z)
+        public SynapseTable(uint w, uint x, uint y, uint z)
         {
             counter = 0;
             axonalEndPoints = new Dictionary<Synapse, SegmentID>();

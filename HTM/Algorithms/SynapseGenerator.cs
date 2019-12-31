@@ -21,22 +21,15 @@ namespace HTM.Algorithms
         private uint ppux;
         private uint ppuy;
         private uint ppuz;
-        private uint leftBoundX;
-        private uint rightBoundX;
-        private uint leftBoundY;
-        private uint rightBoundY;
-        private uint leftBoundZ;
-        private uint rightBoundZ;
-        private uint dmten;
+        private uint ppd;                
 
         private static SynapseGenerator instance = null;        
 
         public SynapseGenerator()
-        {
-            cubeConstant = uint.Parse(ConfigurationManager.AppSettings["CUBECONSTANT"]);
-            leftBoundX = rightBoundX = leftBoundY = rightBoundY = leftBoundZ = rightBoundZ = 0;
-            ppux = ppuy = ppuz = 0;
-            dmten = 0;
+        {   
+            //set PPD, cubeconstant
+            cubeConstant = uint.Parse(ConfigurationManager.AppSettings["CUBECONSTANT"]);            
+            ppd = ppux = ppuy = ppuz = 0;            
         }
 
         public static SynapseGenerator Instance
@@ -72,30 +65,77 @@ namespace HTM.Algorithms
 
         private Synapse MoveNPositionsX(bool leftOrRight, uint n, Synapse position)
         {
-            if(leftOrRight) //left
+            Synapse toRet = new Synapse(position);
+            uint x = position.X;
+            if (leftOrRight) //left
             {
-                //for every reduction in x check if point has crossed to another block
-                Synapse toRet = new Synapse(position);
-                uint x = position.X;
-                while(n>0 &&  )  //check if block is crossed and random block is reached.
+                //for every reduction in x check if point has crossed to another block                
+                while( n > 0 && x > 0)  //check if block is crossed and random block is reached.
                 {
-
+                    n--;
+                    x--;
                 }
             }
             else        //right
             {
-
+                while (n > 0 && x < ppd)  //check if block is crossed and random block is reached.
+                {
+                    n--;
+                    x++;
+                }
             }
+            position.X = x;
+            return position;
         }
 
         private Synapse MoveNPositionsY(bool leftOrRight, uint n, Synapse position)
         {
-
+            Synapse toRet = new Synapse(position);
+            uint y = position.Y;
+            if (leftOrRight) //left
+            {
+                //for every reduction in x check if point has crossed to another block                
+                while (n > 0 && y > 0)  //check if block is crossed and random block is reached.
+                {
+                    n--;
+                    y--;
+                }
+            }
+            else        //right
+            {
+                while (n > 0 && y < ppd)  //check if block is crossed and random block is reached.
+                {
+                    n--;
+                    y++;
+                }
+            }
+            position.Y = y;
+            return position;
         }
 
-        private void MoveNPositionsZ(bool leftorRight, uint n)
+        private Synapse MoveNPositionsZ(bool leftorRight, uint n, Synapse position)
         {
-
+            Synapse toRet = new Synapse(position);
+            uint z = position.Z;
+            if (leftorRight) //left
+            {
+                //for every reduction in x check if point has crossed to another block                
+                while (n > 0 && z > 0)  //check if block is crossed and random block is reached.
+                {
+                    n--;
+                    z--;
+                }
+            }
+            else        //right
+            {
+                while (n > 0 && z < ppd)  //check if block is crossed and random block is reached.
+                {
+                    n--;
+                    z++;
+                }
+            }
+            position.Z = z;
+            return position;
         }
 
         public static Synapse GetBoxedRandomPosition(Synapse pos)

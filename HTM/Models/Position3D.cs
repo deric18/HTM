@@ -3,9 +3,9 @@
     //3Dimensional cordinate system to pin point neuronal synapses
     public class Synapse
     {               
-        public uint X { get; private set; }
-        public uint Y { get; private set; }
-        public uint Z { get; private set; }
+        public uint X { get; set; }
+        public uint Y { get; set; }
+        public uint Z { get; set; }
 
         public Synapse() { }
 

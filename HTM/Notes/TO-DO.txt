@@ -71,6 +71,11 @@ TODO:
  -Complete GetIntervals Operation to get the actual block cordinates for the CP?
  -Complete GenerateCP method to create the CP 
  -Complete registration of CP on CT.
+ With the new coordinate system i have resolved a lot of the older issues which are no longer any issues at all , old workflow needs to be scraped to create a new workflow.
+ New Workflow:
+  -Compute random neuron block
+  -Once computed , predict random position in the block.
+  -Register the predicted synpase to SynapseTable.
 
 
 
