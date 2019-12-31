@@ -22,8 +22,8 @@ namespace HTM.Models
         private uint _internalVoltage;            
         private bool _fullyConnected;          
         private List<Segment> SubSegments;
-        private Dictionary<Position4D, uint> _connections;    //strength
-        private List<Position4D> _predictedSynapses;
+        private Dictionary<Synapse, uint> _connections;    //strength
+        private List<Synapse> _predictedSynapses;
         private static uint NMDA_Spike_Potential;
         private static uint MAX_Connection_Strength;
         private static uint NEW_SYNAPSE_CONNECTION_DEF;
@@ -37,8 +37,8 @@ namespace HTM.Models
             _temporalVoltage = 0;
             _apicalVoltage = 0;            
             _fullyConnected = false;
-            _connections = new Dictionary<Position4D, uint>();
-            _predictedSynapses = new List<Position4D>();            
+            _connections = new Dictionary<Synapse, uint>();
+            _predictedSynapses = new List<Synapse>();            
             NMDA_Spike_Potential = uint.Parse(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]);
             MAX_Connection_Strength = uint.Parse(ConfigurationManager.AppSettings["MAX_CONNECTION_STRENGTH"]);
             NEW_SYNAPSE_CONNECTION_DEF = uint.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]);
@@ -54,7 +54,7 @@ namespace HTM.Models
             return null;
         }
 
-        internal void AddNewConnection(Position4D pos) =>        
+        internal void AddNewConnection(Synapse pos) =>        
             _connections.Add(pos, 5);        
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace HTM.Models
         /// <param name="voltage"></param>
         /// <param name="firingNeuronId"></param>
         /// <returns></returns>
-        public bool Process(uint voltage, Position4D synapseId, InputPatternType iType)
+        public bool Process(uint voltage, Synapse synapseId, InputPatternType iType)
         {
             switch (iType)
             {
@@ -116,8 +116,8 @@ namespace HTM.Models
             */
             //If not branched and position is noand check if segment has max positions , add this position to a possibility list for future connection when the neuron losses and non used connection else if not max position then add new position,
             //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.  
-            BlockID bounds = CPM.GetBound();
-            BlockID newPosition = GetNewPositionFromBound(bounds);            
+            Synapse bounds = SynapseManager.GetBound();
+            Synapse newPosition = GetNewPositionFromBound(bounds);            
 
             if (!_fullyConnected && (_connections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition))
             {
@@ -153,7 +153,7 @@ namespace HTM.Models
             }
         }
 
-        private bool SelfConnection(BlockID newPosition)
+        private bool SelfConnection(Synapse newPosition)
         {
             if (NeuronID.Equals(newPosition))
                 return true;
@@ -167,10 +167,10 @@ namespace HTM.Models
         //    return new Position3D((uint)r.Next((int)BaseConnection.X, (int)segmentBound.X), (uint)r.Next((int)BaseConnection.Y, (int)segmentBound.Y), (uint)r.Next((int)BaseConnection.Z, (int)segmentBound.Z));
         //}                   
 
-        private void AddConnection(Position4D newPosition) =>
+        private void AddConnection(Synapse newPosition) =>
             _connections.Add(newPosition, NEW_SYNAPSE_CONNECTION_DEF);                            
 
-        private void CreateSubSegment(BlockID basePosition)
+        private void CreateSubSegment(Synapse basePosition)
         {
             if (!_hasSubSegments)
             {
@@ -189,12 +189,12 @@ namespace HTM.Models
             _predictedSynapses.Clear();
         }
 
-        private string PrintPosition(Position4D pos4d)
+        private string PrintPosition(Synapse pos4d)
         {
             return " X: " + pos4d.X.ToString() + " Y:" + pos4d.Y.ToString() + " Z:" + pos4d.Z.ToString();
         }
 
-        private bool DoesSubSegmentExist(BlockID newPosition)
+        private bool DoesSubSegmentExist(Synapse newPosition)
         {
             foreach(var seg in SubSegments)
             {
@@ -239,7 +239,7 @@ namespace HTM.Models
 
         #endregion
 
-        private bool DoesConnectionExist(Position4D pos)
+        private bool DoesConnectionExist(Synapse pos)
         {
             uint val;
             if(_connections.TryGetValue(pos, out val))

@@ -6,22 +6,21 @@ namespace HTM.Algorithms
 {
     public class ConnectionTable
     {
-        private char[,][,] cMap;            //keeps track of every connection point in the 
+        private char[,][] cMap;            //keeps track of every connection point in the 
         private ulong counter;
-        private Dictionary<Position4D, SegmentID> axonalEndPoints;
-        private Dictionary<Position4D, SegmentID> dendriticEndPoints;
+        private Dictionary<Synapse, SegmentID> axonalEndPoints;
+        private Dictionary<Synapse, SegmentID> dendriticEndPoints;
 
         public ConnectionTable(uint w, uint x, uint y, uint z)
         {
             counter = 0;
-            axonalEndPoints = new Dictionary<Position4D, SegmentID>();
-            dendriticEndPoints = new Dictionary<Position4D, SegmentID>();
-            cMap = new char[x, y][,];
+            axonalEndPoints = new Dictionary<Synapse, SegmentID>();
+            dendriticEndPoints = new Dictionary<Synapse, SegmentID>();
+            cMap = new char[x, y][];
             for (int i = 0; i < w; i++)
                 for (int j = 0; j < x; j++)
-                    for (int k = 0; k < y; k++)
-                        for (int l = 0; l < z; k++)
-                            cMap[i, j][k, l] = 'A';
+                    for (int k = 0; k < y; k++)                        
+                        cMap[i, j][k] = 'A';
 
             //Draw Temporal Lines here
 
@@ -41,20 +40,20 @@ namespace HTM.Algorithms
         /// <param name="pos">Position that is under claim investigation</param>
         /// <param name="cType">Connection Type</param>
         /// <returns>Connection Result</returns>
-        public ConnectionType ClaimPosition(Position4D pos, SegmentID claimerSegID, EndPointType eType)
+        public ConnectionType ClaimPosition(Synapse pos, SegmentID claimerSegID, EndPointType eType)
         {
-            switch (cMap[pos.X, pos.Y][pos.Z, pos.PosID])
+            switch (cMap[pos.X, pos.Y][pos.Z])
             {
                 case 'A': //Available                   
                     switch (eType)
                     {
                         case EndPointType.Axon:
                             AxonClaim(pos, claimerSegID);
-                            cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'A';
+                            cMap[pos.X, pos.Y][pos.Z] = 'A';
                             break;
                         case EndPointType.Dendrite:
                             DendriteClaim(pos, claimerSegID);
-                            cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'D';
+                            cMap[pos.X, pos.Y][pos.Z] = 'D';
                             break;
 
                         default: break;
@@ -65,7 +64,7 @@ namespace HTM.Algorithms
                     {
                         case EndPointType.Axon://Axon claiming a dendritc position 
                             AxonClaim(pos, claimerSegID);
-                            cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'N';
+                            cMap[pos.X, pos.Y][pos.Z] = 'N';
                             return ConnectionType.ConnectedToDendrite;
                         default:
                             return ConnectionType.NotAvailable;
@@ -76,7 +75,7 @@ namespace HTM.Algorithms
                         case EndPointType.Dendrite:
                             {
                                 DendriteClaim(pos, claimerSegID);
-                                cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'N';
+                                cMap[pos.X, pos.Y][pos.Z] = 'N';
                                 break;
                             }
                         default:
@@ -90,7 +89,7 @@ namespace HTM.Algorithms
                             case EndPointType.Dendrite:
                                 {
                                     DendriteClaim(pos, claimerSegID);
-                                    cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'N';
+                                    cMap[pos.X, pos.Y][pos.Z] = 'N';
                                     return ConnectionType.ConnectedToAxon;
                                 }
                             default:
@@ -104,7 +103,7 @@ namespace HTM.Algorithms
                             case EndPointType.Dendrite:
                                 {
                                     DendriteClaim(pos, claimerSegID);
-                                    cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'N';
+                                    cMap[pos.X, pos.Y][pos.Z] = 'N';
                                     return ConnectionType.ConnectedToAxon;
                                 }
                             default:
@@ -117,24 +116,24 @@ namespace HTM.Algorithms
             return ConnectionType.NotAvailable;
         }
 
-        public void AxonClaim(Position4D pos, SegmentID claimerSegID)
+        public void AxonClaim(Synapse pos, SegmentID claimerSegID)
         {
             SegmentID seg;
             if (dendriticEndPoints.TryGetValue(pos, out seg))
             {
-                CPM.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
-                CPM.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
+                SynapseManager.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
+                SynapseManager.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
             }
         }
 
-        public void DendriteClaim(Position4D pos, SegmentID claimerSegID)
+        public void DendriteClaim(Synapse pos, SegmentID claimerSegID)
         {
-            cMap[pos.X, pos.Y][pos.Z, pos.PosID] = 'N';
+            cMap[pos.X, pos.Y][pos.Z] = 'N';
             SegmentID seg;
             if (axonalEndPoints.TryGetValue(pos, out seg))
             {
-                CPM.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
-                CPM.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
+                SynapseManager.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
+                SynapseManager.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
             }
         }
 

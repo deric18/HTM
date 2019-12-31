@@ -6,14 +6,14 @@ using System.Collections.Generic;
 
 namespace HTM
 {
-    public class CPM
+    public class SynapseManager
     {        
-        public static volatile CPM instance;
+        public static volatile SynapseManager instance;
         public static object syncRoot = new object();
 
-        public CPM() { }
+        public SynapseManager() { }
 
-        public static CPM GetInstance
+        public static SynapseManager GetInstance
         {
             get
             {
@@ -22,7 +22,7 @@ namespace HTM
                     lock (syncRoot)
                     {
                         if (instance == null)
-                            instance = new CPM();   
+                            instance = new SynapseManager();   
                     }
                 }
 
@@ -72,10 +72,10 @@ namespace HTM
         }
 
 
-        public Neuron GetNeuronFromPositionID(Position4D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
+        public Neuron GetNeuronFromPositionID(Synapse pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
         public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.X][segId.Y].GetNeuron(segId.Z);
 
-        public void AddConnection(SegmentID segId, Position4D pos)
+        public void AddConnection(SegmentID segId, Synapse pos)
         {
             GetNeuronFromSegmentID(segId).AddNewConnectionToSegment(pos, segId);
         }
@@ -213,7 +213,7 @@ namespace HTM
             }                        
         }       
 
-        private IEnumerable<Neuron> GetNeuronsFromPositions(List<BlockID> list)
+        private IEnumerable<Neuron> GetNeuronsFromPositions(List<Synapse> list)
         {
             List<Neuron> toReturn = new List<Neuron>();
 
@@ -231,7 +231,7 @@ namespace HTM
 
         private Neuron GetNeuronFromPosition(uint x, uint y, uint z) => Columns[x][y].GetNeuron(z);
 
-        private Neuron GetNeuronFromPosition(BlockID pos3d) => Columns[pos3d.X][pos3d.Y].GetNeuron(pos3d.Z);
+        private Neuron GetNeuronFromPosition(Synapse pos3d) => Columns[pos3d.X][pos3d.Y].GetNeuron(pos3d.Z);
 
         private List<Neuron> GetTemporalColumn(Position2D position2D)
         {

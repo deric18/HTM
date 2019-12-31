@@ -16,7 +16,7 @@ namespace HTM.Models
             ID = new Position2D(x, y);
             for(uint i=0;i< Size; i++)
             {
-                Neuron n = new Neuron(new BlockID(x,y,i));
+                Neuron n = new Neuron(new Synapse(x,y,i));
                 Neurons.Add(n);
             }
         }

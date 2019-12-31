@@ -65,6 +65,13 @@ Problem with this approach - Edge Case : Whenver there is a point which lays on 
 Solution - Needs more imagination , figure drawing and some thorough edge case testing, some good test cases would be what if the point lies on the corner of 3 neuro blocks , how to 
 form the random bounds block then ? and also what if the position is at the top of the Inter neuron Periphery ?
 
+TODO: 
+-Complete the Connection point generation algorithm
+ -Complete SetFlags Operation to find out how many neuron blocks does the given CP overlap to?
+ -Complete GetIntervals Operation to get the actual block cordinates for the CP?
+ -Complete GenerateCP method to create the CP 
+ -Complete registration of CP on CT.
+
 
 
 

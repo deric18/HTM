@@ -1,26 +1,26 @@
 ﻿---------------------------------------------------------------------------------RN----------------------------------------------------------------------------------------------------------------
 Actual Problems:
--Construction of vector space
- --Division of one square unit of node by the confiugured node constant (usually >1000)
- -Need to provide support for direction oriented growth of the segments
- --This need not be done in the construction process , this could be incorporated in the segment codign logic
+Q:Construction of vector space
+A:Division of one square unit of node by the confiugured node constant (usually >1000)
+  Need to provide support for direction oriented growth of the segments
+  This need not be done in the construction process , this could be incorporated in the segment codign logic
 
 
 
--Class Definition of a vector (position with direction)
- --Need 3 dimensional corodinated for the exact position of the point and also a median angle of the branch and the segments inclination for new outgrowth segments
+Q:Class Definition of a vector (position with direction)
+A:Need 3 dimensional corodinated for the exact position of the point and also a median angle of the branch and the segments inclination for new outgrowth segments
 
 
-Algorithm for Segment Growth and Vector overlapping forming synapses:
- --Every segment will have its median angle (i.e basically the amount of inclination it took from its base segment)
+Q:Algorithm for Segment Growth and Vector overlapping forming synapses:
+A:Every segment will have its median angle (i.e basically the amount of inclination it took from its base segment)
   and it will also have an inclination angle attribute that will be used for any new branchlings shooting out of the current branch.
--How to decide whether a segment whould right split, left split or branch even ?
- --🤔🤔🤔 (still Wondering) Needs to be Round Robin. 
--How to decide when a segment should add the next connection or branch towards a new direction ?
- --
+Q:How to decide whether a segment whould right split, left split or branch even ?
+  🤔🤔🤔 (still Wondering) Needs to be Round Robin. 
+Q:How to decide when a segment should add the next connection or branch towards a new direction ?
+ 
 
- Temporal and Apical:
- How will you implement Temporal and Apical Connections for FeedBack ?
+Temporal and Apical:
+Q:How will you implement Temporal and Apical Connections for FeedBack ?
 
 
 Things to keep in mind while designing the connector algorithm:
@@ -35,4 +35,9 @@ T:
 -Proximal Dendrites will have bounds on how much they can grow and only dital dendrites can grow based on the neural schema.
 -A Neuron based on how much spike power it takes it can fire in thre different modes , single fire , Intermittent Firing and Continuous Spiking.
 
-  
+Q:How to decide how many connection points should live on one single line / column and also how many columns should be there in the whole block ?
+cube constant    No. of CP/line   No.lines
+1000                10               100
+10000               100              100
+100000              100              1000
+1000000             1000             1000

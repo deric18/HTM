@@ -11,14 +11,14 @@ namespace HTM.Models
     {
         private uint _voltage;
         private uint _totalSegments;
-        public BlockID NeuronID { get; private set; }
+        public Synapse NeuronID { get; private set; }
         public NeuronState State { get; private set; }
         public Dictionary<uint, Segment> proximalSegments { get; private set; }      
         private List<Segment> _predictedSegments;                
-        private Dictionary<Position4D, SegmentID> axonEndPoints; 
+        private Dictionary<Synapse, SegmentID> axonEndPoints; 
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
 
-        public Neuron(BlockID pos)
+        public Neuron(Synapse pos)
         {
             _voltage = 0;
             _totalSegments = 0;
@@ -26,7 +26,7 @@ namespace HTM.Models
             State = NeuronState.RESTING;
             proximalSegments = new Dictionary<uint, Segment>();
             _predictedSegments = new List<Segment>();
-            axonEndPoints = new Dictionary<Position4D, SegmentID>();
+            axonEndPoints = new Dictionary<Synapse, SegmentID>();
         }
 
         internal Segment GetSegment(SegmentID segID)
@@ -44,11 +44,11 @@ namespace HTM.Models
             //Always use Process method fro mthe neuron as the neuron needs to to strength updates on the segment.
             foreach(var kvp in axonEndPoints )
             {
-                CPM.GetInstance.GetNeuronFromPositionID(kvp.Key).Process(kvp.Value, kvp.Key, InputPatternType.INTERNAL);
+                SynapseManager.GetInstance.GetNeuronFromPositionID(kvp.Key).Process(kvp.Value, kvp.Key, InputPatternType.INTERNAL);
             }            
         }               
 
-        internal void AddNewConnection(Position4D pos, SegmentID segmentID)
+        internal void AddNewConnection(Synapse pos, SegmentID segmentID)
         {
             SegmentID segid;
             if(!axonEndPoints.TryGetValue(pos, out segid))
@@ -58,7 +58,7 @@ namespace HTM.Models
         }
 
         //
-        internal void Process(SegmentID segID, Position4D SynapseId, InputPatternType iType)
+        internal void Process(SegmentID segID, Synapse SynapseId, InputPatternType iType)
         {
             Segment s = GetSegment(segID);
             if(s.Process(NEURONAL_FIRE_VOLTAGE, SynapseId, iType))            
