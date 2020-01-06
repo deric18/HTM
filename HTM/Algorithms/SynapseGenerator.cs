@@ -6,6 +6,8 @@
  * -Handles Randomness of each of the segments own signature
  * API:
  *  List<Position4D> GenerateNewRandomPositions(Position4D lastPosition);
+ *  TODO:
+ *  Redo the logic of predicting new random positions
  */
 
 using System;
@@ -79,12 +81,7 @@ namespace HTM.Algorithms
             synapse.Z = (uint)r.Next(minimum, maximum);
 
             return synapse;
-        }
-        
-        private void RegisterSynapseWithST(Synapse synapse)
-        {
-
-        }
+        }               
 
         private uint MoveNPositionsX(bool leftOrRight, uint n, uint X)
         {            
