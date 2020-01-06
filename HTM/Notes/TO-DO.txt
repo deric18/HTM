@@ -13,7 +13,7 @@ we will have input sdr and output sdr defines the state of the whole system i.e 
 Also need to account for temporal axons for incoming temporal connection and apical axons from upper layers.
 
 
-============================================================================================================CONNECTION TABLE===============================================================================================================================================================
+=================================================================================SYNAPSE TABLE===============================================================================================================================================================
 -Finish Connection Graph and implement temporal connection lines.
  ---Implement a three variable dictionary for lookup for connection points. (this will not work as dictionaries will have conflicts, Neither can i use a bit manipulation system to store the state of the Network as of its limitation
  of just two states , can represent whther a CP is from an axon or a dendrite or just empty. So currently my only option is to use a char map (for 1000 points in 1sq node this will be 100 * 1000 * 8 = 800 KB) pretty descent. (Acceptable) probelm 
@@ -29,7 +29,8 @@ Also need to account for temporal axons for incoming temporal connection and api
 				   -Provide an API for deleting a synapse.
 				   -Provide an API for unclaiming a connection point for any axonal or dendritic segment. 
 
-Problems : - Just having a single char map is causing probelm for the scenario when a segment is growing and tries to claim a synapse with a axonal CP the char map will send a connect signal but cannot inform the segment which neuron the axon is from!
+Problems : - Just having a single char map is causing probelm for the scenario when a segment is growing and tries to claim a synapse with a axonal CP the char map will send a connect signal but cannot
+inform the segment which neuron the axon is from!
 Solution : - If its an axon need to store a sepparate list of neuron ID of respective axonsand segment ID
 
 Problem: -How to represent neuron and SegmentID. (string or int or Guid )
@@ -50,6 +51,7 @@ Algo : The Connection table will maintain an internal character map for all the 
 -Handle Adding New Connection for Segment growth. (AddNewConnection() and BranchSegment())
 -Complete GetNextNeuron and neural growth mechanism.
 
+=================================================================================SYNAPSE GENERATOR==========================================================================================================
 
 Problems:
 -Implementing Apical and Distal Dendrites.-can be done with connection table

@@ -1,5 +1,5 @@
-﻿/*Connection Point Generator *Static Singleton Class
- * Copyright © Deric Roshan Pinto
+﻿/*Connection Point Generator (Static Singleton Class)
+ * Copyright ©Decision Machines
  * Author: Deric Roshan Pinto
  * Responsibilities:
  * -Takes care of logic for creating new connection points for any connection point in any block 
@@ -17,19 +17,23 @@ namespace HTM.Algorithms
     //Need methods for moving a specific number of positions left right down up and anywhere in between.
     public sealed class SynapseGenerator
     {
-        private uint cubeConstant;
-        private uint ppux;
-        private uint ppuy;
-        private uint ppuz;
-        private uint ppd;                
+        private uint rbr;
+        private uint xmin;
+        private uint xmax;
+        private uint ymin;
+        private uint ymax;
+        private uint zmin;
+        private uint zmax;
+        private readonly uint ppd;
+        private int seed;
 
         private static SynapseGenerator instance = null;        
 
         public SynapseGenerator()
-        {   
+        {
             //set PPD, cubeconstant
-            cubeConstant = uint.Parse(ConfigurationManager.AppSettings["CUBECONSTANT"]);            
-            ppd = ppux = ppuy = ppuz = 0;            
+            rbr = uint.Parse(ConfigurationManager.AppSettings["RBR"]);            
+            ppd = xmin = xmax = ymin = ymax = zmin = zmax = 0;            
         }
 
         public static SynapseGenerator Instance
@@ -43,30 +47,48 @@ namespace HTM.Algorithms
             }            
         }
 
-        private void GetBounds(Synapse pos)
-        {
-            if (pos is null)
-            {
-                throw new ArgumentNullException(nameof(pos));
-            }
-            //set appropriate positions to corner points where position is valid.              
-            //need to account for boundary conditions
-        }
-
-        private void SetFlags(Synapse position)
-        {
-
-        }
-
         private void SetBounds(Synapse pos)
+        {//set all dimensional min and maxes
+            xmin = MoveNPositionsX(false, rbr, pos.X);
+            xmax = MoveNPositionsX(true, rbr, pos.X);
+            ymin = MoveNPositionsY(false, rbr, pos.Y);
+            ymax = MoveNPositionsY(true, rbr, pos.Y);
+            zmin = MoveNPositionsZ(false, rbr, pos.Z);
+            zmax = MoveNPositionsZ(true, rbr, pos.Z);
+        }
+
+        private Synapse PredictNewRandomSynapse()
+        {//Use computed bounds to randomly predict a new position inside the random neuro block
+            //Need to be redone.
+
+            Random r = new Random(seed);
+            Synapse synapse = new Synapse();
+            int minimum = Convert.ToInt32(xmin);
+            int maximum = Convert.ToInt32(xmax);
+
+            synapse.X = (uint)r.Next(minimum, maximum);
+
+            minimum = Convert.ToInt32(ymin);
+            maximum = Convert.ToInt32(ymax);
+
+            synapse.Y = (uint)r.Next(minimum, maximum);
+
+            minimum = Convert.ToInt32(zmin);
+            maximum = Convert.ToInt32(zmax);
+
+            synapse.Z = (uint)r.Next(minimum, maximum);
+
+            return synapse;
+        }
+        
+        private void RegisterSynapseWithST(Synapse synapse)
         {
 
         }
 
-        private Synapse MoveNPositionsX(bool leftOrRight, uint n, Synapse position)
-        {
-            Synapse toRet = new Synapse(position);
-            uint x = position.X;
+        private uint MoveNPositionsX(bool leftOrRight, uint n, uint X)
+        {            
+            uint x = X;
             if (leftOrRight) //left
             {
                 //for every reduction in x check if point has crossed to another block                
@@ -84,14 +106,12 @@ namespace HTM.Algorithms
                     x++;
                 }
             }
-            position.X = x;
-            return position;
+            return x;
         }
 
-        private Synapse MoveNPositionsY(bool leftOrRight, uint n, Synapse position)
-        {
-            Synapse toRet = new Synapse(position);
-            uint y = position.Y;
+        private uint MoveNPositionsY(bool leftOrRight, uint n, uint Y)
+        {            
+            uint y = Y;
             if (leftOrRight) //left
             {
                 //for every reduction in x check if point has crossed to another block                
@@ -109,14 +129,12 @@ namespace HTM.Algorithms
                     y++;
                 }
             }
-            position.Y = y;
-            return position;
+            return y;
         }
 
-        private Synapse MoveNPositionsZ(bool leftorRight, uint n, Synapse position)
-        {
-            Synapse toRet = new Synapse(position);
-            uint z = position.Z;
+        private uint MoveNPositionsZ(bool leftorRight, uint n, uint Z)
+        {            
+            uint z = Z;
             if (leftorRight) //left
             {
                 //for every reduction in x check if point has crossed to another block                
@@ -134,32 +152,7 @@ namespace HTM.Algorithms
                     z++;
                 }
             }
-            position.Z = z;
-            return position;
-        }
-
-        public static Synapse GetBoxedRandomPosition(Synapse pos)
-        {
-            if(ValidateVerticalBOunds(pos))
-            {
-
-            }
-            if(ValidateHorizontalBOunds(pos))
-            {
-
-            }
-        }
-
-
-        private bool ValidateVerticalBounds(Synapse pos)
-        {//make sure position is within the RANDOM BOUND BLOCK
-            
-
-        }
-
-        private bool ValidateHorizontalBounds(Synapse pos)
-        {
-            return 
+            return z;
         }
     }
 }

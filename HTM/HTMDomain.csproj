@@ -45,9 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithms\ConnectionPointGenerator.cs" />
-    <Compile Include="Algorithms\ConnectionTable.cs" />
-    <Compile Include="CPM.cs" />
+    <Compile Include="Algorithms\SynapseGenerator.cs" />
+    <Compile Include="Algorithms\SynapseTable.cs" />
+    <Compile Include="SynapseManager.cs" />
     <Compile Include="Encoders\IntegerEncoder.cs" />
     <Compile Include="Enums\BranchingTechnique.cs" />
     <Compile Include="Enums\ConnectionType.cs" />
