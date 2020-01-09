@@ -61,7 +61,7 @@
     <Compile Include="Interfaces\IEncode.cs" />
     <Compile Include="Models\Column.cs" />
     <Compile Include="Models\Neuron.cs" />
-    <Compile Include="Models\NumColumnsPerBlock.cs" />
+    <Compile Include="Init Constants\NumColumnsPerBlock.cs" />
     <Compile Include="Models\Position2D.cs" />
     <Compile Include="Models\Position3D.cs" />
     <Compile Include="Models\SDR.cs" />

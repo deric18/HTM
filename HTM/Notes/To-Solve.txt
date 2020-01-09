@@ -43,5 +43,6 @@ cube constant    No. of CP/line   No.lines
 100000              100              1000
 1000000             1000             1000
 
+Q:How to handle connection fabric, am using uint for position3D , it will be less when i want 100k points within 1 block , i should 
 
 T:How do you want to handle the branching of dednrites and axons ?

@@ -30,9 +30,8 @@ namespace HTM
             }
         }
 
-        public uint NumRows { get; private set; }
-        public uint NumColumns{ get; private set; }
-        public uint NumFiles { get; private set; }
+        public uint XZSize { get; private set; }
+        public uint YSize{ get; private set; }        
         public CPMState State { get; private set; }
         public Column[][] Columns { get; private set; }
         private List<Neuron> _longPredictedList;
@@ -41,11 +40,11 @@ namespace HTM
         private bool _readyTemporal;
         private bool _readyApical;                      
 
-        public static void Initialize(uint length, uint breadth, uint width)
+        public static void Initialize(ulong NumberofPoints)
         {
-            instance.NumRows = length;
-            instance.NumColumns = breadth;
-            instance.NumFiles = width;
+            //ToDo : Calculate the block size based on given number of points for the whole region and initialize the variables accordingly.
+            instance.XZSize = length;
+            instance.YSize = breadth;            
             instance.State = CPMState.RESTING;            
             instance._longPredictedList = new List<Neuron>();
             instance._shortPredictedList = new List<Neuron>();
@@ -237,7 +236,7 @@ namespace HTM
         {
             List<Neuron> toReturn = new List<Neuron>();
 
-            for(uint i=0; i<instance.NumColumns; i++)
+            for(uint i=0; i<instance.Columns; i++)
             {
                 toReturn.Add(GetNeuronFromPosition(position2D.X, i, position2D.Y));
             }

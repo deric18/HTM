@@ -19,6 +19,8 @@ namespace HTM.Algorithms
     //Need methods for moving a specific number of positions left right down up and anywhere in between.
     public sealed class SynapseGenerator
     {
+        private uint xzSize;
+        private uint ySize;        
         private uint rbr;
         private uint xmin;
         private uint xmax;
@@ -34,6 +36,8 @@ namespace HTM.Algorithms
         public SynapseGenerator()
         {
             //set PPD, cubeconstant
+            xzSize = SynapseManager.GetInstance.XZSize;
+            ySize = SynapseManager.GetInstance.YSize;
             rbr = uint.Parse(ConfigurationManager.AppSettings["RBR"]);            
             ppd = xmin = xmax = ymin = ymax = zmin = zmax = 0;            
         }
@@ -82,7 +86,7 @@ namespace HTM.Algorithms
 
             return synapse;
         }               
-
+        //Need to account for respective block Id changes , need some math to account for this.
         private uint MoveNPositionsX(bool leftOrRight, uint n, uint X)
         {            
             uint x = X;
