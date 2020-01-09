@@ -17,6 +17,7 @@ A:Every segment will have its median angle (i.e basically the amount of inclinat
 Q:How to decide whether a segment whould right split, left split or branch even ?
   🤔🤔🤔 (still Wondering) Needs to be Round Robin. 
 Q:How to decide when a segment should add the next connection or branch towards a new direction ?
+A: Dont do any of the above just do random search and connect.
  
 
 Temporal and Apical:
@@ -41,3 +42,6 @@ cube constant    No. of CP/line   No.lines
 10000               100              100
 100000              100              1000
 1000000             1000             1000
+
+
+T:How do you want to handle the branching of dednrites and axons ?
