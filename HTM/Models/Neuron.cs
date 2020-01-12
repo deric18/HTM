@@ -11,14 +11,14 @@ namespace HTM.Models
     {
         private uint _voltage;
         private uint _totalSegments;
-        public Synapse NeuronID { get; private set; }
+        public Position3D NeuronID { get; private set; }
         public NeuronState State { get; private set; }
         public Dictionary<uint, Segment> proximalSegments { get; private set; }      
         private List<Segment> _predictedSegments;                
-        private Dictionary<Synapse, SegmentID> axonEndPoints; 
+        private Dictionary<Position3D, SegmentID> axonEndPoints; 
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
 
-        public Neuron(Synapse pos)
+        public Neuron(Position3D pos)
         {
             _voltage = 0;
             _totalSegments = 0;
@@ -26,7 +26,7 @@ namespace HTM.Models
             State = NeuronState.RESTING;
             proximalSegments = new Dictionary<uint, Segment>();
             _predictedSegments = new List<Segment>();
-            axonEndPoints = new Dictionary<Synapse, SegmentID>();
+            axonEndPoints = new Dictionary<Position3D, SegmentID>();
         }
 
         internal Segment GetSegment(SegmentID segID)
@@ -48,7 +48,7 @@ namespace HTM.Models
             }            
         }               
 
-        internal void AddNewConnection(Synapse pos, SegmentID segmentID)
+        internal void AddNewConnection(Position3D pos, SegmentID segmentID)
         {
             SegmentID segid;
             if(!axonEndPoints.TryGetValue(pos, out segid))
@@ -58,7 +58,7 @@ namespace HTM.Models
         }
 
         //
-        internal void Process(SegmentID segID, Synapse SynapseId, InputPatternType iType)
+        internal void Process(SegmentID segID, Position3D SynapseId, InputPatternType iType)
         {
             Segment s = GetSegment(segID);
             if(s.Process(NEURONAL_FIRE_VOLTAGE, SynapseId, iType))            

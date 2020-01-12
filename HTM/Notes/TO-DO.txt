@@ -37,12 +37,12 @@ Problem: -How to represent neuron and SegmentID. (string or int or Guid )
 Solution: Need a custom new Identifier Object that will handle Hierarchical identification. Position3d and position4d
 
 Algo : The Connection table will maintain an internal character map for all the positions declaring
-'A' for occupied by a axon
-'D' for occupied by a dendrite
-'N' for Not Available ( Already Occupied)
-'a' for available.
-'t' for temporal axon line
-'p' for apical axon line
+'A' for Available.
+'D' for occupied by a dendrite.
+'N' for Not Available ( Already Occupied).
+'a' for occupied by a axon.
+'t' for temporal axon line.
+'p' for apical axon line.
 	
 ---Provide a mechanism for initializing temporal lines.
 -Complete Logic for Proximal Segment Bounds.
@@ -79,7 +79,8 @@ TODO:
   -Compute random neuron block. 
   -Once computed , predict random position in the block.
   -Register the predicted synpase to SynapseTable. (Cant be done , as per principles of modularity this should eb done by the claiming segment ID)
-
+Algorithm:
+-
 
 ==============================================================================SYNAPSE MANAGER=========================================================================================================================================================================
 -Complete Synapse Manager Functionality

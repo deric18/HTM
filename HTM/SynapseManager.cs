@@ -71,10 +71,10 @@ namespace HTM
         }
 
 
-        public Neuron GetNeuronFromPositionID(Synapse pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
+        public Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
         public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.X][segId.Y].GetNeuron(segId.Z);
 
-        public void AddConnection(SegmentID segId, Synapse pos)
+        public void AddConnection(SegmentID segId, Position3D pos)
         {
             GetNeuronFromSegmentID(segId).AddNewConnectionToSegment(pos, segId);
         }
@@ -212,7 +212,7 @@ namespace HTM
             }                        
         }       
 
-        private IEnumerable<Neuron> GetNeuronsFromPositions(List<Synapse> list)
+        private IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
         {
             List<Neuron> toReturn = new List<Neuron>();
 
@@ -230,7 +230,7 @@ namespace HTM
 
         private Neuron GetNeuronFromPosition(uint x, uint y, uint z) => Columns[x][y].GetNeuron(z);
 
-        private Neuron GetNeuronFromPosition(Synapse pos3d) => Columns[pos3d.X][pos3d.Y].GetNeuron(pos3d.Z);
+        private Neuron GetNeuronFromPosition(Position3D pos3d) => Columns[pos3d.X][pos3d.Y].GetNeuron(pos3d.Z);
 
         private List<Neuron> GetTemporalColumn(Position2D position2D)
         {

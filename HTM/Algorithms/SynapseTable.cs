@@ -13,15 +13,15 @@ namespace HTM.Algorithms
         private uint closedCounter;
         private uint temporalCounter;
         private uint apicalCounter;
-        private Dictionary<Synapse, SegmentID> axonalEndPoints;
-        private Dictionary<Synapse, SegmentID> dendriticEndPoints;
+        private Dictionary<Position3D, SegmentID> axonalEndPoints;
+        private Dictionary<Position3D, SegmentID> dendriticEndPoints;
         private static SynapseTable synapseTable;
 
         private SynapseTable(uint x, uint y, uint z)
         {
             openCounter = closedCounter = temporalCounter = closedCounter = 0;
-            axonalEndPoints = new Dictionary<Synapse, SegmentID>();
-            dendriticEndPoints = new Dictionary<Synapse, SegmentID>();
+            axonalEndPoints = new Dictionary<Position3D, SegmentID>();
+            dendriticEndPoints = new Dictionary<Position3D, SegmentID>();
             cMap = new char[x, y][];
             for (int i = 0; i < x; i++)
                 for (int j = 0; j < y; j++)
@@ -50,7 +50,7 @@ namespace HTM.Algorithms
         /// <param name="claimerSegID">SegmentID</param>
         /// <param name="eType">EndpointType eType</param>
         /// <returns>Connection Result</returns>
-        public ConnectionType ClaimPosition(Synapse pos, SegmentID claimerSegID, EndPointType eType)
+        public ConnectionType ClaimPosition(Position3D pos, SegmentID claimerSegID, EndPointType eType)
         {
             /// Scenario 1: If the claimer is a dendrite and the position is empty we just give the position to them.
             /// Scenario 2: If the claimer is a axon and the position is empty we add the segment id to the dict and mark the position as 'A'.
@@ -141,7 +141,7 @@ namespace HTM.Algorithms
             return ConnectionType.NotAvailable;
         }
 
-        private void AxonClaim(Synapse pos, SegmentID claimerSegID)
+        private void AxonClaim(Position3D pos, SegmentID claimerSegID)
         {
             SegmentID seg;
             if (dendriticEndPoints.TryGetValue(pos, out seg))
@@ -151,7 +151,7 @@ namespace HTM.Algorithms
             }
         }
 
-        private void DendriteClaim(Synapse pos, SegmentID claimerSegID)
+        private void DendriteClaim(Position3D pos, SegmentID claimerSegID)
         {
             cMap[pos.X, pos.Y][pos.Z] = 'N';
             SegmentID seg;

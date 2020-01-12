@@ -53,7 +53,7 @@ namespace HTM.Algorithms
             }            
         }
 
-        private void SetBounds(Synapse pos)
+        private void SetBounds(Position3D pos)
         {//set all dimensional min and maxes
             xmin = MoveNPositionsX(false, rbr, pos.X);
             xmax = MoveNPositionsX(true, rbr, pos.X);
@@ -63,12 +63,12 @@ namespace HTM.Algorithms
             zmax = MoveNPositionsZ(true, rbr, pos.Z);
         }
 
-        private Synapse PredictNewRandomSynapse()
+        private Position3D PredictNewRandomSynapse()
         {//Use computed bounds to randomly predict a new position inside the random neuro block
             //Need to be redone.
 
             Random r = new Random(seed);
-            Synapse synapse = new Synapse();
+            Position3D synapse = new Position3D();
             int minimum = Convert.ToInt32(xmin);
             int maximum = Convert.ToInt32(xmax);
 
@@ -87,6 +87,7 @@ namespace HTM.Algorithms
             return synapse;
         }               
         //Need to account for respective block Id changes , need some math to account for this.
+        //x only accounts for x 
         private uint MoveNPositionsX(bool leftOrRight, uint n, uint X)
         {            
             uint x = X;
