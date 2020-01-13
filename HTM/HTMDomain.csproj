@@ -45,8 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithms\Interval.cs" />
     <Compile Include="Algorithms\SynapseGenerator.cs" />
     <Compile Include="Algorithms\SynapseTable.cs" />
+    <Compile Include="Algorithms\Vertice.cs" />
     <Compile Include="SynapseManager.cs" />
     <Compile Include="Encoders\IntegerEncoder.cs" />
     <Compile Include="Enums\BranchingTechnique.cs" />

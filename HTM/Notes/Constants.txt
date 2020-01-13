@@ -1,9 +1,11 @@
 ﻿---------------------------CONSTANTS----------------------------
+NUMBLOCKSPERROW - TOTAL NUMBER OF BLOCK PER ROW
+NUMBLOCKSPERCOL - TOTAL NUMBER OF BLOCKS PER COLUMN
 NUMCONNECTONPOINTS- TOTAL NUMBER OF CONNECTION POINTS IN THE REGION
 NUMNEURONS- TOTAL NUMBER OF NEURONS IN THE REGION
 CUBECONSTANT- NUMBER OF CONNECTION POINTS TO NUMBER OF NEURONS RATIO.
 NUMCONPOINTSPERDIMENSION - Total Connection points per dimension.
-RBR - RANDOMBLOCKRADIUS - cube radius for generating new random position 
+RBR - BLOCKRADIUS - cube radius for generating new random position 
 PPB - Points Per Block
 PPL - Points Per Layer - number of points in one single 3D line.
 PRUNE_THRESHOLD

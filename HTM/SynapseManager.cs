@@ -30,8 +30,8 @@ namespace HTM
             }
         }
 
-        public uint XZSize { get; private set; }
-        public uint YSize{ get; private set; }        
+        public uint NumRows { get; private set; }
+        public uint NumCols{ get; private set; }        
         public CPMState State { get; private set; }
         public Column[][] Columns { get; private set; }
         private List<Neuron> _longPredictedList;
@@ -43,8 +43,8 @@ namespace HTM
         public static void Initialize(ulong NumberofPoints)
         {
             //ToDo : Calculate the block size based on given number of points for the whole region and initialize the variables accordingly.
-            instance.XZSize = length;
-            instance.YSize = breadth;            
+            instance.NumRows = length;
+            instance.NumCols = breadth;            
             instance.State = CPMState.RESTING;            
             instance._longPredictedList = new List<Neuron>();
             instance._shortPredictedList = new List<Neuron>();

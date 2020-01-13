@@ -79,8 +79,11 @@ TODO:
   -Compute random neuron block. 
   -Once computed , predict random position in the block.
   -Register the predicted synpase to SynapseTable. (Cant be done , as per principles of modularity this should eb done by the claiming segment ID)
+
 Algorithm:
--
+-Compute new Coordinates for the random square block for the given position.
+-Once computed determine transform for every point thereby also determining basis blocks for the corresponding positions.
+-Using the computed basis blocks predict new point using Interval class.
 
 ==============================================================================SYNAPSE MANAGER=========================================================================================================================================================================
 -Complete Synapse Manager Functionality

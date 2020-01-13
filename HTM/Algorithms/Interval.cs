@@ -8,7 +8,8 @@ namespace HTM.Algorithms
 {
     internal static class Interval
     {        
-        private static uint PredictNewRandomSynapse(uint i1, uint i2, uint i3, uint i4)
+        //iLow, iLowMid, iHighMid, iHigh
+        public static uint PredictNewRandomSynapse(uint i1, uint i2, uint i3, uint i4)
         {//Use computed bounds to randomly predict a new position inside the random neuro block
             //Need to be redone.
 
@@ -24,7 +25,7 @@ namespace HTM.Algorithms
             return (rnd1 + rnd2) % 2 == 0 ? rnd1 : rnd2;
         }
 
-        private static uint PredictNewRandomSynapseWithoutInterval(uint i1, uint i2)
+        public static uint PredictNewRandomSynapseWithoutInterval(uint i1, uint i2)
         {
             Random r = new Random();
             int I1 = Convert.ToInt32(i1);
