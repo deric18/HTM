@@ -48,3 +48,6 @@ Q:How to handle connection fabric, am using uint for position3D , it will be les
 T:How do you want to handle the branching of dednrites and axons ?
 A: simple random branching.
 
+Q:What is the purpose of transforming within neuro blocks
+A: whenever generating new random positions ,if the random square neuro block for the position being considered is going to be transformed into  jsut x left then basis block are different and if its xz transform then basis blocks are different than 
+x baiss blocks. so need to be included than that.
