@@ -42,7 +42,11 @@ namespace HTM
 
         public static void Initialize(ulong NumberofPoints)
         {
-            //ToDo : Calculate the block size based on given number of points for the whole region and initialize the variables accordingly.
+            //Notes ToDo : BASED ON NUMBER OF CLOUMNS , ROWS AND FILES TO BE CREATED , CREATE THAT MANY BLOCKS IN ORDER WITH X-Y & THEN Z CO-ORDINATE SYSTEM WITH SYNAPSE GENERATOR AND SYNAPSE TABLE AND INTERVAL
+            /*LOAD ONE OF THE CONFIGURATIONS FROM NumColumnsPerBlock ,  once loaded intialise the system appropriately 
+             * Initialie the synapse table 
+             * Intialise interval , SynapseGenerator
+             **/           
             instance.NumRows = length;
             instance.NumCols = breadth;            
             instance.State = CPMState.RESTING;            

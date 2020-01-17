@@ -84,6 +84,17 @@ Algorithm:
 -Compute new Coordinates for the random square block for the given position.
 -Once computed determine transform for every point thereby also determining basis blocks for the corresponding positions.
 -Using the computed basis blocks predict new point using Interval class.
+===================================================================================SEGMENT============================================================================================================================================================================
+Problems:
+-There are 2 types of segments proximal and distal , how does proximal segments create new distal segments
+-Proximal Segmetns are the first created layer of segments per neuron
+-Distal Segments are the segments post first layer.
+
+
+
+====================================================================================NEURON============================================================================================================================================================================
+
+
 
 ==============================================================================SYNAPSE MANAGER=========================================================================================================================================================================
 -Complete Synapse Manager Functionality
