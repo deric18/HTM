@@ -25,7 +25,13 @@ namespace HTM.Algorithms
             return (rnd1 + rnd2) % 2 == 0 ? rnd1 : rnd2;
         }
 
-        public static uint PredictNewRandomSynapseWithoutInterval(uint i1, uint i2)
+        /// <summary>
+        /// i1 is minimum and i2 is the maximum
+        /// </summary>
+        /// <param name="i1"></param>
+        /// <param name="i2"></param>
+        /// <returns></returns>
+        public static uint PredictNewRandomSynapseWithoutInterval(uint i1, uint i2)         
         {
             Random r = new Random();
             int I1 = Convert.ToInt32(i1);

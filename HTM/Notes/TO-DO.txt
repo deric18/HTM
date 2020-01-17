@@ -66,7 +66,7 @@ whenever you pick one.
 Problem with this approach - Edge Case : Whenver there is a point which lays on the edge of the given neuronn block then defining its random bounds block becomes difficult logic wise
 Solution - Needs more imagination , figure drawing and some thorough edge case testing, some good test cases would be what if the point lies on the corner of 3 neuro blocks , how to 
 form the random bounds block then ? and also what if the position is at the top of the Inter neuron Periphery ? , I need something like a block ID , this will change 
-logic of SynapseGenerator , need to account blockID into it now.
+logic of SynapseGenerator , need to account blockID into it now.  
 
 TODO: 
 -Complete the Connection point generation algorithm
