@@ -38,13 +38,18 @@ namespace HTM.Models
             throw new InvalidOperationException("Invalid Segment ID Access");
         }        
 
+        internal void Process(Position3D position, SegmentID segmentID, uint potential)
+        {
+
+        }
+
         internal void Fire()
         {
             //Supply firing voltage to all the connected synapses.
             //Always use Process method fro mthe neuron as the neuron needs to to strength updates on the segment.
             foreach(var kvp in axonEndPoints )
             {
-                SynapseManager.GetInstance.GetNeuronFromPositionID(kvp.Key).Process(kvp.Value, kvp.Key, InputPatternType.INTERNAL);
+                CPM.GetInstance.GetNeuronFromPositionID(kvp.Key).Process(kvp.Value, kvp.Key, InputPatternType.INTERNAL);
             }            
         }               
 

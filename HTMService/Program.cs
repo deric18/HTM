@@ -11,7 +11,7 @@ namespace HTMService
     {
         static void Main(string[] args)
         {
-            SynapseManager cpm = SynapseManager.GetInstance;
+            CPM cpm = CPM.GetInstance;
 
             //Console.WriteLine("Enter lenth of the block:");
             //uint x = Convert.ToUInt32(Console.ReadLine());

@@ -10,7 +10,7 @@ namespace HTM
     {
         static void Main(string[] args)
         {
-            SynapseManager cpm = SynapseManager.GetInstance;            
+            CPM cpm = CPM.GetInstance;            
 
             Console.WriteLine("Enter lenth of the block:");
             uint x = Convert.ToUInt32(Console.ReadLine());
@@ -20,7 +20,7 @@ namespace HTM
             uint z = Convert.ToUInt32(Console.ReadLine());
 
             Console.WriteLine("Initializing...");
-            SynapseManager.Initialize(x, y, z);
+            CPM.Initialize(x, y, z);
             Console.WriteLine("Done.");
 
             //Set Up Spatial Input pattern Source

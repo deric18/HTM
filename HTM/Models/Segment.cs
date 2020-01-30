@@ -20,7 +20,7 @@ namespace HTM.Models
         private uint _temporalVoltage;
         private uint _apicalVoltage;
         private uint _internalVoltage;            
-        private bool _fullyConnected;          
+        private bool _fullyConnected;       
         private List<Segment> SubSegments;
         private Dictionary<Position3D, uint> _connections;    //strength
         private List<Position3D> _predictedSynapses;
@@ -29,9 +29,10 @@ namespace HTM.Models
         private static uint NEW_SYNAPSE_CONNECTION_DEF;
         
 
-        public Segment(SegmentID segmentID, Vector baseVector, int seed)
+        public Segment(SegmentID segmentID, Vector baseVector, int seed, SegmentType sType)
         {            
             SegmentId = segmentID;
+            this.sType = sType;
             _bType = BranchingTechnique.BranchBinary;
             _sumVoltage = 0;
             _temporalVoltage = 0;
@@ -109,14 +110,14 @@ namespace HTM.Models
         /// Boxed Growth : Direction and boxed random connection
         /// 1.A Segment should have direction it grows and by default will have limits set to how far away the segment can predict its new connection.
         /// </summary>
-        internal void AddNewLocalConnection()
+        private void AddNewLocalConnection()
         {            
             //Make sure you are not connecting to an axon of your own neuron if its a new position
             /*Decide how to add new connection : Randomly pick connections from the segments local visibility radius and connect.
             */
             //If not branched and position is noand check if segment has max positions , add this position to a possibility list for future connection when the neuron losses and non used connection else if not max position then add new position,
             //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.  
-            Position3D bounds = SynapseManager.GetBound();
+            Position3D bounds = CPM.GetBound();
             Position3D newPosition = GetNewPositionFromBound(bounds);            
 
             if (!_fullyConnected && (_connections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition))
@@ -134,6 +135,11 @@ namespace HTM.Models
                 //log Information with details , Segment has reached a peak connection pathway , this is essentially a crucial segment for the whole region.
             }            
         }       
+
+        private void PickLocalForNewSegment()
+        {
+
+        }
 
         public void Prune()
         {
@@ -215,7 +221,7 @@ namespace HTM.Models
         /// -When to branch and when to GetNewConnection
         ///  --Role out a Round Robin.
         /// </summary>        
-        private void SegmentGrow()
+        private void Grow()
         {
             switch (_bType)
             {

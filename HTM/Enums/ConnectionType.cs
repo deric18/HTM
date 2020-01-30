@@ -1,6 +1,6 @@
 ﻿namespace HTM.Enums
 {
-    public enum ConnectionType
+    public enum CType
     {
         ConnectedToAxon,
         ConnectedToDendrite,

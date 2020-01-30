@@ -36,8 +36,8 @@ namespace HTM.Algorithms
         public SynapseGenerator()
         {
             //set PPD, cubeconstant
-            xzSize = SynapseManager.GetInstance.NumRows;
-            ySize = SynapseManager.GetInstance.NumCols;
+            xzSize = CPM.GetInstance.NumRows;
+            ySize = CPM.GetInstance.NumCols;
             rbr = uint.Parse(ConfigurationManager.AppSettings["RBR"]);            
             ppd = xmin = xmax = ymin = ymax = zmin = zmax = 0;            
         }

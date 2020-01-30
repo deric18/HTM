@@ -13,8 +13,8 @@ namespace HTM.Algorithms
         Vertice(Position3D pos)
         {
             this.pos = pos;
-            this.numCols = SynapseManager.GetInstance.NumCols;
-            this.numRows = SynapseManager.GetInstance.NumRows;
+            this.numCols = CPM.GetInstance.NumCols;
+            this.numRows = CPM.GetInstance.NumRows;
             string s = ConfigurationManager.AppSettings["BLOCKRADIUS"];
             if (String.IsNullOrEmpty(s))
                 throw new InvalidOperationException("BlcokRadius needs to be Configured");
@@ -28,8 +28,8 @@ namespace HTM.Algorithms
 
         private uint PredictX_Coordinate()
         {
-            uint numRows = SynapseManager.GetInstance.NumCols;
-            uint numCols = SynapseManager.GetInstance.NumRows;
+            uint numRows = CPM.GetInstance.NumCols;
+            uint numCols = CPM.GetInstance.NumRows;
             if (pos.X - blockRadius <= 0) //Crossing into Left Block of X;
             {
                 if (pos.BlockID % 10 != 0)  //X Basis Block

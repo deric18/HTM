@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace HTM.Algorithms
 {
-    public class SynapseTable
+    public class ConnectionTable
     {
         private char[,][] cMap;            //keeps track of every connection point in the 
         private ulong openCounter;
@@ -15,13 +15,15 @@ namespace HTM.Algorithms
         private uint apicalCounter;
         private Dictionary<Position3D, SegmentID> axonalEndPoints;
         private Dictionary<Position3D, SegmentID> dendriticEndPoints;
-        private static SynapseTable synapseTable;
+        private Dictionary<Position3D, DoubleSegment> synapses;
+        private static ConnectionTable synapseTable;
 
-        private SynapseTable(uint x, uint y, uint z)
+        private ConnectionTable(uint x, uint y, uint z)
         {
             openCounter = closedCounter = temporalCounter = closedCounter = 0;
-            axonalEndPoints = new Dictionary<Position3D, SegmentID>();
-            dendriticEndPoints = new Dictionary<Position3D, SegmentID>();
+            axonalEndPoints = new Dictionary<Position3D, SegmentID>();          //holds all the due axonal connections.
+            dendriticEndPoints = new Dictionary<Position3D, SegmentID>();       //<position3d , corresponding segment id of the dendrite>.
+            synapses = new Dictionary<Position3D, DoubleSegment>();             //Holds all the synapses with respective synapses ID's.
             cMap = new char[x, y][];
             for (int i = 0; i < x; i++)
                 for (int j = 0; j < y; j++)
@@ -36,10 +38,15 @@ namespace HTM.Algorithms
 
         }
 
-        public static SynapseTable Singleton(uint x = 0, uint y = 0, uint z = 0)
+        /*TO Implement:
+         * -when cpm processes a neuronal fire it gives all the positions to which the neuron fires , then cpm needs to get all thos positions and find out if there are any neurons connecting to the specific position and if so get there segment ids and tra
+         *  potential to those segments
+         */
+
+        public static ConnectionTable Singleton(uint x = 0, uint y = 0, uint z = 0)
         {
             if(synapseTable == null)           
-                synapseTable = new SynapseTable(x, y, z);            
+                synapseTable = new ConnectionTable(x, y, z);            
             return synapseTable;
         }
 
@@ -49,7 +56,7 @@ namespace HTM.Algorithms
         /// <param name="pos">Position that is under claim investigation</param>
         /// <param name="claimerSegID">SegmentID</param>
         /// <param name="eType">EndpointType eType</param>
-        /// <returns>Connection Result</returns>
+        /// <returns>ConnectionType to</returns>
         public ConnectionType ClaimPosition(Position3D pos, SegmentID claimerSegID, EndPointType eType)
         {
             /// Scenario 1: If the claimer is a dendrite and the position is empty we just give the position to them.
@@ -146,8 +153,8 @@ namespace HTM.Algorithms
             SegmentID seg;
             if (dendriticEndPoints.TryGetValue(pos, out seg))
             {
-                SynapseManager.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
-                SynapseManager.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
+                CPM.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
+                CPM.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
             }
         }
 
@@ -157,8 +164,8 @@ namespace HTM.Algorithms
             SegmentID seg;
             if (axonalEndPoints.TryGetValue(pos, out seg))
             {
-                SynapseManager.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
-                SynapseManager.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
+                CPM.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
+                CPM.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
             }
         }
 

@@ -11,7 +11,7 @@ namespace HtmTest
         [TestMethod]
         public void TestNeuron()
         {
-            HTM.SynapseManager cpm = new HTM.SynapseManager();
+            HTM.CPM cpm = new HTM.CPM();
 
             SDR testInput = GetTestInput();
             SDR expectedOutput = GetTestOutput();

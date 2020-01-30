@@ -6,14 +6,14 @@ using System.Collections.Generic;
 
 namespace HTM
 {
-    public class SynapseManager
+    public class CPM
     {        
-        public static volatile SynapseManager instance;
+        public static volatile CPM instance;
         public static object syncRoot = new object();
 
-        public SynapseManager() { }
+        public CPM() { }
 
-        public static SynapseManager GetInstance
+        public static CPM GetInstance
         {
             get
             {
@@ -22,7 +22,7 @@ namespace HTM
                     lock (syncRoot)
                     {
                         if (instance == null)
-                            instance = new SynapseManager();   
+                            instance = new CPM();   
                     }
                 }
 
@@ -73,7 +73,6 @@ namespace HTM
                 return;
             }
         }
-
 
         public Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
         public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.X][segId.Y].GetNeuron(segId.Z);
@@ -240,7 +239,7 @@ namespace HTM
         {
             List<Neuron> toReturn = new List<Neuron>();
 
-            for(uint i=0; i<instance.Columns; i++)
+            for (uint i = 0; i < instance.Columns; i++)
             {
                 toReturn.Add(GetNeuronFromPosition(position2D.X, i, position2D.Y));
             }
