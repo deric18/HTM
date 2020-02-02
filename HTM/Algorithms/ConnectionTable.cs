@@ -2,6 +2,7 @@
 
 using HTM.Enums;
 using HTM.Models;
+using System;
 using System.Collections.Generic;
 
 namespace HTM.Algorithms
@@ -13,17 +14,17 @@ namespace HTM.Algorithms
         private uint closedCounter;
         private uint temporalCounter;
         private uint apicalCounter;
-        private Dictionary<Position3D, SegmentID> axonalEndPoints;
-        private Dictionary<Position3D, SegmentID> dendriticEndPoints;
-        private Dictionary<Position3D, DoubleSegment> synapses;
+        private Dictionary<string, SegmentID> axonalEndPoints;
+        private Dictionary<string, SegmentID> dendriticEndPoints;
+        private Dictionary<string, DoubleSegment> synapses;
         private static ConnectionTable synapseTable;
 
         private ConnectionTable(uint x, uint y, uint z)
         {
             openCounter = closedCounter = temporalCounter = closedCounter = 0;
-            axonalEndPoints = new Dictionary<Position3D, SegmentID>();          //holds all the due axonal connections.
-            dendriticEndPoints = new Dictionary<Position3D, SegmentID>();       //<position3d , corresponding segment id of the dendrite>.
-            synapses = new Dictionary<Position3D, DoubleSegment>();             //Holds all the synapses with respective synapses ID's.
+            axonalEndPoints = new Dictionary<string, SegmentID>();          //holds all the due axonal connections.
+            dendriticEndPoints = new Dictionary<string, SegmentID>();       //<position3d , corresponding segment id of the dendrite>.
+            synapses = new Dictionary<string, DoubleSegment>();             //Holds all the synapses with respective synapses ID's.
             cMap = new char[x, y][];
             for (int i = 0; i < x; i++)
                 for (int j = 0; j < y; j++)
@@ -63,6 +64,7 @@ namespace HTM.Algorithms
             /// Scenario 2: If the claimer is a axon and the position is empty we add the segment id to the dict and mark the position as 'A'.
             /// Scenario 3: If the claimer is a dendrite and the positio9n is occupied by an axonal seg then check for selfing , remove the axonal seg id from the dict ,mark the position as 'N' in cMap and return the seg id.
             /// Scenario 4: If the claimer is a axon and the position is occupied by the dendrite then we again check for selfing, and send connect signal to claimed neuron, mark the position and return bind signal to claiming neuron.
+            SegmentID segid;
             switch (cMap[pos.X, pos.Y][pos.Z])
             {
                 case 'A': //Available                   
@@ -72,12 +74,12 @@ namespace HTM.Algorithms
                             AxonClaim(pos, claimerSegID);
                             cMap[pos.X, pos.Y][pos.Z] = 'A';
                             ++openCounter;
-                            break;
+                            return new ConnectionType(CType.SuccesfullyOccupied);                            
                         case EndPointType.Dendrite:
                             DendriteClaim(pos, claimerSegID);
                             cMap[pos.X, pos.Y][pos.Z] = 'D';
                             ++openCounter;
-                            break;
+                            return new ConnectionType(CType.SuccesfullyOccupied);
 
                         default: break;
                     }
@@ -90,24 +92,29 @@ namespace HTM.Algorithms
                             AxonClaim(pos, claimerSegID);
                             cMap[pos.X, pos.Y][pos.Z] = 'N';
                             --openCounter;
-                            ++closedCounter;
-                            return ConnectionType.ConnectedToDendrite;
+                            ++closedCounter;                            
+                            if(dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
+                                return new ConnectionType(CType.ConnectedToDendrite, segid);
+                            break;  
                         default:
-                            return ConnectionType.NotAvailable;
+                            return new ConnectionType(CType.NotAvailable);
                     }
+                    break;
                 case 'a'://Axon
                     switch (eType)
                     {
-                        case EndPointType.Dendrite:
+                        case EndPointType.Dendrite:     //dendrite claiming an axon
                             {
                                 DendriteClaim(pos, claimerSegID);
                                 cMap[pos.X, pos.Y][pos.Z] = 'N';
                                 --openCounter;
-                                ++closedCounter;
+                                ++closedCounter;                                
+                                if (dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
+                                    return new ConnectionType(CType.ConnectedToDendrite, segid);
                                 break;
                             }
                         default:
-                            return ConnectionType.NotAvailable;
+                            return new ConnectionType(CType.NotAvailable);
                     }
                     break;
                 case 'T'://Temporal Axon Line
@@ -119,12 +126,15 @@ namespace HTM.Algorithms
                                     DendriteClaim(pos, claimerSegID);
                                     cMap[pos.X, pos.Y][pos.Z] = 'N';
                                     ++temporalCounter;
-                                    --openCounter;
-                                    return ConnectionType.ConnectedToAxon;
+                                    --openCounter;                                    
+                                    if (dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
+                                        return new ConnectionType(CType.ConnectedToAxon, segid);
+                                    break;
                                 }
                             default:
-                                return ConnectionType.NotAvailable;
+                                return new ConnectionType(CType.NotAvailable);
                         }
+                        break;
                     }
                 case 'P'://Apical Axon Line
                     {
@@ -136,22 +146,25 @@ namespace HTM.Algorithms
                                     cMap[pos.X, pos.Y][pos.Z] = 'N';
                                     ++apicalCounter;
                                     --openCounter;
-                                    return ConnectionType.ConnectedToAxon;
+                                    if (dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
+                                        return new ConnectionType(CType.ConnectedToAxon, segid);
+                                    break;
                                 }
                             default:
-                                return ConnectionType.NotAvailable;
+                                return new ConnectionType(CType.NotAvailable);
                         }
                     }
-                case 'N': return ConnectionType.NotAvailable; 
+                    break;
+                case 'N': return new ConnectionType(CType.NotAvailable);
             }
 
-            return ConnectionType.NotAvailable;
+            return new ConnectionType(CType.NotAvailable);
         }
 
         private void AxonClaim(Position3D pos, SegmentID claimerSegID)
         {
             SegmentID seg;
-            if (dendriticEndPoints.TryGetValue(pos, out seg))
+            if (dendriticEndPoints.TryGetValue(pos.GetString(), out seg))
             {
                 CPM.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
                 CPM.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
@@ -162,7 +175,7 @@ namespace HTM.Algorithms
         {
             cMap[pos.X, pos.Y][pos.Z] = 'N';
             SegmentID seg;
-            if (axonalEndPoints.TryGetValue(pos, out seg))
+            if (axonalEndPoints.TryGetValue(pos.GetString(), out seg))
             {
                 CPM.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
                 CPM.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment

@@ -13,8 +13,8 @@ namespace HTM.Models
         private uint _totalSegments;
         public Position3D NeuronID { get; private set; }
         public NeuronState State { get; private set; }
-        public Dictionary<uint, Segment> proximalSegments { get; private set; }      
-        private List<Segment> _predictedSegments;                
+        public Dictionary<Guid, Segment> proximalSegments { get; private set; }      
+        private List<SegmentID> _predictedSegments;                
         private Dictionary<Position3D, SegmentID> axonEndPoints; 
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
 
@@ -24,22 +24,33 @@ namespace HTM.Models
             _totalSegments = 0;
             NeuronID = pos;
             State = NeuronState.RESTING;
-            proximalSegments = new Dictionary<uint, Segment>();
-            _predictedSegments = new List<Segment>();
+            proximalSegments = new Dictionary<Guid, Segment>();
+            _predictedSegments = new List<SegmentID>();
             axonEndPoints = new Dictionary<Position3D, SegmentID>();
         }
 
         internal Segment GetSegment(SegmentID segID)
         {
             Segment seg;
-            if (proximalSegments.TryGetValue(segID.ID, out seg))
+            if (proximalSegments.TryGetValue(segID.Guid, out seg))
                 return seg;
 
             throw new InvalidOperationException("Invalid Segment ID Access");
         }        
 
-        internal void Process(Position3D position, SegmentID segmentID, uint potential)
+        /// <summary>
+        /// Process Potential to segment and decide if you are gonna fire or not so CPM can add you to the prediction list.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="segmentID"></param>
+        /// <param name="potential"></param>
+        /// <returns></returns>
+        internal Potential Process(Position3D position, SegmentID segmentID, uint potential)
         {
+            //Get the segment , supply the potential and see if it decides to fire (NMDA) or depolarise.
+            //if NMDA add segment to predicted list and return response based on firing limits also after firing remember to flush the voltage.
+            //if deplorised good , keep the potential.
+
 
         }
 
