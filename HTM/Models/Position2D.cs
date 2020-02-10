@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace HTM.Models
 {
     //2-Dimensional Cartesian cordinate system
-    class Position2D
+    public class Position2D
     {
         public uint X { get; private set; }
         public uint Y { get; private set; }
@@ -17,6 +17,11 @@ namespace HTM.Models
         {
             X = x;
             Y = y;
+        }
+
+        public string GetString()
+        {
+            return X.ToString() + Y.ToString();
         }
     }
 }

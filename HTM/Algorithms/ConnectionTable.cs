@@ -36,7 +36,6 @@ namespace HTM.Algorithms
 
             //Draw Apical Lines here
 
-
         }
 
         /*TO Implement:

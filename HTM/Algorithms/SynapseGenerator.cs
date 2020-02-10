@@ -16,7 +16,10 @@ using HTM.Models;
 
 namespace HTM.Algorithms
 {
-    //Need methods for moving a specific number of positions left right down up and anywhere in between.
+    //NOTE : Need to account for scenario where position predicted is already occupied and in such cases we need to compute the position.
+    /// <summary>
+    /// To use this API , Intialise this object to ur segment pos3d and and call the setbounds method and call PredictNJEwRAndomSynapse Method , easy as it looks. thats it!
+    /// </summary>
     public sealed class SynapseGenerator
     {
         private uint xzSize;
@@ -63,10 +66,10 @@ namespace HTM.Algorithms
             zmax = MoveNPositionsZ(true, rbr, pos.Z);
         }
 
-        private Position3D PredictNewRandomSynapse()
+        public Position3D PredictNewRandomSynapse(Position3D basePosition)
         {//Use computed bounds to randomly predict a new position inside the random neuro block
             //Need to be redone.
-
+            SetBounds(basePosition);
             Random r = new Random(seed);
             Position3D synapse = new Position3D();
             int minimum = Convert.ToInt32(xmin);

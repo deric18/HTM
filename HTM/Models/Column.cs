@@ -9,6 +9,7 @@ namespace HTM.Models
         public List<Neuron> Neurons { get; private set; }
         public Position2D ID { get; private set; }
         public uint Size { get; private set; }
+        
 
         public Column(uint x, uint y, uint size)
         {
@@ -21,10 +22,18 @@ namespace HTM.Models
             }
         }
 
-        public Neuron GetNeuron(uint z) => Neurons[(int)z];               
+        public void Fire()
+        {
 
-        public List<Neuron> GetPredictedCells => Neurons.Where(pos => pos.State == NeuronState.PREDICTED).ToList();        
+        }
 
+        public Neuron GetNeuron(uint z) => Neurons[(int)z];
+
+        public List<Neuron> GetPredictedCells()
+        {
+            return Neurons.Where(pos => (pos.State == NeuronState.PREDICTED || pos.State == NeuronState.SPIKING)).ToList();
+        }
+        
         public string GetFiringCellRepresentation()
         {
             string toReturn = null;

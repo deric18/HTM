@@ -85,23 +85,27 @@ Algorithm:
 -Once computed determine transform for every point thereby also determining basis blocks for the corresponding positions.
 -Using the computed basis blocks predict new point using Interval class.
 ===================================================================================SEGMENT============================================================================================================================================================================
+
 Problems:
 -There are 2 types of segments proximal and distal , how does proximal segments create new distal segments
 -Proximal Segmetns are the first created layer of segments per neuron
 -Distal Segments are the segments post first layer.
 
-
-
 ====================================================================================NEURON============================================================================================================================================================================
 -kisi ko pata nahi ki lauda kitna kaam baki hai ?
-
-
+--finish process first 
+--then finish fire //fire will be done in CPM not in neuron
+--finish grow and prune
+ 
+Questions:?
+-Should the neuron wait ofr the end of the cycle to fire as it can either have potential to go into spike mode or just regular fire single fire
+--CPM should handle this logic , just add the neuron ID to the predicted list and make its voltage get property puiblic so at the end of the cycle CPM can analyse and decide which neuron should do what.
 
 ==============================================================================SYNAPSE MANAGER=========================================================================================================================================================================
 -Complete Synapse Manager Functionality
  -Process
  -Predict
-
+ 
 ===============================================================================ENCODER================================================================================================================================================================================
 -Write Some Encoders.
 

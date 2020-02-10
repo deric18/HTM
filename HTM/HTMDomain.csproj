@@ -52,6 +52,8 @@
     <Compile Include="Algorithms\ConnectionTable.cs" />
     <Compile Include="Algorithms\Transform.cs" />
     <Compile Include="Algorithms\Vertice.cs" />
+    <Compile Include="Enums\PotentialType.cs" />
+    <Compile Include="Enums\SignalType.cs" />
     <Compile Include="Enums\TransformType.cs" />
     <Compile Include="CPM.cs" />
     <Compile Include="Encoders\IntegerEncoder.cs" />

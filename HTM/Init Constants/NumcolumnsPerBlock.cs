@@ -9,7 +9,7 @@ namespace HTM.Models
     public static class NumColumnsPerBlock
     {
         public static readonly Dictionary<uint, KeyValuePair<int, int>> ColumnConfigurationPerBlock;
-        //<Number of Points per Line , Number of lines per dimension>
+        //Total Number of Points, <Number of Points per Line , Number of lines per dimension>
         static NumColumnsPerBlock()
         {
             ColumnConfigurationPerBlock = new Dictionary<uint, KeyValuePair<int, int>>()

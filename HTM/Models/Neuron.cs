@@ -15,8 +15,9 @@ namespace HTM.Models
         public NeuronState State { get; private set; }
         public Dictionary<Guid, Segment> proximalSegments { get; private set; }      
         private List<SegmentID> _predictedSegments;                
-        private Dictionary<Position3D, SegmentID> axonEndPoints; 
+        public Dictionary<Position3D, SegmentID> axonEndPoints { get; private set; } 
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
+        private CPM _cpm;
 
         public Neuron(Position3D pos)
         {
@@ -27,6 +28,7 @@ namespace HTM.Models
             proximalSegments = new Dictionary<Guid, Segment>();
             _predictedSegments = new List<SegmentID>();
             axonEndPoints = new Dictionary<Position3D, SegmentID>();
+            _cpm = CPM.GetInstance;
         }
 
         internal Segment GetSegment(SegmentID segID)
@@ -45,24 +47,25 @@ namespace HTM.Models
         /// <param name="segmentID"></param>
         /// <param name="potential"></param>
         /// <returns></returns>
-        internal Potential Process(Position3D position, SegmentID segmentID, uint potential)
+        internal bool Process(Position3D position, SegmentID segmentID, uint potential)
         {
             //Get the segment , supply the potential and see if it decides to fire (NMDA) or depolarise.
             //if NMDA add segment to predicted list and return response based on firing limits also after firing remember to flush the voltage.
             //if deplorised good , keep the potential.
-
-
-        }
-
-        internal void Fire()
-        {
-            //Supply firing voltage to all the connected synapses.
-            //Always use Process method fro mthe neuron as the neuron needs to to strength updates on the segment.
-            foreach(var kvp in axonEndPoints )
+            Segment seg = GetSegment(segmentID);
+            if(seg.Process(potential, position, InputPatternType.INTERNAL))     //if NMDA
             {
-                CPM.GetInstance.GetNeuronFromPositionID(kvp.Key).Process(kvp.Value, kvp.Key, InputPatternType.INTERNAL);
-            }            
-        }               
+                _voltage += seg._sumVoltage;
+                seg.FlushVoltage();
+                _predictedSegments.Add(seg.SegmentId);
+                return true;
+            }
+            return false;
+        }
+        public string GetString() => NeuronID.GetString();
+
+        private void FlushVoltage() =>        
+            _voltage = 0;        
 
         internal void AddNewConnection(Position3D pos, SegmentID segmentID)
         {
@@ -73,22 +76,14 @@ namespace HTM.Models
             }
         }
 
-        //
-        internal void Process(SegmentID segID, Position3D SynapseId, InputPatternType iType)
-        {
-            Segment s = GetSegment(segID);
-            if(s.Process(NEURONAL_FIRE_VOLTAGE, SynapseId, iType))            
-                _predictedSegments.Add(s);                                                                        
-        }
-
-        internal void Predict()
-        {
-
-        }           
-
         internal void Grow()
         {
-
+            //check which segment is growing the fastest and getting modre NMDA spikes and supply a grow signal
         }
-    }
+
+        internal void PRune()
+        {
+            //check which segment is most underpeforming and send inhibit signal to such segments.
+        }
+    } 
 }

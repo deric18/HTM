@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System;
 using HTM.Enums;
+using HTM.Algorithms;
 
 namespace HTM.Models
 {
+    //NOTE: line : 103
     /// <summary>
     /// -If Proximal Polarization  of the system
     /// -NMDA
@@ -13,15 +15,14 @@ namespace HTM.Models
     public class Segment
     {                        
         public SegmentID SegmentId { get; private set; }
-
-        private BranchingTechnique _bType;
+        public Position3D BasePostion { get; private set; }        
         private SegmentType sType;
-        private uint _sumVoltage;
+        public uint _sumVoltage { get; private set; }
         private uint _temporalVoltage;
         private uint _apicalVoltage;
         private uint _internalVoltage;            
         private bool _fullyConnected;       
-        private List<Segment> SubSegments;
+        private Lazy<List<Segment>> SubSegments;
         private Dictionary<Position3D, uint> _connections;    //strength
         private List<Position3D> _predictedSynapses;
         private static uint NMDA_Spike_Potential;
@@ -47,9 +48,9 @@ namespace HTM.Models
 
         internal Segment GetSegment(int v)
         {
-            if(v < SubSegments.Count)
+            if(SubSegments.IsValueCreated)
             {
-                return SubSegments[v];
+                return SubSegments.Value[v];
             }
 
             return null;
@@ -66,6 +67,7 @@ namespace HTM.Models
         /// <returns></returns>
         public bool Process(uint voltage, Position3D synapseId, InputPatternType iType)
         {
+            #region REMOVED
             switch (iType)
             {
                 case InputPatternType.INTERNAL:
@@ -85,6 +87,7 @@ namespace HTM.Models
                     }
                 default:break;
             }
+            #endregion
 
             _sumVoltage += voltage;            
 
@@ -96,7 +99,7 @@ namespace HTM.Models
                 if(_connections.TryGetValue(synapseId, out connectionStrength))
                 {
                     if (connectionStrength < MAX_Connection_Strength)                        
-                        _connections[synapseId]++;
+                        _connections[synapseId]++;                                                  //Debug and make sure this works fine
                 }
 
                 return true;
@@ -116,21 +119,24 @@ namespace HTM.Models
             /*Decide how to add new connection : Randomly pick connections from the segments local visibility radius and connect.
             */
             //If not branched and position is noand check if segment has max positions , add this position to a possibility list for future connection when the neuron losses and non used connection else if not max position then add new position,
-            //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.  
-            Position3D bounds = CPM.GetBound();
-            Position3D newPosition = GetNewPositionFromBound(bounds);            
+            //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.                          
+
+            SynapseGenerator sg = new SynapseGenerator();
+            Position3D newPosition;
 
             if (!_fullyConnected && (_connections.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])) && !DoesConnectionExist(newPosition) && !SelfConnection(newPosition))
             {
+                newPosition = sg.PredictNewRandomSynapse(BasePostion);
                 AddConnection(newPosition);
             }
-            else if(!_fullyConnected && SubSegments?.Count < int.Parse(ConfigurationManager.AppSettings["MAX_SEGMENTS_PER_NEURON"]) && !DoesSubSegmentExist(newPosition))
-            {                
+            else if(!_fullyConnected && SubSegments.Value.Count < int.Parse(ConfigurationManager.AppSettings["MAX_SEGMENTS_PER_NEURON"]) && !DoesSubSegmentExist(newPosition))
+            {
+                newPosition = sg.PredictNewRandomSynapse(BasePostion);
                 CreateSubSegment(newPosition);
             }
             else
             {
-                Console.WriteLine("Segment " + PrintPosition(NeuronID) + "-" + SegmentID + " is Over Connected");                
+                Console.WriteLine("Neuron: " + PrintBasePosition() + "Segment: " + PrintPosition(SegmentId) + "SEG ID: " + SegmentId.ID + "-" + " is Over Connected");                
                 _fullyConnected = true;
                 //log Information with details , Segment has reached a peak connection pathway , this is essentially a crucial segment for the whole region.
             }            
@@ -161,10 +167,12 @@ namespace HTM.Models
 
         private bool SelfConnection(Position3D newPosition)
         {
-            if (NeuronID.Equals(newPosition))
-                return true;
+            
+        }
 
-            return false;
+        private string PrintBasePosition()
+        {
+            Console.Write("X: {0} Y: {1} Z: {2}", BasePostion.X, BasePostion.Y, BasePostion.Z);
         }
 
         //private Position3D GetNewPositionFromBound(Position3D segmentBound)

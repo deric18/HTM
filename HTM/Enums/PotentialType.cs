@@ -1,9 +1,10 @@
 ﻿namespace HTM.Enums
 {
-    enum Potential
+    enum PotentialType
     {
         FIRE,
         SPIKE,
-        DEPOLARIZE
+        DEPOLARIZE,
+        RESTING
     }
 }

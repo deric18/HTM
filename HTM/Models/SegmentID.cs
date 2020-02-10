@@ -6,23 +6,15 @@ using System.Threading.Tasks;
 
 namespace HTM.Models
 {
-    public class SegmentID
+    public class SegmentID : Position3D
     {
-        public Guid Guid { get; set; }
-        public uint ID { get; private set; }
-        public uint X { get; private set; }
-        public uint Y { get; private set; }
-        public uint Z { get; private set; }
+        public Guid Guid { get; set; }        
 
-        public SegmentID() { }
+        public SegmentID():base() { }
 
-        public SegmentID(uint x, uint y, uint z, uint segmentid)
+        public SegmentID(uint x, uint y, uint z, uint segmentid):base(x,y,z,segmentid)
         {
-            Guid = new Guid();
-            X = x;
-            Y = y;
-            Z = z;
-            ID = segmentid;
+            Guid = new Guid();            
         }       
     }
 }
