@@ -1,6 +1,6 @@
-﻿---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-																								OBJECTIVES
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+﻿-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+																																			 OBJECTIVES
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Axonal and Dendritic Initial orientation and Growth Mechanism
 -Objective should be to increase as much sparsity as possible.
 -Generate a random orientation generator to assign initial orientation
@@ -13,7 +13,7 @@ we will have input sdr and output sdr defines the state of the whole system i.e 
 Also need to account for temporal axons for incoming temporal connection and apical axons from upper layers.
 
 
-=================================================================================SYNAPSE TABLE===============================================================================================================================================================
+=============================================================================================================================================SYNAPSE TABLE=========================================================================================================================================================================
 -Finish Connection Graph and implement temporal connection lines.
  ---Implement a three variable dictionary for lookup for connection points. (this will not work as dictionaries will have conflicts, Neither can i use a bit manipulation system to store the state of the Network as of its limitation
  of just two states , can represent whther a CP is from an axon or a dendrite or just empty. So currently my only option is to use a char map (for 1000 points in 1sq node this will be 100 * 1000 * 8 = 800 KB) pretty descent. (Acceptable) probelm 
@@ -45,13 +45,9 @@ Algo : The Connection table will maintain an internal character map for all the 
 'p' for apical axon line.
 	
 ---Provide a mechanism for initializing temporal lines.
--Complete Logic for Proximal Segment Bounds.
--Complete Schema for Distal Dendritic Segment Growth for every neuron. 
--Complete fire implementation for neurons and segments.		
--Handle Adding New Connection for Segment growth. (AddNewConnection() and BranchSegment())
--Complete GetNextNeuron and neural growth mechanism.
+-Complete basic CP structure and put unit tests in place to test it.
 
-=================================================================================SYNAPSE GENERATOR====================================================================================================================================================================
+============================================================================================================================================SYNAPSE GENERATOR======================================================================================================================================================================
 
 Problems:
 -Implementing Apical and Distal Dendrites.-can be done with connection table
@@ -78,20 +74,23 @@ TODO:
  New Workflow:
   -Compute random neuron block. 
   -Once computed , predict random position in the block.
-  -Register the predicted synpase to SynapseTable. (Cant be done , as per principles of modularity this should eb done by the claiming segment ID)
+  -Register the predicted synpase to SynapseTable. 
+
+Problem: If you use blockID's to create new blocks and subset of dimensional coordiantes then you have no other way of doing then doing synapse generation and maangement becomes problematic , the best solution that earlier we had thought out is the best way farward
+To create a single 3D coordinate system and have virtual blockID assigned to these things just for a point of reference.
 
 Algorithm:
 -Compute new Coordinates for the random square block for the given position.
 -Once computed determine transform for every point thereby also determining basis blocks for the corresponding positions.
 -Using the computed basis blocks predict new point using Interval class.
-===================================================================================SEGMENT============================================================================================================================================================================
+===============================================================================================================================================\==SEGMENT============================================================================================================================================================================
 
 Problems:
 -There are 2 types of segments proximal and distal , how does proximal segments create new distal segments
 -Proximal Segmetns are the first created layer of segments per neuron
 -Distal Segments are the segments post first layer.
 
-====================================================================================NEURON============================================================================================================================================================================
+===================================================================================================================================================NEURON============================================================================================================================================================================
 -kisi ko pata nahi ki lauda kitna kaam baki hai ?
 --finish process first 
 --then finish fire //fire will be done in CPM not in neuron
@@ -101,17 +100,17 @@ Questions:?
 -Should the neuron wait ofr the end of the cycle to fire as it can either have potential to go into spike mode or just regular fire single fire
 --CPM should handle this logic , just add the neuron ID to the predicted list and make its voltage get property puiblic so at the end of the cycle CPM can analyse and decide which neuron should do what.
 
-==============================================================================SYNAPSE MANAGER=========================================================================================================================================================================
+==============================================================================================================================================SYNAPSE MANAGER=========================================================================================================================================================================
 -Complete Synapse Manager Functionality
  -Process
  -Predict
  
-===============================================================================ENCODER================================================================================================================================================================================
+==================================================================================================================================================ENCODER================================================================================================================================================================================
 -Write Some Encoders.
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-																								TESTING:	
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+																		                                                           				TESTING:	
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -Write some unit tests to see if everything is working properly
 	-Similar inputs should generate similar output SDR's
 		what kind of things should i feed into it ?

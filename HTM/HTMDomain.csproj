@@ -69,7 +69,7 @@
     <Compile Include="Interfaces\IEncode.cs" />
     <Compile Include="Models\Column.cs" />
     <Compile Include="Models\Neuron.cs" />
-    <Compile Include="Init Constants\NumColumnsPerBlock.cs" />
+    <Compile Include="Init Constants\ConfigProvider.cs" />
     <Compile Include="Models\Position2D.cs" />
     <Compile Include="Models\Position3D.cs" />
     <Compile Include="Models\SDR.cs" />
@@ -83,13 +83,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Notes\Algorithm.txt" />
     <Content Include="Notes\Constants.txt" />
     <Content Include="Notes\Encoder.txt" />
     <Content Include="Notes\FunctionalDiagram.txt" />
+    <Content Include="Notes\Tasks.txt" />
     <Content Include="Notes\Theory.txt" />
     <Content Include="Notes\Thoughts.txt" />
-    <Content Include="Notes\TO-DO.txt" />
-    <Content Include="Notes\To-Solve.txt" />
+    <Content Include="Notes\Notes.txt" />
+    <Content Include="Notes\QNA.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

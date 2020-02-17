@@ -9,7 +9,7 @@ namespace HTM.Algorithms
 {
     public class ConnectionTable
     {
-        private char[,][] cMap;            //keeps track of every connection point in the 
+        private char[,][,] cMap;            //keeps track of every connection point in the 
         private ulong openCounter;
         private uint closedCounter;
         private uint temporalCounter;
@@ -19,34 +19,36 @@ namespace HTM.Algorithms
         private Dictionary<string, DoubleSegment> synapses;
         private static ConnectionTable synapseTable;
 
-        private ConnectionTable(uint x, uint y, uint z)
+        private ConnectionTable(uint numBlocks, BlockConfigProvider bcp)
         {
             openCounter = closedCounter = temporalCounter = closedCounter = 0;
             axonalEndPoints = new Dictionary<string, SegmentID>();          //holds all the due axonal connections.
             dendriticEndPoints = new Dictionary<string, SegmentID>();       //<position3d , corresponding segment id of the dendrite>.
             synapses = new Dictionary<string, DoubleSegment>();             //Holds all the synapses with respective synapses ID's.
-            cMap = new char[x, y][];
-            for (int i = 0; i < x; i++)
-                for (int j = 0; j < y; j++)
-                    for (int k = 0; k < z; k++)                        
-                        cMap[i, j][k] = 'A';
+            cMap = new char[numBlocks, bcp.X][,];
 
+
+            for (uint block = 0; block < numBlocks; block++)
+                for (uint i = 0; i < bcp.X; i++)
+                    for (uint j = 0; j < bcp.Y; j++)
+                        for (uint k = 0; k < bcp.Z; k++)
+                            cMap[block, i][j, k] = 'A';
             //Draw Temporal Lines here
 
 
             //Draw Apical Lines here
 
-        }
+        }        
 
         /*TO Implement:
          * -when cpm processes a neuronal fire it gives all the positions to which the neuron fires , then cpm needs to get all thos positions and find out if there are any neurons connecting to the specific position and if so get there segment ids and tra
          *  potential to those segments
          */
 
-        public static ConnectionTable Singleton(uint x = 0, uint y = 0, uint z = 0)
+        public static ConnectionTable Singleton(uint w, BlockConfigProvider bcp)
         {
             if(synapseTable == null)           
-                synapseTable = new ConnectionTable(x, y, z);            
+                synapseTable = new ConnectionTable(w, bcp);            
             return synapseTable;
         }
 
@@ -64,19 +66,19 @@ namespace HTM.Algorithms
             /// Scenario 3: If the claimer is a dendrite and the positio9n is occupied by an axonal seg then check for selfing , remove the axonal seg id from the dict ,mark the position as 'N' in cMap and return the seg id.
             /// Scenario 4: If the claimer is a axon and the position is occupied by the dendrite then we again check for selfing, and send connect signal to claimed neuron, mark the position and return bind signal to claiming neuron.
             SegmentID segid;
-            switch (cMap[pos.X, pos.Y][pos.Z])
+            switch (cMap[pos.ID, pos.X][pos.Y,pos.Z])
             {
                 case 'A': //Available                   
                     switch (eType)
                     {
                         case EndPointType.Axon:
                             AxonClaim(pos, claimerSegID);
-                            cMap[pos.X, pos.Y][pos.Z] = 'A';
+                            cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'A';
                             ++openCounter;
                             return new ConnectionType(CType.SuccesfullyOccupied);                            
                         case EndPointType.Dendrite:
                             DendriteClaim(pos, claimerSegID);
-                            cMap[pos.X, pos.Y][pos.Z] = 'D';
+                            cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'D';
                             ++openCounter;
                             return new ConnectionType(CType.SuccesfullyOccupied);
 
@@ -89,7 +91,7 @@ namespace HTM.Algorithms
                     {
                         case EndPointType.Axon://Axon claiming a dendritc position 
                             AxonClaim(pos, claimerSegID);
-                            cMap[pos.X, pos.Y][pos.Z] = 'N';
+                            cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
                             --openCounter;
                             ++closedCounter;                            
                             if(dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
@@ -105,7 +107,7 @@ namespace HTM.Algorithms
                         case EndPointType.Dendrite:     //dendrite claiming an axon
                             {
                                 DendriteClaim(pos, claimerSegID);
-                                cMap[pos.X, pos.Y][pos.Z] = 'N';
+                                cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
                                 --openCounter;
                                 ++closedCounter;                                
                                 if (dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
@@ -123,7 +125,7 @@ namespace HTM.Algorithms
                             case EndPointType.Dendrite:
                                 {
                                     DendriteClaim(pos, claimerSegID);
-                                    cMap[pos.X, pos.Y][pos.Z] = 'N';
+                                    cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
                                     ++temporalCounter;
                                     --openCounter;                                    
                                     if (dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
@@ -142,7 +144,7 @@ namespace HTM.Algorithms
                             case EndPointType.Dendrite:
                                 {
                                     DendriteClaim(pos, claimerSegID);
-                                    cMap[pos.X, pos.Y][pos.Z] = 'N';
+                                    cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
                                     ++apicalCounter;
                                     --openCounter;
                                     if (dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
@@ -158,6 +160,11 @@ namespace HTM.Algorithms
             }
 
             return new ConnectionType(CType.NotAvailable);
+        }
+
+        internal void InterfaceFire(string position)
+        {
+
         }
 
         private void AxonClaim(Position3D pos, SegmentID claimerSegID)

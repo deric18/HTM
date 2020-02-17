@@ -1,0 +1,2 @@
+﻿-Finsish CPM---------------------Done
+-Finish 2 unit tests to test the structure of Synapses structure in the block and in the region

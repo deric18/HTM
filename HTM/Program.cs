@@ -22,7 +22,8 @@ namespace HTM
             Console.WriteLine("Initializing...");
             CPM.Initialize(x, y, z);
             Console.WriteLine("Done.");
-
+            Console.Clear();
+            Console.WriteLine("System Ready.");
             //Set Up Spatial Input pattern Source
 
             //Set Up Temporal Input Pattern Source

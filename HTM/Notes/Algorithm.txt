@@ -1,0 +1,13 @@
+﻿RBR - Random Block Radius
+BASIS BLOCK			- THESE ARE THE BLOCKS THAT ARE ON THE EDGE FACES OF THE REGION.
+NUMBLOCKSPERCOL		- TOTAL NUMBER OF BLOCK PER ONE ROW OF THE REGION
+NUMBLOCKSPERROW		- TOTAL NUMBER OF BLOCKS PER ONE COLUMN OF THE REGION
+
+
+-Check if the given position belong to any of the basis block
+-if so assign respective coordinate to 0 and predict the rest and return.
+
+handling Core Basis Block :
+--check x,y,z block radius differences and set it to zero respc.
+-evaluate there counterparts to construct the RSB
+-PPRedict the new position with that .

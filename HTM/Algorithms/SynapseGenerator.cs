@@ -17,6 +17,7 @@ using HTM.Models;
 namespace HTM.Algorithms
 {
     //NOTE : Need to account for scenario where position predicted is already occupied and in such cases we need to compute the position.
+    //       CPM.NumX is actually the count of number of columns in the block and CPM.NumY is the count of number of rows in the block , Line : 43
     /// <summary>
     /// To use this API , Intialise this object to ur segment pos3d and and call the setbounds method and call PredictNJEwRAndomSynapse Method , easy as it looks. thats it!
     /// </summary>
@@ -39,8 +40,8 @@ namespace HTM.Algorithms
         public SynapseGenerator()
         {
             //set PPD, cubeconstant
-            xzSize = CPM.GetInstance.NumRows;
-            ySize = CPM.GetInstance.NumCols;
+            xzSize = CPM.GetInstance.NumX;
+            ySize = CPM.GetInstance.NumY;
             rbr = uint.Parse(ConfigurationManager.AppSettings["RBR"]);            
             ppd = xmin = xmax = ymin = ymax = zmin = zmax = 0;            
         }

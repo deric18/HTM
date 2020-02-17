@@ -2,6 +2,7 @@
 using HTM.Models;
 using HTM.Enums;
 using System.Collections.Generic;
+using HTM.Algorithms;
 
 namespace HTM
 {
@@ -32,15 +33,18 @@ namespace HTM
         public uint NumX { get; private set; }
         public uint NumY{ get; private set; }        
         public uint NumZ { get; private set; }
+        public uint NumBLocks { get; private set; }
         public CPMState State { get; private set; }
+        public BlockConfigProvider BCP { get; private set; }
         public Column[][] Columns { get; private set; }
         private Dictionary<string, Neuron> _longPredictedList;        //why 2 lists ? whats the diff ???
         //private List<Neuron> _shortPredictedList;
         private bool _readySpatial;
         private bool _readyTemporal;
-        private bool _readyApical;                      
+        private bool _readyApical;
+        private ConnectionTable cTable;
 
-        public static void Initialize(uint x, uint y, uint z)
+        public void Initialize(uint x, uint y, uint z)
         {
             //Notes ToDo : BASED ON NUMBER OF CLOUMNS , ROWS AND FILES TO BE CREATED , CREATE THAT MANY BLOCKS IN ORDER WITH X-Y & THEN Z CO-ORDINATE SYSTEM WITH SYNAPSE GENERATOR AND SYNAPSE TABLE AND INTERVAL
             /*LOAD ONE OF THE CONFIGURATIONS FROM NumColumnsPerBlock ,  once loaded intialise the system appropriately 
@@ -73,14 +77,16 @@ namespace HTM
                 Console.ReadKey();
                 return;
             }
-        }
 
-        internal void AddNeuronToPredictedList(Neuron neuron) => _longPredictedList.Add(neuron);        
+            instance.BCP = new BlockConfigProvider(100000);
+            instance.NumBLocks = 30;
+
+            cTable = ConnectionTable.Singleton(NumBLocks, instance.BCP);
+        }
+        
         internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
         internal Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.X][segId.Y].GetNeuron(segId.Z);
-
           
-
         /// <summary>
         /// All the Firing modules update the predicted list , changing the current state of the system.
         /// </summary>
@@ -190,54 +196,14 @@ namespace HTM
             }            
             else if(predictedCells.Count ==  1)
             {
-                //fire
-
+                //fire                
+                predictedCells[0].Fire();
             }
             else
             {
                 //pick & fire
 
-            }
-
-            switch(iType)
-            {
-                case InputPatternType.SPATIAL:
-                    {
-                        Column col = GetSpatialColumn(pos);
-
-                        List<Neuron> predictedCells = col.GetPredictedCells;
-
-                        if (predictedCells.Count > 0)
-                        {
-                            //Regular Fire
-                            foreach (var neuron in predictedCells)
-                            {
-                                _longPredictedList.AddRange(GetNeuronsFromPositions(neuron.Fire()));
-                            }
-                        }
-                        else
-                        {
-                            //Bursting
-                        }
-                        break;
-                    }
-                case InputPatternType.TEMPORAL:
-                    {
-                        //Bursts all the time
-                        //Travel through the axonal line laterally and add them to longpredicted list , give them temporal voltage
-                        List<Neuron> temporalColumn = GetTemporalColumn(pos);
-
-                        break;
-                    }
-                case InputPatternType.APICAL:
-                    {
-                        //Bursts all the time
-                        //Travel through the apical lines and add them to longpredictedlist , give them apical voltage.
-
-                        break;
-                    }
-                default:break;
-            }                        
+            }                           
         }       
 
         private IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
@@ -264,7 +230,7 @@ namespace HTM
         {
             List<Neuron> toReturn = new List<Neuron>();
 
-            for (uint i = 0; i < instance.Columns; i++)
+            for (uint i = 0; i < instance.Columns.Length; i++)
             {
                 toReturn.Add(GetNeuronFromPosition(position2D.X, i, position2D.Y));
             }

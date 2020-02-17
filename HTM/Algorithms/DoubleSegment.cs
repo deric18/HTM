@@ -3,13 +3,18 @@
     using HTM.Models;
     public class DoubleSegment
     {
-        public SegmentID Claimer { get; set; }
-        public SegmentID Connector { get; set; }
+        public Position3D axonID { get; set; }
+        public SegmentID dendriteID { get; set; }
 
-        public DoubleSegment(SegmentID Claimer, SegmentID Connector)
+        public DoubleSegment(Position3D Claimer, SegmentID Connector)
         {
-            this.Claimer = Claimer;
-            this.Connector = Connector;
+            this.axonID = Claimer;
+            this.dendriteID = Connector;
+        }
+
+        internal void InterfaceFire()
+        {
+            CPM.GetInstance.GetNeuronFromSegmentID()
         }
     }
 }

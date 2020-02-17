@@ -22,15 +22,15 @@
 
             //based on above values , initialize and populate all the basic block modulos.
 
-        //       XL_BB_Mods = XR_BB_Mods = YU_BB_Mod = YD_BB_Mod = ZF_BB_Mod = ZB_BB_Mod = 0;
+            //XL_BB_Mods = XR_BB_Mods = YU_BB_Mod = YD_BB_Mod = ZF_BB_Mod = ZB_BB_Mod = 0;
         }
 
-        private bool XL_BB_Mods(uint blockid) => (blockid % num_cols_reg == 0);
-        private bool XR_BB_Mods(uint blockid) => (blockid % (num_cols_reg -1)) == 0;
-        private bool YU_BB_Mods(uint blockid) => (((num_cols_reg * num_rows_reg) - num_cols_reg) <= blockid) ? blockid < (num_cols_reg * num_rows_reg) ? true : false : false;
-        private bool YD_BB_Mods(uint blockid) => (0 <= blockid ? blockid < num_cols_reg ? true : false : false);
-        private bool ZF_BB_Mods(uint blockid) => (0 <= blockid ? 0 < num_rows_reg * num_cols_reg ? true : false : false);
-        private bool ZB_BB_Mods(uint blockid) => ((num_cols_reg * num_rows_reg * num_rows_reg) - (num_rows_reg * num_cols_reg) <= blockid ? blockid < (num_rows_reg * num_cols_reg) ? true : false : false);
+        private bool XL_BB_Mods(uint ID) => (ID % num_cols_reg == 0);
+        private bool XR_BB_Mods(uint ID) => (ID % (num_cols_reg -1)) == 0;
+        private bool YU_BB_Mods(uint ID) => (((num_cols_reg * num_rows_reg) - num_cols_reg) <= ID) ? ID < (num_cols_reg * num_rows_reg) ? true : false : false;
+        private bool YD_BB_Mods(uint ID) => (0 <= ID ? ID < num_cols_reg ? true : false : false);
+        private bool ZF_BB_Mods(uint ID) => (0 <= ID ? 0 < num_rows_reg * num_cols_reg ? true : false : false);
+        private bool ZB_BB_Mods(uint ID) => ((num_cols_reg * num_rows_reg * num_rows_reg) - (num_rows_reg * num_cols_reg) <= ID ? ID < (num_rows_reg * num_cols_reg) ? true : false : false);
 
         public Position3D ComputeNPredictNewPosition(Position3D pos) 
         {
@@ -45,46 +45,57 @@
              *  else no
              *  then compute the intervals and generate new random positions for x,y,z & return new position
              * */
-            Position3D newPosition = new Position3D(0,0,0); 
-            uint b = pos.BlockID;
+            Position3D newPosition = new Position3D(0,0,0);             
+            uint b = pos.ID;
             bool basis_block_x = false;
             bool basis_block_y = false;
             bool basis_block_z = false;
 
-            if ((XL_BB_Mods(b) && RSBCheckX(pos)) || (XR_BB_Mods(b) && RSBCheckX(pos)))
+            if ((XL_BB_Mods(b) && RSBCheckX(pos)) || (XR_BB_Mods(b) && RSBCheckX(pos)))     //point belongs to one of XL/XR Basis Block
             {
-                newPosition.BlockID = pos.BlockID;
+                newPosition.ID = pos.ID;
                 newPosition.X = 0;
                 basis_block_x = true;
                 //Predict y & x
             }            
-            if((YU_BB_Mods(b) && RSBCheckY(pos)) || (YD_BB_Mods(b) && RSBCheckY(pos)))
+            if((YU_BB_Mods(b) && RSBCheckY(pos)) || (YD_BB_Mods(b) && RSBCheckY(pos)))      //point belongs to one of YU/YD Basis Block
             {
-                newPosition.BlockID = pos.BlockID;
+                newPosition.ID = pos.ID;
                 newPosition.Y = 0;
-                basis_block_y = true;
+                basis_block_y = true;   
+                //predict x & z
             }            
-            if((ZF_BB_Mods(b) && RSBCheckZ(pos)) || (ZB_BB_Mods(b) && RSBCheckZ(pos)))
+            if((ZF_BB_Mods(b) && RSBCheckZ(pos)) || (ZB_BB_Mods(b) && RSBCheckZ(pos)))      //point belongs to one of ZF/ZB Basis Block
             {
-                newPosition.BlockID = pos.BlockID;
+                newPosition.ID = pos.ID;
                 newPosition.Z = 0;
                 basis_block_z = true;
+                //predict x & y
             }
 
-            if (basis_block_x && basis_block_y && basis_block_z) //Mostly unlikely as no pos3d can fall outside of three faces of the block
-                return newPosition;
+            //most probable case will be that it is not a basis block so process them first n return the new position
+            if (!basis_block_x && !basis_block_y && !basis_block_z)    //0 coordinate falls outside of 3/3 faces of the block //falls within the neuroblock.
+            {
+                //Randomly predict all the 3 positions using the PredictSynapseWithoutinterval method and return the position
+                return Predict3(pos);
+            }
+            else if (basis_block_x && basis_block_y && basis_block_z) //CORE BASIS BLOCK This happens exactly at 8 blocks need to be careful to return an appropirate new predicted position to the caller.
+            {
+                /*
+                 * figure out which core basis block it is and then 
+                 * LLO,RLO,LUO,RUO - LLN,RLN,LUN,RUN
+                 * create the adjusted RSB and predict coordinates.
+                */
+
+            }
             else if(() || () || ())    //2 coordinates falls outside of 2/3 faces of the block
             {
-                //Control comes here for both basis and non basis block
+                //control comes here only for basis blocks
                 //for basis block set the coords to 0 and predict the single point within the internval and return the poosition
                 //for non basis blocks use the Predictsynapseswithinterval method and based on the prediction figure out the block number of the nrepositions and then return the new position
                 newPosition.X
             }
-            else if (!basis_block_x && !basis_block_y && !basis_block_z)    //0 coordinate falls outside of 3/3 faces of the block //falls within the neuroblock.
-            {
-                //Randomly predict all the 3 positions using the PredictSynapseWithoutinterval method and return the position
-                return Predict3(pos);
-            }            
+                      
             //one coordinate falls outside of 1/3 faces;
             //if the block is a basis block then predict it with z/y/z min of 0 and max of blockradius of x/y/z from x/y/z and for the other 2 points that falls inside of the block predict them using PredictSynapseWithoutInterval for both of them
             //els if the block is not a basis block then predict the position with PredictSynapseWithanInterval method for the position and for other 2 points use the other method and finally return the position.
@@ -103,7 +114,7 @@
 
         }
 
-        Position3D Predict3(Position3D)
+        Position3D Predict3(uitn i1min, uint i2min, uint i3min, uint i1max, uint i2max, uint i3max)
         {
 
         }

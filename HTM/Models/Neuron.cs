@@ -62,6 +62,15 @@ namespace HTM.Models
             }
             return false;
         }
+
+        internal void Fire()
+        {
+            foreach(var kvp in axonEndPoints)
+            {
+
+            }
+        }
+
         public string GetString() => NeuronID.GetString();
 
         private void FlushVoltage() =>        

@@ -10,6 +10,8 @@ namespace HTM.Models
         public uint Y { get; set; }
         public uint Z { get; set; }                
 
+        public Position3D() { }
+
         public Position3D(uint x, uint y, uint z)
         {            
             X = x;
