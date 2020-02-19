@@ -8,22 +8,18 @@ namespace HTM
 {
     public class CPM
     {        
-        public static volatile CPM instance;
-        public static object syncRoot = new object();
+        private static volatile CPM instance;        
 
-        public CPM() { }
+        private CPM() { }
 
         public static CPM GetInstance
         {
             get
             {
                 if (instance == null)
-                {
-                    lock (syncRoot)
-                    {
+                {                
                         if (instance == null)
-                            instance = new CPM();   
-                    }
+                            instance = new CPM();                       
                 }
 
                 return instance;
@@ -72,7 +68,7 @@ namespace HTM
             }
             catch(Exception e)
             {
-                Console.WriteLine("Out Of Memory Allocated for the Service via Operating System! , Please reduce the dimensions of the Neuroblock \n NumRows : " + length + "\n NumColumns : " + breadth + "\n NumFiles : " + width);
+                Console.WriteLine("Out Of Memory Allocated for the Service via Operating System! , Please reduce the dimensions of the Neuroblock \n NumRows : " + NumY + "\n NumColumns : " + NumX + "\n NumFiles : " + NumZ);
                 Console.WriteLine(e.Message);
                 Console.ReadKey();
                 return;

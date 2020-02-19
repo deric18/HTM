@@ -14,7 +14,7 @@
 
         internal void InterfaceFire()
         {
-            CPM.GetInstance.GetNeuronFromSegmentID()
+            CPM.GetInstance.GetNeuronFromSegmentID();
         }
     }
 }

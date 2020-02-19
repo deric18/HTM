@@ -77,7 +77,7 @@
             if (!basis_block_x && !basis_block_y && !basis_block_z)    //0 coordinate falls outside of 3/3 faces of the block //falls within the neuroblock.
             {
                 //Randomly predict all the 3 positions using the PredictSynapseWithoutinterval method and return the position
-                return Predict3(pos);
+               // return Predict3(pos);
             }
             else if (basis_block_x && basis_block_y && basis_block_z) //CORE BASIS BLOCK This happens exactly at 8 blocks need to be careful to return an appropirate new predicted position to the caller.
             {
@@ -88,36 +88,38 @@
                 */
 
             }
-            else if(() || () || ())    //2 coordinates falls outside of 2/3 faces of the block
-            {
-                //control comes here only for basis blocks
-                //for basis block set the coords to 0 and predict the single point within the internval and return the poosition
-                //for non basis blocks use the Predictsynapseswithinterval method and based on the prediction figure out the block number of the nrepositions and then return the new position
-                newPosition.X
-            }
+
+            return new Position3D();
+            //else if(() || () || ())    //2 coordinates falls outside of 2/3 faces of the block
+            //{
+            //    //control comes here only for basis blocks
+            //    //for basis block set the coords to 0 and predict the single point within the internval and return the poosition
+            //    //for non basis blocks use the Predictsynapseswithinterval method and based on the prediction figure out the block number of the nrepositions and then return the new position
+            //    newPosition.X
+            //}
                       
-            //one coordinate falls outside of 1/3 faces;
-            //if the block is a basis block then predict it with z/y/z min of 0 and max of blockradius of x/y/z from x/y/z and for the other 2 points that falls inside of the block predict them using PredictSynapseWithoutInterval for both of them
-            //els if the block is not a basis block then predict the position with PredictSynapseWithanInterval method for the position and for other 2 points use the other method and finally return the position.
-            if(basis_block_x)
+            ////one coordinate falls outside of 1/3 faces;
+            ////if the block is a basis block then predict it with z/y/z min of 0 and max of blockradius of x/y/z from x/y/z and for the other 2 points that falls inside of the block predict them using PredictSynapseWithoutInterval for both of them
+            ////els if the block is not a basis block then predict the position with PredictSynapseWithanInterval method for the position and for other 2 points use the other method and finally return the position.
+            //if(basis_block_x)
 
             
         }
 
-        uint Predict1(uint min, uint high)
-        {
+        //uint Predict1(uint min, uint high)
+        //{
 
-        }
+        //}
 
-        uint[] Predict2(uint i1, uint i2, uint i3, uint i4)
-        {
+        //uint[] Predict2(uint i1, uint i2, uint i3, uint i4)
+        //{
 
-        }
+        //}
 
-        Position3D Predict3(uitn i1min, uint i2min, uint i3min, uint i1max, uint i2max, uint i3max)
-        {
-
-        }
+        //Position3D Predict3(uint i1min, uint i2min, uint i3min, uint i1max, uint i2max, uint i3max)
+        //{
+            
+        //}
 
         private bool RSBCheckX(Position3D pos) => pos.X - blockRadius > 0 ? true : false;
 

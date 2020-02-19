@@ -43,9 +43,11 @@ namespace HTM.Algorithms
         /*TO Implement:
          * -when cpm processes a neuronal fire it gives all the positions to which the neuron fires , then cpm needs to get all thos positions and find out if there are any neurons connecting to the specific position and if so get there segment ids and tra
          *  potential to those segments
+         *  CPM Constants:
+         *  A = Available , D - Occupied by Dendrite , a - Occupied by axon , N - Not Available , 
          */
 
-        public static ConnectionTable Singleton(uint w, BlockConfigProvider bcp)
+        public static ConnectionTable Singleton(uint w = 0, BlockConfigProvider bcp = null)
         {
             if(synapseTable == null)           
                 synapseTable = new ConnectionTable(w, bcp);            
@@ -94,7 +96,7 @@ namespace HTM.Algorithms
                             cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
                             --openCounter;
                             ++closedCounter;                            
-                            if(dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
+                            if(dendriticEndPoints.TryGetValue(pos.StringID, out segid))
                                 return new ConnectionType(CType.ConnectedToDendrite, segid);
                             break;  
                         default:
@@ -110,7 +112,7 @@ namespace HTM.Algorithms
                                 cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
                                 --openCounter;
                                 ++closedCounter;                                
-                                if (dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
+                                if (dendriticEndPoints.TryGetValue(pos.StringID, out segid))
                                     return new ConnectionType(CType.ConnectedToDendrite, segid);
                                 break;
                             }
@@ -128,7 +130,7 @@ namespace HTM.Algorithms
                                     cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
                                     ++temporalCounter;
                                     --openCounter;                                    
-                                    if (dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
+                                    if (dendriticEndPoints.TryGetValue(pos.StringID, out segid))
                                         return new ConnectionType(CType.ConnectedToAxon, segid);
                                     break;
                                 }
@@ -147,7 +149,7 @@ namespace HTM.Algorithms
                                     cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
                                     ++apicalCounter;
                                     --openCounter;
-                                    if (dendriticEndPoints.TryGetValue(pos.GetString(), out segid))
+                                    if (dendriticEndPoints.TryGetValue(pos.StringID, out segid))
                                         return new ConnectionType(CType.ConnectedToAxon, segid);
                                     break;
                                 }
@@ -168,25 +170,42 @@ namespace HTM.Algorithms
         }
 
         private void AxonClaim(Position3D pos, SegmentID claimerSegID)
-        {
-            SegmentID seg;
-            if (dendriticEndPoints.TryGetValue(pos.GetString(), out seg))
+        {            
+            SegmentID claimeeSegID;
+            if (dendriticEndPoints.TryGetValue(pos.StringID, out claimeeSegID))
             {
-                CPM.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
-                CPM.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
+                //form a synapse and get rid of both values in the network.
+                CPM.GetInstance.GetNeuronFromSegmentID(claimerSegID).AddNewConnection(pos, claimerSegID);     //inform claimer segment - axon
+                CPM.GetInstance.GetNeuronFromSegmentID(claimeeSegID).AddNewConnection(pos, claimeeSegID);     //inform claimee segment - dendrite
+                dendriticEndPoints.Remove(pos.StringID);
+                synapses.Add(pos.StringID, new DoubleSegment(claimeeSegID, claimeeSegID));
+                cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
             }
+            else
+            {
+                axonalEndPoints.Add(pos.StringID, claimerSegID);
+                cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'a';
+            }            
         }
 
-        private void DendriteClaim(Position3D pos, SegmentID claimerSegID)
-        {
-            cMap[pos.X, pos.Y][pos.Z] = 'N';
-            SegmentID seg;
-            if (axonalEndPoints.TryGetValue(pos.GetString(), out seg))
+        private void DendriteClaim(Position3D pos, SegmentID claimeeSegID)
+        {            
+            SegmentID claimerSegID;
+            if (axonalEndPoints.TryGetValue(pos.StringID, out claimerSegID))
             {
-                CPM.GetInstance.AddConnection(seg, pos);         //inform dendritic segment
-                CPM.GetInstance.AddConnection(claimerSegID, pos);//inform claiming segment
+                CPM.GetInstance.GetNeuronFromSegmentID(claimerSegID).AddNewConnection(pos, claimerSegID);     //inform claimer segment - dendrite
+                CPM.GetInstance.GetNeuronFromSegmentID(claimerSegID).AddNewConnection(pos, claimerSegID);     //inform claimee segment - axon
+                axonalEndPoints.Remove(pos.StringID);
+                synapses.Add(pos.StringID, new DoubleSegment(claimerSegID, claimeeSegID));
+                cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
+            }
+            else
+            {
+                dendriticEndPoints.Add(pos.StringID, claimerSegID);
+                cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'd';
             }
         }
+        
 
 
     }

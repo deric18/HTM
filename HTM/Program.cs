@@ -20,7 +20,7 @@ namespace HTM
             uint z = Convert.ToUInt32(Console.ReadLine());
 
             Console.WriteLine("Initializing...");
-            CPM.Initialize(x, y, z);
+            cpm.Initialize(x, y, z);
             Console.WriteLine("Done.");
             Console.Clear();
             Console.WriteLine("System Ready.");

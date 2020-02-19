@@ -1,14 +1,26 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using HTM.Models;
 using HTM;
+using HTM.Algorithms;
 
 namespace HtmTest
 {
     [TestClass]    
     public class TestSynapseBlockStructure
     {
-        CPM cpm = CPM.GetInstance;
-        cpm.Initialize(10, 10, 10);
+        CPM instance;
+
+        [TestInitialize]
+        public void Initialze()
+        {
+            instance = CPM.GetInstance;
+            instance.Initialize(10, 10, 10);
+        }
+
+        [TestMethod]
+        public void TestBlockStructure()
+        {
+            ConnectionTable ctable = ConnectionTable.Singleton();
+        }
+        
     }
 }
