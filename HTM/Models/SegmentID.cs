@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 namespace HTM.Models
 {
     public class SegmentID : Position3D
-    {
-        public Guid Guid { get; set; }        
+    {        
+        
+        internal SegmentID():base() { }
 
-        public SegmentID():base() { }
+        internal SegmentID(Position3D pos) : base(pos) { }
 
-        public SegmentID(uint x, uint y, uint z, uint segmentid):base(x,y,z,segmentid)
-        {
-            Guid = new Guid();            
-        }       
+        internal SegmentID(uint x, uint y, uint z):base(x,y,z)
+        {            
+        }
+
+        internal string GetStringID() => base.StringID;
     }
 }

@@ -103,7 +103,7 @@ namespace HTM
 
                         foreach(var pos in firingPositions)
                         {                            
-                            instance.ProcessColumn(pos.X, pos.Y, inputPattern.IType);
+                            instance.ColumnFire(pos.X, pos.Y, inputPattern.IType);
                         }
                         _readySpatial = false;
                         _readyApical = true;
@@ -119,7 +119,7 @@ namespace HTM
 
                         foreach (var pos in firingPositions)
                         {
-                            instance.ProcessColumn(pos.X, pos.Y, inputPattern.IType);
+                            instance.ColumnFire(pos.X, pos.Y, inputPattern.IType);
                         }
                         _readySpatial = true;
                         _readyTemporal = false;
@@ -136,21 +136,39 @@ namespace HTM
 
                         foreach (var pos in firingPositions)
                         {
-                            instance.ProcessColumn(pos.X, pos.Y, inputPattern.IType);
+                            instance.ColumnFire(pos.X, pos.Y, inputPattern.IType);
                         }
                         _readyApical = false;
                         _readyTemporal = true;
                         break;
                     }
             }            
-        }        
+        }
 
-
-        internal void Fire()
+        private void ColumnFire(uint X, uint Y, InputPatternType iType)
         {
-            //get neurons from the predicted list and depending on there voltages & spatial columnar inhibition decide which ones should fire and which one should inhibit 
-            //then get all the axonal endpoints of the firing neurons and using connection table get the connected segment IDs and supply voltage to them based on the firing mode.
+            //check if pos in predicted neuron list if so return else do the full charade.
+            //check for predicted cells in the column and decide whther to burst or not
+            //pick cells and fire
+            //return List of positions 
 
+            List<Neuron> predictedCells = instance.Columns[X][Y].GetPredictedCells();
+            if (predictedCells.Count == 0)
+            {
+                //Burst 
+                instance.Columns[X][Y].Fire();
+            }
+            else if (predictedCells.Count == 1)
+            {
+                //fire                
+                predictedCells[0].Fire();
+            }
+            else
+            {
+                //pick the cell with highest voltage & fire , inhibitting the others.
+                Neuron toFire = instance.Columns[X][Y].GetMaxVoltageNeuronInColumn();
+                toFire.Fire();
+            }            
 
         }
 
@@ -164,6 +182,7 @@ namespace HTM
                 foreach(var column in columnArray)
                 {
                     //toReturn += column.GetFiringCellRepresentation();
+
                 }
             }
 
@@ -174,33 +193,12 @@ namespace HTM
         {   //ToDo
             //Give a GROW SIGNAL around the network 
             //Can always be tweaked and policies may be constructed for sending these signals based on how much a neuron/Segment has contributed.
-        }
-        
-         
-        private void ProcessColumn(uint X, uint Y, InputPatternType iType)
-        {
-            //check if pos in predicted neuron list if so return else do the full charade.
-            //check for predicted cells in the column and decide whther to burst or not
-            //pick cells and fire
-            //return List of positions 
 
-            List<Neuron> predictedCells = instance.Columns[X][Y].GetPredictedCells();
-            if(predictedCells.Count == 0 )
-            {
-                //Burst 
-                instance.Columns[X][Y].Fire();
-            }            
-            else if(predictedCells.Count ==  1)
-            {
-                //fire                
-                predictedCells[0].Fire();
-            }
-            else
-            {
-                //pick & fire
 
-            }                           
-        }       
+
+
+
+        }                                                          
 
         private IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
         {
@@ -221,6 +219,11 @@ namespace HTM
         private Neuron GetNeuronFromPosition(uint x, uint y, uint z) => Columns[x][y].GetNeuron(z);
 
         private Neuron GetNeuronFromPosition(Position3D pos3d) => Columns[pos3d.X][pos3d.Y].GetNeuron(pos3d.Z);
+
+        private Neuron GetNeuronFromSegmentID(string SegmentID)
+        {
+
+        }
 
         private List<Neuron> GetTemporalColumn(Position2D position2D)
         {

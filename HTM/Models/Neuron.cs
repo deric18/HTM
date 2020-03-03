@@ -8,33 +8,33 @@ namespace HTM.Models
     /// 1.Account for both excitatory and inhibitory neurons
     /// </summary>
     public class Neuron
-    {
-        private uint _voltage;
+    {                
+        internal uint Voltage { get; private set; }
+        internal Position3D NeuronID { get; private set; }
+        internal NeuronState State { get; private set; }
+        private Dictionary<string, Segment> Segments { get; set; }        
         private uint _totalSegments;
-        public Position3D NeuronID { get; private set; }
-        public NeuronState State { get; private set; }
-        public Dictionary<Guid, Segment> proximalSegments { get; private set; }      
         private List<SegmentID> _predictedSegments;                
-        public Dictionary<Position3D, SegmentID> axonEndPoints { get; private set; } 
+        public List<SegmentID> axonEndPoints { get; private set; } 
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
         private CPM _cpm;
 
         public Neuron(Position3D pos)
         {
-            _voltage = 0;
+            Voltage = 0;
             _totalSegments = 0;
             NeuronID = pos;
             State = NeuronState.RESTING;
-            proximalSegments = new Dictionary<Guid, Segment>();
+            Segments = new Dictionary<string, Segment>();
             _predictedSegments = new List<SegmentID>();
-            axonEndPoints = new Dictionary<Position3D, SegmentID>();
+            axonEndPoints = new List<SegmentID>();
             _cpm = CPM.GetInstance;
-        }
+        }        
 
         internal Segment GetSegment(SegmentID segID)
         {
             Segment seg;
-            if (proximalSegments.TryGetValue(segID.Guid, out seg))
+            if (Segments.TryGetValue(segID.StringID, out seg))
                 return seg;
 
             throw new InvalidOperationException("Invalid Segment ID Access");
@@ -55,7 +55,7 @@ namespace HTM.Models
             Segment seg = GetSegment(segmentID);
             if(seg.Process(potential, position, InputPatternType.INTERNAL))     //if NMDA
             {
-                _voltage += seg._sumVoltage;
+                Voltage += seg._sumVoltage;
                 seg.FlushVoltage();
                 _predictedSegments.Add(seg.SegmentId);
                 return true;
@@ -65,24 +65,26 @@ namespace HTM.Models
 
         internal void Fire()
         {
-            foreach(var kvp in axonEndPoints)
+            foreach(var seg in axonEndPoints)
             {
-
+                
             }
         }
 
-        public string GetString() => NeuronID.GetString();
+        public string GetString() => NeuronID.StringID;
 
         private void FlushVoltage() =>        
-            _voltage = 0;        
+            Voltage = 0;        
 
-        internal void AddNewConnection(Position3D pos, SegmentID segmentID)
+        internal bool AddNewConnection(Position3D pos, SegmentID segmentID)
         {
-            SegmentID segid;
-            if(!axonEndPoints.TryGetValue(pos, out segid))
+            Segment segment;
+            if(!Segments.TryGetValue(pos.StringID, out segment))
             {
-                axonEndPoints.Add(pos, segmentID);
+                segment.AddNewConnection(pos);
+                return true;
             }
+            return false;
         }
 
         internal void Grow()
@@ -90,7 +92,7 @@ namespace HTM.Models
             //check which segment is growing the fastest and getting modre NMDA spikes and supply a grow signal
         }
 
-        internal void PRune()
+        internal void Prune()
         {
             //check which segment is most underpeforming and send inhibit signal to such segments.
         }

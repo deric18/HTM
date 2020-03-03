@@ -46,28 +46,28 @@
              *  then compute the intervals and generate new random positions for x,y,z & return new position
              * */
             Position3D newPosition = new Position3D(0,0,0);             
-            uint b = pos.ID;
+            uint b = pos.BID;
             bool basis_block_x = false;
             bool basis_block_y = false;
             bool basis_block_z = false;
 
             if ((XL_BB_Mods(b) && RSBCheckX(pos)) || (XR_BB_Mods(b) && RSBCheckX(pos)))     //point belongs to one of XL/XR Basis Block
             {
-                newPosition.ID = pos.ID;
+                newPosition.BID = pos.BID;
                 newPosition.X = 0;
                 basis_block_x = true;
                 //Predict y & x
             }            
             if((YU_BB_Mods(b) && RSBCheckY(pos)) || (YD_BB_Mods(b) && RSBCheckY(pos)))      //point belongs to one of YU/YD Basis Block
             {
-                newPosition.ID = pos.ID;
+                newPosition.BID = pos.BID;
                 newPosition.Y = 0;
                 basis_block_y = true;   
                 //predict x & z
             }            
             if((ZF_BB_Mods(b) && RSBCheckZ(pos)) || (ZB_BB_Mods(b) && RSBCheckZ(pos)))      //point belongs to one of ZF/ZB Basis Block
             {
-                newPosition.ID = pos.ID;
+                newPosition.BID = pos.BID;
                 newPosition.Z = 0;
                 basis_block_z = true;
                 //predict x & y

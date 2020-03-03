@@ -1,2 +1,5 @@
-﻿-Finsish CPM---------------------Done
+﻿-Finish Segment
+-Finish Neuron
+-Finsish CPM			
 -Finish 2 unit tests to test the structure of Synapses structure in the block and in the region
+	--Need to think about how to structure these unit tests. i.e What would be a good unit test for the structure of the block and its region.

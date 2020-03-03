@@ -6,12 +6,12 @@ namespace HTM.Models
 {
     public class Column
     {
-        public List<Neuron> Neurons { get; private set; }
-        public Position2D ID { get; private set; }
-        public uint Size { get; private set; }
+        internal List<Neuron> Neurons { get; private set; }
+        internal Position2D ID { get; private set; }
+        internal uint Size { get; private set; }
         
 
-        public Column(uint x, uint y, uint size)
+        internal Column(uint x, uint y, uint size)
         {
             Size = size;
             ID = new Position2D(x, y);
@@ -22,19 +22,34 @@ namespace HTM.Models
             }
         }
 
-        public void Fire()
+        internal void Fire()
         {
 
         }
 
-        public Neuron GetNeuron(uint z) => Neurons[(int)z];
+        internal Neuron GetMaxVoltageNeuronInColumn()
+        {
+            Neuron toRet = null;
+            uint max = 0;
+            Neurons.ForEach(q =>
+            {
+                if (max < q.Voltage)
+                {
+                    max = q.Voltage;
+                    toRet = q;
+                }
+            });
+            return toRet;
+        }
 
-        public List<Neuron> GetPredictedCells()
+        internal Neuron GetNeuron(uint z) => Neurons[(int)z];
+
+        internal List<Neuron> GetPredictedCells()
         {
             return Neurons.Where(pos => (pos.State == NeuronState.PREDICTED || pos.State == NeuronState.SPIKING)).ToList();
         }
         
-        public string GetFiringCellRepresentation()
+        internal string GetFiringCellRepresentation()
         {
             string toReturn = null;
             foreach(var neuron in Neurons)

@@ -38,14 +38,17 @@ namespace HTM.Algorithms
 
             //Draw Apical Lines here
 
-        }        
+        }
 
         /*TO Implement:
          * -when cpm processes a neuronal fire it gives all the positions to which the neuron fires , then cpm needs to get all thos positions and find out if there are any neurons connecting to the specific position and if so get there segment ids and tra
          *  potential to those segments
          *  CPM Constants:
          *  A = Available , D - Occupied by Dendrite , a - Occupied by axon , N - Not Available , 
-         */
+         
+             */
+
+        public char Position(uint blockID, uint x, uint y, uint z) => cMap[blockID, x][y, z];
 
         public static ConnectionTable Singleton(uint w = 0, BlockConfigProvider bcp = null)
         {
@@ -68,19 +71,19 @@ namespace HTM.Algorithms
             /// Scenario 3: If the claimer is a dendrite and the positio9n is occupied by an axonal seg then check for selfing , remove the axonal seg id from the dict ,mark the position as 'N' in cMap and return the seg id.
             /// Scenario 4: If the claimer is a axon and the position is occupied by the dendrite then we again check for selfing, and send connect signal to claimed neuron, mark the position and return bind signal to claiming neuron.
             SegmentID segid;
-            switch (cMap[pos.ID, pos.X][pos.Y,pos.Z])
+            switch (cMap[pos.BID, pos.X][pos.Y,pos.Z])
             {
                 case 'A': //Available                   
                     switch (eType)
                     {
                         case EndPointType.Axon:
                             AxonClaim(pos, claimerSegID);
-                            cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'A';
+                            cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'A';
                             ++openCounter;
                             return new ConnectionType(CType.SuccesfullyOccupied);                            
                         case EndPointType.Dendrite:
                             DendriteClaim(pos, claimerSegID);
-                            cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'D';
+                            cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'D';
                             ++openCounter;
                             return new ConnectionType(CType.SuccesfullyOccupied);
 
@@ -93,7 +96,7 @@ namespace HTM.Algorithms
                     {
                         case EndPointType.Axon://Axon claiming a dendritc position 
                             AxonClaim(pos, claimerSegID);
-                            cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
+                            cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'N';
                             --openCounter;
                             ++closedCounter;                            
                             if(dendriticEndPoints.TryGetValue(pos.StringID, out segid))
@@ -109,7 +112,7 @@ namespace HTM.Algorithms
                         case EndPointType.Dendrite:     //dendrite claiming an axon
                             {
                                 DendriteClaim(pos, claimerSegID);
-                                cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
+                                cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'N';
                                 --openCounter;
                                 ++closedCounter;                                
                                 if (dendriticEndPoints.TryGetValue(pos.StringID, out segid))
@@ -127,7 +130,7 @@ namespace HTM.Algorithms
                             case EndPointType.Dendrite:
                                 {
                                     DendriteClaim(pos, claimerSegID);
-                                    cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
+                                    cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'N';
                                     ++temporalCounter;
                                     --openCounter;                                    
                                     if (dendriticEndPoints.TryGetValue(pos.StringID, out segid))
@@ -146,7 +149,7 @@ namespace HTM.Algorithms
                             case EndPointType.Dendrite:
                                 {
                                     DendriteClaim(pos, claimerSegID);
-                                    cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
+                                    cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'N';
                                     ++apicalCounter;
                                     --openCounter;
                                     if (dendriticEndPoints.TryGetValue(pos.StringID, out segid))
@@ -179,12 +182,12 @@ namespace HTM.Algorithms
                 CPM.GetInstance.GetNeuronFromSegmentID(claimeeSegID).AddNewConnection(pos, claimeeSegID);     //inform claimee segment - dendrite
                 dendriticEndPoints.Remove(pos.StringID);
                 synapses.Add(pos.StringID, new DoubleSegment(claimeeSegID, claimeeSegID));
-                cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
+                cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'N';
             }
             else
             {
                 axonalEndPoints.Add(pos.StringID, claimerSegID);
-                cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'a';
+                cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'a';
             }            
         }
 
@@ -197,12 +200,12 @@ namespace HTM.Algorithms
                 CPM.GetInstance.GetNeuronFromSegmentID(claimerSegID).AddNewConnection(pos, claimerSegID);     //inform claimee segment - axon
                 axonalEndPoints.Remove(pos.StringID);
                 synapses.Add(pos.StringID, new DoubleSegment(claimerSegID, claimeeSegID));
-                cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'N';
+                cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'N';
             }
             else
             {
                 dendriticEndPoints.Add(pos.StringID, claimerSegID);
-                cMap[pos.ID, pos.X][pos.Y, pos.Z] = 'd';
+                cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'd';
             }
         }
         
