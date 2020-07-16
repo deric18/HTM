@@ -67,26 +67,27 @@ namespace HTM.Algorithms
             zmax = MoveNPositionsZ(true, rbr, pos.Z);
         }
 
+        /// <summary>
+        /// SetBounds on the original position 
+        /// </summary>
+        /// <param name="basePosition"></param>
+        /// <returns></returns>
         public Position3D PredictNewRandomSynapse(Position3D basePosition)
         {//Use computed bounds to randomly predict a new position inside the random neuro block
             //Need to be redone.
             SetBounds(basePosition);
             Random r = new Random(seed);
             Position3D synapse = new Position3D();
-            int minimum = Convert.ToInt32(xmin);
-            int maximum = Convert.ToInt32(xmax);
+            
 
-            synapse.X = (uint)r.Next(minimum, maximum);
+            //Check if the generated RNB falls completely inside the block or or edge points fall outside
+            //If it falls inside predict 3 new random positions and return the new synapse
+            //else if it falls outside block 
+            //  -check if its a basis block or not and the part that falls outside the block is not corresponding to the basis block
+            //   -if its a basis block that is falling outside then initilise that dimension of the point to zero and compute the remaining 2 dimensions
+            //   -else compute the dimensions which are falling outside and initialise the one falling insdie
+            //  -If its not a basis block then compute the intervals for the dimensions falling outside the block and also just randomly get the ones that are not failling outside and return the new synapse.
 
-            minimum = Convert.ToInt32(ymin);
-            maximum = Convert.ToInt32(ymax);
-
-            synapse.Y = (uint)r.Next(minimum, maximum);
-
-            minimum = Convert.ToInt32(zmin);
-            maximum = Convert.ToInt32(zmax);
-
-            synapse.Z = (uint)r.Next(minimum, maximum);
 
             return synapse;
         }               

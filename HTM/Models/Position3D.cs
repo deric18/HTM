@@ -28,8 +28,11 @@ namespace HTM.Models
         public  bool Equals(Position3D segId) =>         
             this.X.Equals(segId.X) && this.Y.Equals(segId.Y) && this.Z.Equals(segId.Z);
 
-        internal string StringID =>        
-            X.ToString() + "-" + Y.ToString() + "-" + Z.ToString() + "-" + BID.ToString();        
+        internal string StringIDWithBID =>        
+            X.ToString() + "-" + Y.ToString() + "-" + Z.ToString() + "-" + BID.ToString();
+
+        internal string StringID =>
+            X.ToString() + "-" + Y.ToString() + "-" + Z.ToString();
     }
 }
 

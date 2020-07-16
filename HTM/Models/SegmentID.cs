@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*
+ * Segment ID Syntax : <<Neuron Position3D>--<Segment Number>--<Segment Position3D>> 
+ */
 
 namespace HTM.Models
-{
+{    
     public class SegmentID : Position3D
     {        
         

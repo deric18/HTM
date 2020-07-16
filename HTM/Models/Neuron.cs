@@ -57,7 +57,7 @@ namespace HTM.Models
             {
                 Voltage += seg._sumVoltage;
                 seg.FlushVoltage();
-                _predictedSegments.Add(seg.SegmentId);
+                _predictedSegments.Add(segmentID);
                 return true;
             }
             return false;

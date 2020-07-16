@@ -1,0 +1,2 @@
+﻿-There is no way to do this app without storing all the synapses programatically , you will have to come up with a mathematical solution , using the analogy of a private key ,publick key
+-Try to define a synapse in terms of public key , private key and text.

@@ -14,7 +14,7 @@ namespace HTM
 
             Console.WriteLine("Enter lenth of the block:");
             uint x = Convert.ToUInt32(Console.ReadLine());
-            Console.WriteLine("Enter breadth of the block:");
+                                                                                                                                                                                                                                                                                                                                                                                                 Console.WriteLine("Enter breadth of the block:");                                                                                                                                                                                                                                                                                                                                                        
             uint y = Convert.ToUInt32(Console.ReadLine());
             Console.WriteLine("Enter width of the block:");
             uint z = Convert.ToUInt32(Console.ReadLine());
@@ -34,7 +34,8 @@ namespace HTM
             Bitmap B = GetInput();
 
             int size = B.Width * B.Height;
-            int connectionfraction = Convert.ToInt32(ConfigurationSettings.AppSettings.Get("ConnectionFraction"));
+             
+
 
             /*
              -Join - Associate each of the pixel with its nearby neibhours in its SDR 
@@ -52,7 +53,7 @@ namespace HTM
 
         public static Bitmap GetInput()
         {
-            var bmpScreenshot = new Bitmap(Screen.PrimaryScreen.Bounds.Width,
+            return new Bitmap(Screen.PrimaryScreen.Bounds.Width,
                                Screen.PrimaryScreen.Bounds.Height,
                                PixelFormat.Format32bppArgb);
 

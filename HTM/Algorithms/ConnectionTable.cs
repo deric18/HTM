@@ -178,6 +178,7 @@ namespace HTM.Algorithms
             if (dendriticEndPoints.TryGetValue(pos.StringID, out claimeeSegID))
             {
                 //form a synapse and get rid of both values in the network.
+                if (CPM.GetInstance.GetNeuronFromSegmentID(claimerSegID).NeuronID.Equals(CPM.GetInstance.GetNeuronFromSegmentID(claimeeSegID).NeuronID)) return;        //Check for Selfing
                 CPM.GetInstance.GetNeuronFromSegmentID(claimerSegID).AddNewConnection(pos, claimerSegID);     //inform claimer segment - axon
                 CPM.GetInstance.GetNeuronFromSegmentID(claimeeSegID).AddNewConnection(pos, claimeeSegID);     //inform claimee segment - dendrite
                 dendriticEndPoints.Remove(pos.StringID);
@@ -191,25 +192,24 @@ namespace HTM.Algorithms
             }            
         }
 
-        private void DendriteClaim(Position3D pos, SegmentID claimeeSegID)
+        //Axon is always the claimer and dendrite is always the claimee
+        private void DendriteClaim(Position3D pos, SegmentID claimeeSegID)      //A dendrite is claiming an axon
         {            
             SegmentID claimerSegID;
             if (axonalEndPoints.TryGetValue(pos.StringID, out claimerSegID))
             {
+                if (CPM.GetInstance.GetNeuronFromSegmentID(claimerSegID).NeuronID.Equals(CPM.GetInstance.GetNeuronFromSegmentID(claimeeSegID).NeuronID)) return;        //Check for Selfing
                 CPM.GetInstance.GetNeuronFromSegmentID(claimerSegID).AddNewConnection(pos, claimerSegID);     //inform claimer segment - dendrite
                 CPM.GetInstance.GetNeuronFromSegmentID(claimerSegID).AddNewConnection(pos, claimerSegID);     //inform claimee segment - axon
-                axonalEndPoints.Remove(pos.StringID);
-                synapses.Add(pos.StringID, new DoubleSegment(claimerSegID, claimeeSegID));
-                cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'N';
+                axonalEndPoints.Remove(pos.StringID);                                                         //flush existing axon                   
+                synapses.Add(pos.StringID, new DoubleSegment(claimerSegID, claimeeSegID));                    //add synapse
+                cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'N';                                                     //refresh connection point
             }
             else
             {
                 dendriticEndPoints.Add(pos.StringID, claimerSegID);
                 cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'd';
             }
-        }
-        
-
-
+        }        
     }
 }
