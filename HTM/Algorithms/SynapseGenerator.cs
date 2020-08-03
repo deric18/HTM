@@ -72,7 +72,7 @@ namespace HTM.Algorithms
         /// </summary>
         /// <param name="basePosition"></param>
         /// <returns></returns>
-        public Position3D PredictNewRandomSynapse(Position3D basePosition)
+        public Position3D PredictNewRandomPosition(Position3D basePosition, SegmentID segId)
         {//Use computed bounds to randomly predict a new position inside the random neuro block
             //Need to be redone.
             SetBounds(basePosition);

@@ -17,7 +17,15 @@ namespace HTM.Algorithms
         private Dictionary<string, SegmentID> axonalEndPoints;
         private Dictionary<string, SegmentID> dendriticEndPoints;
         private Dictionary<string, DoubleSegment> synapses;
-        private static ConnectionTable synapseTable;
+        public static ConnectionTable SingleTon;
+
+
+        public static ConnectionTable Singleton(uint w = 0, BlockConfigProvider bcp = null)
+        {
+            if (SingleTon == null)
+                SingleTon = new ConnectionTable(w, bcp);
+            return SingleTon;
+        }
 
         private ConnectionTable(uint numBlocks, BlockConfigProvider bcp)
         {
@@ -50,12 +58,9 @@ namespace HTM.Algorithms
 
         public char Position(uint blockID, uint x, uint y, uint z) => cMap[blockID, x][y, z];
 
-        public static ConnectionTable Singleton(uint w = 0, BlockConfigProvider bcp = null)
-        {
-            if(synapseTable == null)           
-                synapseTable = new ConnectionTable(w, bcp);            
-            return synapseTable;
-        }
+        public bool IsPositionAvailable(Position3D pos) => (cMap[pos.BID, pos.X][pos.Y, pos.Z] == 'A');
+
+        
 
         /// <summary>
         /// Position Claimer        
