@@ -25,13 +25,13 @@ namespace HTM.Algorithms
             axonalEndPoints = new Dictionary<string, SegmentID>();          //holds all the due axonal connections.
             dendriticEndPoints = new Dictionary<string, SegmentID>();       //<position3d , corresponding segment id of the dendrite>.
             synapses = new Dictionary<string, DoubleSegment>();             //Holds all the synapses with respective synapses ID's.
-            cMap = new char[numBlocks, bcp.X][,];
+            cMap = new char[numBlocks, bcp.NumXperBlock][,];
 
 
             for (uint block = 0; block < numBlocks; block++)
-                for (uint i = 0; i < bcp.X; i++)
-                    for (uint j = 0; j < bcp.Y; j++)
-                        for (uint k = 0; k < bcp.Z; k++)
+                for (uint i = 0; i < bcp.NumXperBlock; i++)
+                    for (uint j = 0; j < bcp.NumYperBlock; j++)
+                        for (uint k = 0; k < bcp.NumZperBlock; k++)
                             cMap[block, i][j, k] = 'A';
             //Draw Temporal Lines here
 

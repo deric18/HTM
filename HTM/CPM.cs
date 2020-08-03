@@ -26,11 +26,10 @@ namespace HTM
             }
         }
 
-        public uint NumX { get; private set; }
-        public uint NumY{ get; private set; }        
-        public uint NumZ { get; private set; }
-        public uint NumBLocks { get; private set; }
-        public CPMState State { get; private set; }
+        public uint NumX { get; private set; }      //Number of Neuron Rows in the region
+        public uint NumY{ get; private set; }        //Number of Neuron Columns in the region
+        public uint NumZ { get; private set; }      //Number of Neuron Files in the region
+        public uint NumBlocks { get; private set; } //Number of Blocks in the Region        
         public BlockConfigProvider BCP { get; private set; }
         public Column[][] Columns { get; private set; }
         private Dictionary<string, Neuron> _longPredictedList;        //why 2 lists ? whats the diff ???
@@ -49,8 +48,7 @@ namespace HTM
              **/           
             instance.NumX = x;
             instance.NumY = y;
-            instance.NumZ = z;
-            instance.State = CPMState.RESTING;            
+            instance.NumZ = z;            
             instance._longPredictedList = new Dictionary<string, Neuron>();
             //instance._shortPredictedList = new List<Neuron>();
             instance._readyApical = false;
@@ -75,9 +73,9 @@ namespace HTM
             }
 
             instance.BCP = new BlockConfigProvider(100000);
-            instance.NumBLocks = 30;
+            instance.NumBlocks = 30;
 
-            cTable = ConnectionTable.Singleton(NumBLocks, instance.BCP);
+            cTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
         }
         
         internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);

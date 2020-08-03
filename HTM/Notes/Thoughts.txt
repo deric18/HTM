@@ -6,3 +6,5 @@ there can be multiple different things going on in the real world but there can 
 
 -Emotions are neccessary at some level for Intelligence given that intelligence is a way of finding a solution satisfying all the given constraints a way of including all these constraints into the system is to create a series of emotional systems 
 and allow all the systems to communicate with each other and also with core central decision making system that comes is responsible for coming up with a solution (biologically this would be pre-frontal cortex).
+
+RECURSIVE ASSCIATIVE NEURAL NETWORK:

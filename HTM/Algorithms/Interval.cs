@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HTM.Models;
+using System;
 
 namespace HTM.Algorithms
 {
@@ -25,17 +22,46 @@ namespace HTM.Algorithms
             return (rnd1 + rnd2) % 2 == 0 ? rnd1 : rnd2;
         }
 
-        /// <summary>
-        /// i1 is minimum and i2 is the maximum
-        /// </summary>
-        /// <param name="i1"></param>
-        /// <param name="i2"></param>
-        /// <returns></returns>
-        public static uint PredictNewRandomSynapseWithoutInterval(uint i1, uint i2)         
+
+
+        public static Position3D PredictNewRandomSynapseWithoutInterval(Position3D pos, char dimension, uint blockRadius)
+        {
+            Position3D toRet;
+
+            switch(dimension)
+            {
+                case 'x':
+                case 'X':
+                    {
+                        toRet.Z = GetRand()
+                        toRet.Y = pos.Y;
+                        toRet.Z = pos.Z;
+                        break;
+                    }
+                case 'y':
+                case 'Y':break;
+                case 'z':
+                case 'Z':break;
+                case 'A':
+                case 'a':break;
+                default: break;
+
+            }
+        }        
+
+        private static uint GetRand(uint min, uint max)
         {
             Random r = new Random();
-            int I1 = Convert.ToInt32(i1);
-            int I2 = Convert.ToInt32(i2);
+            int I1 = Convert.ToInt32(min);
+            int I2 = Convert.ToInt32(max);
+            return (uint)r.Next(I1, I2);
+        }
+
+        public static uint GetRand(int seed, uint min, uint max)
+        {
+            Random r = new Random(seed);
+            int I1 = Convert.ToInt32(min);
+            int I2 = Convert.ToInt32(max);
             return (uint)r.Next(I1, I2);
         }
     }

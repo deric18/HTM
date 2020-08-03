@@ -89,6 +89,7 @@
     <Content Include="Notes\FunctionalDiagram.txt" />
     <Content Include="Notes\Tasks.txt" />
     <Content Include="Notes\Theory.txt" />
+    <Content Include="Notes\ThingsNotToGoBackTo.txt" />
     <Content Include="Notes\Thoughts.txt" />
     <Content Include="Notes\Notes.txt" />
     <Content Include="Notes\QNA.txt" />
