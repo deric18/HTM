@@ -29,7 +29,10 @@
         private uint numXPerBlock;
         private uint numYPerBlock;
         private uint numZPerBlock;
-        
+        bool basis_block_x = false;
+        bool basis_block_y = false;
+        bool basis_block_z = false;
+        bool crossOver_X, crossOver_Y, crossOver_Z;
 
         private Transform()
         {
@@ -40,12 +43,13 @@
             numXPerBlock = CPM.GetInstance.BCP.NumXperBlock;
             numYPerBlock = CPM.GetInstance.BCP.NumYperBlock;
             numZPerBlock = CPM.GetInstance.BCP.NumZperBlock;
+            crossOver_X = crossOver_Y = crossOver_Z = false;
             //based on above values , initialize and populate all the basic block modulos.
 
             //XL_BB_Mods = XR_BB_Mods = YU_BB_Mod = YD_BB_Mod = ZF_BB_Mod = ZB_BB_Mod = 0;
         }
 
-        private bool XL_BB_Mods(uint bId) => (bId % num_cols_reg == 0);           //e
+        private bool XL_BB_Mods(uint bId) => (bId % num_cols_reg == 0);           //returns true if basis block else false
         private bool XR_BB_Mods(uint bId) => (bId % (num_cols_reg - 1)) == 0;
         private bool YU_BB_Mods(uint bId) => (((num_cols_reg * num_rows_reg) - num_cols_reg) <= bId) ? bId < (num_cols_reg * num_rows_reg) ? true : false : false;
         private bool YD_BB_Mods(uint bId) => (0 <= bId ? bId < num_cols_reg ? true : false : false);
@@ -62,7 +66,7 @@
 
 
 
-        public Position3D PredictNewRandomPosition(Position3D pos)
+        public Position3D PredictNewRandomPosition(Position3D basePosition)
         {
             /*
              * Basis Block 
@@ -74,32 +78,27 @@
              *    then assign (0) for the respective basis block dimension and generate radom interval numbers for the rest of the dimension
              *  else no
              *  then compute the intervals and generate new random positions for x,y,z & return new position
-             * */
-            Position3D newPosition = new Position3D(0, 0, 0);
-
+             * */            
+            basis_block_x = false;
+            basis_block_y = false;
+            basis_block_z = false;
+            crossOver_X = crossOver_Y = crossOver_Z = false;
             #region VERIFICATIONS - SETTING FLAGS
 
-            uint bId = pos.BID;
-            bool basis_block_x = false;
-            bool basis_block_y = false;
-            bool basis_block_z = false;
+            uint bId = basePosition.BID;
 
-            if ((XL_BB_Mods(bId) && RSBCheckX(pos)) || (XR_BB_Mods(bId) && RSBCheckX(pos)))     
-            {
-                newPosition.BID = pos.BID;                
-                basis_block_x = true;                
-            }
-            if ((YU_BB_Mods(bId) && RSBCheckY(pos)) || (YD_BB_Mods(bId) && RSBCheckY(pos)))      
-            {
-                newPosition.BID = pos.BID;                
-                basis_block_y = true;                
-            }
-            if ((ZF_BB_Mods(bId) && RSBCheckZ(pos)) || (ZB_BB_Mods(bId) && RSBCheckZ(pos)))      
-            {
-                newPosition.BID = pos.BID;                
-                basis_block_z = true;                
-            }
 
+            basis_block_x = (XL_BB_Mods(bId) || XR_BB_Mods(bId)) ? true : false;
+            crossOver_X = RSBCheckX(basePosition) ? true : false;
+
+
+            basis_block_y = ((YU_BB_Mods(bId) || (YD_BB_Mods(bId)) ? true : false && RSBCheckY(basePosition)));
+            crossOver_Y = RSBCheckY(basePosition) ? true : false;
+
+
+            basis_block_z = ((ZF_BB_Mods(bId) || (ZB_BB_Mods(bId)) ? true : false && RSBCheckZ(basePosition)));
+            crossOver_Z = RSBCheckZ(basePosition)  ? true : false;
+            
             #endregion
 
 
@@ -107,7 +106,7 @@
             if (!basis_block_x && !basis_block_y && !basis_block_z)    //0 coordinate falls outside of 3/3 faces of the block //falls within the neuroblock.
             {
                 //Randomly predict all the 3 positions using the PredictSynapseWithoutinterval method and return the position
-                return TransformHelper.PredictNewRandomSynapseWithoutInterval(pos, 'A', blockRadius);
+                return TransformHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'A', blockRadius);
             }
             else if (basis_block_x && basis_block_y && basis_block_z) //CORE BASIS BLOCK This happens exactly at 8 blocks need to be careful to return an appropirate new predicted position to the caller.
             {
@@ -117,44 +116,9 @@
                  * create the adjusted RSB and predict coordinates.
                 */
                 //will do later
-            }
-            //else if ((basis_block_x && basis_block_y) || (basis_block_y && basis_block_z) || (basis_block_z && basis_block_x))    //2/3 coordinates falls outside of the block                                                                                                                                                                                                        
-            //{
-            //    //control comes here only for basis blocks
-            //    //for basis block set the coords to 0 and predict the single point within the interval and return the poosition
-            //    //for non basis blocks use the Predictsynapseswithinterval method and based on the prediction figure out the block number of the nrepositions and then return the new position
-            //    newPosition.X = 0;
-            //}
-            //else if(basis_block_x && !basis_block_y && !basis_block_z)          //point belongs to one of XL/XR Basis Block
-            //{
-
-            //}
-            //else if(basis_block_y && !basis_block_x && !basis_block_z)          //point belongs to one of YU/YD Basis Block
-            //{
-
-            //}
-            //else if(basis_block_z && !basis_block_x && !basis_block_y)          //point belongs to one of ZF/ZB Basis Block
-            //{
-
-            //}
+            }            
             else
-            {
-                
-                Interval i;
-
-
-                if(basis_block_x)
-                {                    
-
-                }
-                if(basis_block_y)
-                {
-
-                }
-                if(basis_block_z)
-                {
-
-                }
+            {                                                
 
             }
 
@@ -168,21 +132,37 @@
 
 
         public Position3D ComputeInterval(Position3D pos)
-        {
-            /*
-              * Recieve the point and the block Radius 
-              * figure which dimensions are crossed over by the random neuro block 
-              * For all those dimensions compute intervals
-              * pick randoms
-              * create a new position
-              * return point
-             */            
-            
-            //primary goal is to find out all he possible values a co-ordinate can have
-            if(RSBCheckX(pos) ) 
-                            
+        {            
+            //primary goal is to find out all the possible values a co-ordinate can have
+            if (basis_block_x)       //Is Basis Block & Overlaps
+            {
+                int xmin = (int)(((-1) * numXPerBlock) + (pos.X - blockRadius));
+                Interval interval = new Interval(xmin, (int)((-1) * numXPerBlock), 0, (int)pos.X);
 
-            
+            }
+            else
+            {
+
+            }
+            if (basis_block_y)
+            {
+
+            }
+            else
+            {
+
+            }
+            if (basis_block_z)
+            {
+
+            }
+            else
+            {
+
+            }
+
+
+
         }
     }
 }

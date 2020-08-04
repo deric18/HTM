@@ -5,10 +5,7 @@ namespace HTM.Algorithms
 {
     internal static class TransformHelper
     {
-        public static bool RSBCheckX(Position3D pos, int blockRadius) => (pos.X - blockRadius > 0 || pos.X + blockRadius > numXPerBlock) ? true : false;
-        public static bool RSBCheckY(Position3D pos, int blockRadius) => (pos.Y - blockRadius > 0 || pos.Y + blockRadius > numYPerBlock) ? true : false;
-        public static bool RSBCheckZ(Position3D pos, int blockRadius) => (pos.Z - blockRadius > 0 || pos.Z + blockRadius > numZPerBlock) ? true : false;
-
+       
         public static Position3D PredictNewRandomSynapseWithoutInterval(Position3D pos, char dimension, uint blockRadius)
         {
             Position3D toRet = pos;
@@ -48,40 +45,22 @@ namespace HTM.Algorithms
             return ConnectionTable.SingleTon.IsPositionAvailable(toRet) ? toRet : PredictNewRandomSynapseWithoutInterval(pos, dimension, blockRadius);
 
         }
-
-        public static Position3D PredictNewRandomSynapseWithInterval(Position3D pos, char dimension, uint blockRadius)
-        {
-            Position3D toRet = pos;
-            //TODO : Forming intervals for negative indexed coordiantes , reducing blockId's for such coordinates as such ,...
-
-            switch (dimension)
-            {
-                case 'x':
-                case 'X':
-                    {
-                        if(pos.X - blockRadius >= 0  || pos.X + blockRadius < CPM.GetInstance.BCP.NumXperBlock)
-                        {
-                            throw new Exception("Called PredictNewRandomSynapseWithInterval without neccesity for interval");
-                        }
-                        //Compute interval 
-                        toRet.X = GetRand()                        
-                        break;
-                    }
-                case 'y':
-                case 'Y': break;
-                case 'z':
-                case 'Z': break;
-                case 'A':
-                case 'a': break;
-                default: break;
-
-            }
-        }
-
-        private 
+        
 
         //iLow, iLowMid, iHighMid, iHigh
-        private static uint PredictNewRandomSynapse(uint i1, uint i2, uint i3, uint i4)
+        internal static uint PredictRandomIntervalInteger(int i1, int i2, int i3, int i4)
+        {//Use computed bounds to randomly predict a new position inside the random neuro block
+            //Need to be redone.
+
+            Random r = new Random();            
+
+            uint rnd1 = (uint)r.Next(i1, i2);
+            uint rnd2 = (uint)r.Next(i3, i4);
+
+            return (rnd1 + rnd2) % 2 == 0 ? rnd1 : rnd2;
+        }
+
+        internal static uint PredictRandomIntervalInteger2(uint i1, uint i2, uint i3, uint i4)
         {//Use computed bounds to randomly predict a new position inside the random neuro block
             //Need to be redone.
 
