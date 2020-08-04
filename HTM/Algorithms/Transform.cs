@@ -103,24 +103,58 @@
 
 
             //most probable case will be that it is not a basis block so process them first n return the new position
-            if (!basis_block_x && !basis_block_y && !basis_block_z)    //0 coordinate falls outside of 3/3 faces of the block //falls within the neuroblock.
+            if (!basis_block_x && !basis_block_y && !basis_block_z && !crossOver_X && !crossOver_Y && !crossOver_Z)    //0 coordinate falls outside of 3/3 faces of the block //falls within the neuroblock.
             {
                 //Randomly predict all the 3 positions using the PredictSynapseWithoutinterval method and return the position
-                return TransformHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'A', blockRadius);
+                return TransformHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(basePosition, 'A', blockRadius);
             }
-            else if (basis_block_x && basis_block_y && basis_block_z) //CORE BASIS BLOCK This happens exactly at 8 blocks need to be careful to return an appropirate new predicted position to the caller.
+            else 
             {
+                Position3D newPosition = new Position3D();
+                if (!basis_block_x && !crossOver_X)
+                {
+                    //Not a basis block and not crossing over
+                    newPosition.X =  TransformHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'X', blockRadius);
+                }
+                else if(!basis_block_x && crossOver_X)
+                {
+
+                }
+                else if(basis_block_x && crossOver_X)
+                {
+
+                }
+
+                if (!basis_block_y && !crossOver_Y)
+                {
+
+                }
+                else if (!basis_block_y && crossOver_Y)
+                {
+                }
+                else if (basis_block_y && crossOver_Y)
+                {
+
+                }
+
+                if (!basis_block_z && !crossOver_Z)
+                {
+
+                }
+                else if (!basis_block_z && crossOver_Z)
+                {
+                }
+                else if (basis_block_z && crossOver_Z)
+                {
+
+                }
                 /*
                  * figure out which core basis block it is and then 
                  * LLO,RLO,LUO,RUO - LLN,RLN,LUN,RUN
                  * create the adjusted RSB and predict coordinates.
                 */
                 //will do later
-            }            
-            else
-            {                                                
-
-            }
+            }                        
 
 
             return new Position3D();
@@ -131,7 +165,7 @@
         }        
 
 
-        public Position3D ComputeInterval(Position3D pos)
+        public uint ComputeInterval(Position3D pos)
         {            
             //primary goal is to find out all the possible values a co-ordinate can have
             if (basis_block_x)       //Is Basis Block & Overlaps

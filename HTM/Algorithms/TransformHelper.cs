@@ -6,35 +6,75 @@ namespace HTM.Algorithms
     internal static class TransformHelper
     {
        
-        public static Position3D PredictNewRandomSynapseWithoutInterval(Position3D pos, char dimension, uint blockRadius)
+        public static uint PredictNewRandomSynapseWithoutInterval(Position3D pos, char dimension, uint blockRadius)
         {
-            Position3D toRet = pos;
+            uint toRet = 0;
 
             switch(dimension)
             {
                 case 'x':
                 case 'X':
                     {
-                        toRet.X = GetRand(pos.X - blockRadius, pos.X + blockRadius);                        
+                        toRet = GetRand(pos.X - blockRadius, pos.X + blockRadius);                        
                         break;
                     }
                 case 'y':
                 case 'Y':
                     {                        
-                        toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius); ;                     
+                        toRet = GetRand(pos.Y - blockRadius, pos.Y + blockRadius);               
                         break;
                     }                    
                 case 'z':
                 case 'Z':
                     {                        
-                        toRet.Z = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
+                        toRet = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
                         break;
                     }                    
+                //case 'A':
+                //case 'a':
+                //    {
+                //        toRet.X = GetRand(pos.X - blockRadius, pos.X + blockRadius);
+                //        toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius); 
+                //        toRet.Z = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
+                //        break;
+                //    }
+                default: break;
+
+            }
+
+            return toRet;
+
+        }
+
+        public static Position3D PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(Position3D pos, char dimension, uint blockRadius)
+        {
+            Position3D toRet = pos;
+
+            switch (dimension)
+            {
+                case 'x':
+                case 'X':
+                    {
+                        toRet.X = GetRand(pos.X - blockRadius, pos.X + blockRadius);
+                        break;
+                    }
+                case 'y':
+                case 'Y':
+                    {
+                        toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius);
+                        break;
+                    }
+                case 'z':
+                case 'Z':
+                    {
+                        toRet.Z = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
+                        break;
+                    }
                 case 'A':
                 case 'a':
                     {
                         toRet.X = GetRand(pos.X - blockRadius, pos.X + blockRadius);
-                        toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius); ;
+                        toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius);
                         toRet.Z = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
                         break;
                     }
@@ -42,10 +82,10 @@ namespace HTM.Algorithms
 
             }
 
-            return ConnectionTable.SingleTon.IsPositionAvailable(toRet) ? toRet : PredictNewRandomSynapseWithoutInterval(pos, dimension, blockRadius);
+            return ConnectionTable.SingleTon.IsPositionAvailable(toRet) ? toRet : PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(pos, dimension, blockRadius);
 
         }
-        
+
 
         //iLow, iLowMid, iHighMid, iHigh
         internal static uint PredictRandomIntervalInteger(int i1, int i2, int i3, int i4)
