@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections;
 
 namespace HTM.Models
 {
     //3Dimensional cordinate system to pin point neuronal synapses
-    public class Position3D
+    public class Position3D : 
     {                       
         public uint BID { get; set; }
         public uint X { get; set; }
@@ -26,13 +27,14 @@ namespace HTM.Models
             (z * CPM.GetInstance.NumX * CPM.GetInstance.NumY + y * CPM.GetInstance.NumX + x);        
 
         public  bool Equals(Position3D segId) =>         
-            this.X.Equals(segId.X) && this.Y.Equals(segId.Y) && this.Z.Equals(segId.Z);
+            this.X.Equals(segId.X) && this.Y.Equals(segId.Y) && this.Z.Equals(segId.Z);        
 
         internal string StringIDWithBID =>        
             X.ToString() + "-" + Y.ToString() + "-" + Z.ToString() + "-" + BID.ToString();
 
         internal string StringID =>
             X.ToString() + "-" + Y.ToString() + "-" + Z.ToString();
+        
     }
 }
 

@@ -35,13 +35,13 @@ namespace HTM.Algorithms
                 if (pos.BlockID % 10 != 0)  //X Basis Block
                 {
                     //check for x transform or xz transform
-                    return Interval.PredictNewRandomSynapseWithoutInterval(0, pos.X);
+                    return IntervalHelper.PredictNewRandomSynapseWithoutInterval(0, pos.X);
                 }
                 else       //Non  Basis Block
                 {
                     //Need to redo the logic for coordinates                    
                     uint i1 = numCols - AbsoluteSub(blockRadius, pos.X);
-                    return Interval.PredictNewRandomSynapse(i1, numCols, 0, pos.X);
+                    return IntervalHelper.PredictNewRandomSynapse(i1, numCols, 0, pos.X);
                 }
 
             }
