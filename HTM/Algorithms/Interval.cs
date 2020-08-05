@@ -8,7 +8,7 @@ namespace HTM.Algorithms
         private int x2;
         private int y1;
         private int y2;
-        bool xDone, yDone, zDone;
+        bool xDone, yDone, zDone;           //Done this way for points whose RSB is crossing over for all the 3 dimensions
         uint X, Y, Z;
         private int seed;
 
@@ -35,25 +35,28 @@ namespace HTM.Algorithms
         {
             if (xDone)
                 throw new System.Exception("Invalid Operation");
-            X = TransformHelper.PredictRandomIntervalInteger(x1, x2, y1, y2);
+            X = SynapseGeneratorHelper.PredictRandomIntervalInteger(x1, x2, y1, y2);
             xDone = true;
         }
 
-        public void PerformOpearationY()
+        public void PerformOpearationY(int x1, int x2, int y1, int y2)
         {
+            UpdateValues(x1, x2, y1, y2);
             if (yDone)
                 throw new System.Exception("Invalid Operation");
-            Y = TransformHelper.PredictRandomIntervalInteger(x1, x2, y1, y2);
+            Y = SynapseGeneratorHelper.PredictRandomIntervalInteger(x1, x2, y1, y2);
             yDone = true;
         }
 
-        public void PerformOpearationZ()
+        public void PerformOpearationZ(int x1, int x2, int y1, int y2)
         {
+            UpdateValues(x1, x2, y1, y2);
             if (zDone)
                 throw new System.Exception("Invalid Operation");
-            Z = TransformHelper.PredictRandomIntervalInteger(x1, x2, y1, y2);
+            Z = SynapseGeneratorHelper.PredictRandomIntervalInteger(x1, x2, y1, y2);
             zDone = true;
         }
+        
 
         public Position3D GetNewPosition() =>        
             (xDone && yDone && zDone) ? new Position3D(X, Y, Z) : null;        

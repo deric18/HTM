@@ -48,7 +48,7 @@ namespace HTM.Models
             NEW_SYNAPSE_CONNECTION_DEF = uint.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]);
         }
 
-        private string ComputeSegmentID(Position3D neuronID, string segCount, Position3D basePos) => neuronID.StringID + "--" + segCount + "--" + basePos.StringID;
+        private string ComputeSegmentID(Position3D neuronID, string segCount, Position3D basePos) => neuronID.StringID + "/" + segCount + "/" + basePos.StringID;
 
         internal Segment GetSegment(int v)
         {
@@ -72,25 +72,25 @@ namespace HTM.Models
         public bool Process(uint voltage, Position3D synapseId, InputPatternType iType)
         {
             #region REMOVED
-            switch (iType)
-            {
-                case InputPatternType.INTERNAL:
-                    {
-                        _internalVoltage += voltage;
-                        break;
-                    }
-                case InputPatternType.TEMPORAL:
-                    {
-                        _temporalVoltage += voltage;
-                        break;
-                    }
-                case InputPatternType.APICAL:
-                    {
-                        _apicalVoltage += voltage;
-                        break;
-                    }
-                default:break;
-            }
+            //switch (iType)
+            //{
+            //    case InputPatternType.INTERNAL:
+            //        {
+            //            _internalVoltage += voltage;
+            //            break;
+            //        }
+            //    case InputPatternType.TEMPORAL:
+            //        {
+            //            _temporalVoltage += voltage;
+            //            break;
+            //        }
+            //    case InputPatternType.APICAL:
+            //        {
+            //            _apicalVoltage += voltage;
+            //            break;
+            //        }
+            //    default:break;
+            //}
             #endregion
 
             _sumVoltage += voltage;            
@@ -125,7 +125,7 @@ namespace HTM.Models
         /// 1.A Segment should have direction it grows and by default will have limits set to how far away the segment can predict its new connection.
         /// </summary>
         private void AddNewLocalConnection()
-        {            
+        {
             //Make sure you are not connecting to an axon of your own neuron if its a new position
             /*Decide how to add new connection : Randomly pick connections from the segments local visibility radius and connect.
             */
@@ -133,18 +133,18 @@ namespace HTM.Models
             //Pick Suitable position (position next to the best firing position) need a method here to determine which direction the axon is growing and where to connect as such.                        
             //Alert Connection Table about the new position
 
-            SynapseGenerator sg = new SynapseGenerator();
+            SynapseGenerator sg =  CPM.GetInstance.synapseGenerator;
             Position3D newPosition;
 
             if ((_synapses.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])))
             {//Below number of synapses threshold for segment 
-                newPosition = sg.PredictNewRandomSynapse(this.BasePosition);
+                newPosition = sg.PredictNewRandomPosition(this.BasePosition, SegmentId);
                 AddConnection(newPosition);
             } 
             else if(SubSegments.Value.Count < int.Parse(ConfigurationManager.AppSettings["MAX_SEGMENTS_PER_NEURON"]))
             {//Below number of subsegments threshold for segment 
                 //handle logic for if this position is already marked in ctable then do a new position. basically dont do anything everything is already handled in ctable.
-                newPosition = sg.PredictNewRandomSynapse(this.BasePosition);
+                newPosition = sg.PredictNewRandomPosition(this.BasePosition, SegmentId);
                 CreateSubSegment(newPosition);
             }
             else
@@ -176,7 +176,7 @@ namespace HTM.Models
 
         private void PrintSegmnetID()
         {
-            Console.Write("X: {0} Y: {1} Z: {2}", SegmentId.X, SegmentId.Y, SegmentId.Z);
+            Console.Write(SegmentId);
         }
 
         //private Position3D GetNewPositionFromBound(Position3D segmentBound)

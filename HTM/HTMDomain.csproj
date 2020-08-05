@@ -48,10 +48,10 @@
     <Compile Include="Algorithms\ConnectionType.cs" />
     <Compile Include="Algorithms\DoubleSegment.cs" />
     <Compile Include="Algorithms\Interval.cs" />
-    <Compile Include="Algorithms\SynapseGenerator.cs" />
+    <Compile Include="Algorithms\SynapseGeneratorHelper.cs" />
+    <Compile Include="Algorithms\Delete.cs" />
     <Compile Include="Algorithms\ConnectionTable.cs" />
-    <Compile Include="Algorithms\Transform.cs" />
-    <Compile Include="Algorithms\Vertice.cs" />
+    <Compile Include="Algorithms\SynapseGenerator.cs" />
     <Compile Include="Enums\PotentialType.cs" />
     <Compile Include="Enums\SignalType.cs" />
     <Compile Include="Enums\TransformType.cs" />
@@ -75,7 +75,6 @@
     <Compile Include="Models\SDR.cs" />
     <Compile Include="Models\Segment.cs" />
     <Compile Include="Models\SegmentID.cs" />
-    <Compile Include="Models\Vector.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

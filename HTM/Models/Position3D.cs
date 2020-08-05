@@ -4,7 +4,7 @@ using System.Collections;
 namespace HTM.Models
 {
     //3Dimensional cordinate system to pin point neuronal synapses
-    public class Position3D : 
+    public class Position3D 
     {                       
         public uint BID { get; set; }
         public uint X { get; set; }

@@ -38,6 +38,7 @@ namespace HTM
         private bool _readyTemporal;
         private bool _readyApical;
         private ConnectionTable cTable;
+        internal SynapseGenerator synapseGenerator;
 
         public void Initialize(uint x, uint y, uint z)
         {
@@ -76,6 +77,7 @@ namespace HTM
             instance.NumBlocks = 30;
 
             cTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
+            synapseGenerator = SynapseGenerator.GetInstance;
         }
         
         internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
@@ -220,7 +222,14 @@ namespace HTM
 
         private Neuron GetNeuronFromSegmentID(string SegmentID)
         {
+            string[] tokens = SegmentID?.Split('/');
+            string[] neuronId = tokens[0]?.Split('-');
+            if(neuronId.Length < 3)
+            {
+                throw new Exception("Corrupted stringId : Cannot extract NeuronId from SegmentID");
+            }
 
+            return GetNeuronFromPosition(Convert.ToUInt32(neuronId[0]), Convert.ToUInt32(neuronId[1]), Convert.ToUInt32(neuronId[2]));
         }
 
         private List<Neuron> GetTemporalColumn(Position2D position2D)

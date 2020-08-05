@@ -5,15 +5,18 @@
 namespace HTM.Models
 {    
     public class SegmentID : Position3D
-    {                
-        internal SegmentID():base() { }
+    {
+        private uint SegmentNumber;
+        private Position3D NeuronId;
+        private Position3D Position;
 
-        internal SegmentID(Position3D pos) : base(pos) { }
+        internal SegmentID(Position3D neuronId, uint segNum, Position3D newPosition) : base(newPosition)
+        {
+            NeuronId = neuronId;
+            SegmentNumber = segNum;
+            Position = newPosition;
+        }        
 
-        internal SegmentID(uint x, uint y, uint z):base(x,y,z)
-        {            
-        }
-
-        internal string GetStringID() => base.StringID;
+        internal string GetSegmentID() => NeuronId.StringID + "--" + SegmentNumber.ToString() + "--" + Position.StringID;
     }
 }

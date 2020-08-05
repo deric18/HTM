@@ -3,7 +3,7 @@ using System;
 
 namespace HTM.Algorithms
 {
-    internal static class TransformHelper
+    internal static class SynapseGeneratorHelper
     {
        
         public static uint PredictNewRandomSynapseWithoutInterval(Position3D pos, char dimension, uint blockRadius)
@@ -29,15 +29,7 @@ namespace HTM.Algorithms
                     {                        
                         toRet = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
                         break;
-                    }                    
-                //case 'A':
-                //case 'a':
-                //    {
-                //        toRet.X = GetRand(pos.X - blockRadius, pos.X + blockRadius);
-                //        toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius); 
-                //        toRet.Z = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
-                //        break;
-                //    }
+                    }                                   
                 default: break;
 
             }
@@ -116,7 +108,7 @@ namespace HTM.Algorithms
             return (rnd1 + rnd2) % 2 == 0 ? rnd1 : rnd2;
         }
 
-        private static uint GetRand(uint min, uint max)
+        public static uint GetRand(uint min, uint max)
         {
             Random r = new Random();
             int I1 = Convert.ToInt32(min);

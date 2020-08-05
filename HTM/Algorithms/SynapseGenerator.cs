@@ -1,165 +1,176 @@
-﻿/*Connection Point Generator (Static Singleton Class)
- * Copyright ©Decision Machines
- * Author: Deric Roshan Pinto
- * Responsibilities:
- * -Takes care of logic for creating new connection points for any connection point in any block 
- * -Handles Randomness of each of the segments own signature
- * API:
- *  List<Position4D> GenerateNewRandomPositions(Position4D lastPosition);
- *  TODO:
- *  Redo the logic of predicting new random positions
- */
-
-using System;
-using System.Configuration;
-using HTM.Models;
-
+﻿//TODO
+//1. Check multiplier for block radius for its dimensions 
+//2. Check and register the generated position with connection Table
+//3. Option to take seed in from segment Id's
 namespace HTM.Algorithms
 {
-    //NOTE : Need to account for scenario where position predicted is already occupied and in such cases we need to compute the position.
-    //       CPM.NumX is actually the count of number of columns in the block and CPM.NumY is the count of number of rows in the block , Line : 43
-    /// <summary>
-    /// To use this API , Intialise this object to ur segment pos3d and and call the setbounds method and call PredictNJEwRAndomSynapse Method , easy as it looks. thats it!
-    /// </summary>
-    public sealed class SynapseGenerator
+    using System;
+    using System.Configuration;
+    using HTM.Models;
+
+    //Notes: Make sure to make blockRadius to include the number of cells in a column to be multiplied with the size of the square radius.
+
+    public class SynapseGenerator
     {
-        private uint xzSize;
-        private uint ySize;        
-        private uint rbr;
-        private uint xmin;
-        private uint xmax;
-        private uint ymin;
-        private uint ymax;
-        private uint zmin;
-        private uint zmax;
-        private readonly uint ppd;
-        private int seed;
+        private static SynapseGenerator Instance;
 
-        private static SynapseGenerator instance = null;        
-
-        public SynapseGenerator()
-        {
-            //set PPD, cubeconstant
-            xzSize = CPM.GetInstance.NumX;
-            ySize = CPM.GetInstance.NumY;
-            rbr = uint.Parse(ConfigurationManager.AppSettings["RBR"]);            
-            ppd = xmin = xmax = ymin = ymax = zmin = zmax = 0;            
-        }
-
-        public static SynapseGenerator Instance
+        public static SynapseGenerator GetInstance
         {
             get
             {
-                if (instance == null)
-                    instance = new SynapseGenerator();
-
-                return instance;
-            }            
+                if(Instance == null)
+                {
+                    Instance = new SynapseGenerator();
+                }
+                return Instance;
+            }
         }
 
-        private void SetBounds(Position3D pos)
-        {//set all dimensional min and maxes
-            xmin = MoveNPositionsX(false, rbr, pos.X);
-            xmax = MoveNPositionsX(true, rbr, pos.X);
-            ymin = MoveNPositionsY(false, rbr, pos.Y);
-            ymax = MoveNPositionsY(true, rbr, pos.Y);
-            zmin = MoveNPositionsZ(false, rbr, pos.Z);
-            zmax = MoveNPositionsZ(true, rbr, pos.Z);
+        private uint blockRadius;
+        private uint num_rows_reg;
+        private uint num_cols_reg;
+        private uint num_files_reg;
+        private uint numXPerBlock;
+        private uint numYPerBlock;
+        private uint numZPerBlock;
+        bool basis_block_x = false;
+        bool basis_block_y = false;
+        bool basis_block_z = false;
+        bool crossOver_X, crossOver_Y, crossOver_Z;
+
+        private SynapseGenerator()
+        {
+            blockRadius = Convert.ToUInt32(ConfigurationManager.AppSettings["BLOCKRADIUS"]);        //Radius for the random block 
+            num_rows_reg = CPM.GetInstance.NumX;   //number of blocks per row
+            num_cols_reg = CPM.GetInstance.NumY;   //number of blocks per column
+            num_files_reg = CPM.GetInstance.NumZ;  //number of blocks per file
+            numXPerBlock = CPM.GetInstance.BCP.NumXperBlock;
+            numYPerBlock = CPM.GetInstance.BCP.NumYperBlock;
+            numZPerBlock = CPM.GetInstance.BCP.NumZperBlock;
+            crossOver_X = crossOver_Y = crossOver_Z = false;
+            //based on above values , initialize and populate all the basic block modulos.
+
+            //XL_BB_Mods = XR_BB_Mods = YU_BB_Mod = YD_BB_Mod = ZF_BB_Mod = ZB_BB_Mod = 0;
         }
 
+        private bool XL_BB_Mods(uint bId) => (bId % num_cols_reg == 0);           //returns true if basis block else false
+        private bool XR_BB_Mods(uint bId) => (bId % (num_cols_reg - 1)) == 0;
+        private bool YU_BB_Mods(uint bId) => (((num_cols_reg * num_rows_reg) - num_cols_reg) <= bId) ? bId < (num_cols_reg * num_rows_reg) ? true : false : false;
+        private bool YD_BB_Mods(uint bId) => (0 <= bId ? bId < num_cols_reg ? true : false : false);
+        private bool ZF_BB_Mods(uint bId) => (0 <= bId ? 0   < num_rows_reg * num_cols_reg ? true : false : false);
+        private bool ZB_BB_Mods(uint bId) => ((num_cols_reg * num_rows_reg * num_files_reg) - (num_rows_reg * num_cols_reg) <= bId ? bId < (num_rows_reg * num_cols_reg * num_files_reg) ? true : false : false);
         /// <summary>
-        /// SetBounds on the original position 
+        /// Checks if the RSB for the pos falls out of the existing block or not
         /// </summary>
-        /// <param name="basePosition"></param>
-        /// <returns></returns>
-        public Position3D PredictNewRandomPosition(Position3D basePosition, SegmentID segId)
-        {//Use computed bounds to randomly predict a new position inside the random neuro block
-            //Need to be redone.
-            SetBounds(basePosition);
-            Random r = new Random(seed);
-            Position3D synapse = new Position3D();
+        /// <param name="pos"></param>
+        /// <returns>True if doesnt cross over the block boundaries false otherwise</returns>
+        private bool RSBCheckX(Position3D pos) => (pos.X - blockRadius < 0 || pos.X + blockRadius > numXPerBlock) ? true : false;
+        private bool RSBCheckY(Position3D pos) => (pos.Y - blockRadius < 0 || pos.Y + blockRadius > numYPerBlock) ? true : false;
+        private bool RSBCheckZ(Position3D pos) => (pos.Z - blockRadius < 0 || pos.Z + blockRadius > numZPerBlock) ? true : false;
+
+
+
+        public Position3D PredictNewRandomPosition(Position3D basePosition, string claimerSegId)
+        {
+            /*
+             * Basis Block 
+             *  if yes
+             *  then do random square within the block 
+             *    if yes 
+             *    then compute the intervals and generate new random positions for x,y,z & return new position
+             *    else 
+             *    then assign (0) for the respective basis block dimension and generate radom interval numbers for the rest of the dimension
+             *  else no
+             *  then compute the intervals and generate new random positions for x,y,z & return new position
+             * */
+            Position3D newPosition = new Position3D();
+            basis_block_x = false;
+            basis_block_y = false;
+            basis_block_z = false;
+            crossOver_X = crossOver_Y = crossOver_Z = false;
+            #region VERIFICATIONS - SETTING FLAGS
+
+            uint bId = basePosition.BID;
+
+
+            basis_block_x = (XL_BB_Mods(bId) || XR_BB_Mods(bId)) ? true : false;
+            crossOver_X = RSBCheckX(basePosition) ? true : false;
+
+
+            basis_block_y = ((YU_BB_Mods(bId) || (YD_BB_Mods(bId)) ? true : false && RSBCheckY(basePosition)));
+            crossOver_Y = RSBCheckY(basePosition) ? true : false;
+
+
+            basis_block_z = ((ZF_BB_Mods(bId) || (ZB_BB_Mods(bId)) ? true : false && RSBCheckZ(basePosition)));
+            crossOver_Z = RSBCheckZ(basePosition)  ? true : false;
             
-
-            //Check if the generated RNB falls completely inside the block or or edge points fall outside
-            //If it falls inside predict 3 new random positions and return the new synapse
-            //else if it falls outside block 
-            //  -check if its a basis block or not and the part that falls outside the block is not corresponding to the basis block
-            //   -if its a basis block that is falling outside then initilise that dimension of the point to zero and compute the remaining 2 dimensions
-            //   -else compute the dimensions which are falling outside and initialise the one falling insdie
-            //  -If its not a basis block then compute the intervals for the dimensions falling outside the block and also just randomly get the ones that are not failling outside and return the new synapse.
+            #endregion
 
 
-            return synapse;
-        }               
-        //Need to account for respective block Id changes , need some math to account for this.
-        //x only accounts for x 
-        private uint MoveNPositionsX(bool leftOrRight, uint n, uint X)
-        {            
-            uint x = X;
-            if (leftOrRight) //left
+            //most probable case will be that it is not a basis block so process them first n return the new position
+            if (!basis_block_x && !basis_block_y && !basis_block_z && !crossOver_X && !crossOver_Y && !crossOver_Z)    //0 coordinate falls outside of 3/3 faces of the block //falls within the neuroblock.
             {
-                //for every reduction in x check if point has crossed to another block                
-                while( n > 0 && x > 0)  //check if block is crossed and random block is reached.
-                {
-                    n--;
-                    x--;
-                }
+                //Randomly predict all the 3 positions using the PredictSynapseWithoutinterval method and return the position
+                return SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(basePosition, 'A', blockRadius);
             }
-            else        //right
-            {
-                while (n > 0 && x < ppd)  //check if block is crossed and random block is reached.
+            else 
+            {                       
+                if ((!basis_block_x && !crossOver_X) && (basis_block_x && !crossOver_X))
                 {
-                    n--;
-                    x++;
+                    //Not a basis block and not crossing over
+                    newPosition.X =  SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'X', blockRadius);
                 }
-            }
-            return x;
-        }
+                else if(!basis_block_x && crossOver_X)
+                {
+                    int xmin = (int)(((-1) * numXPerBlock) + (basePosition.X - blockRadius));
+                    newPosition.X = SynapseGeneratorHelper.PredictRandomIntervalInteger(xmin, (int)((-1) * numXPerBlock), 0, (int)basePosition.X);                    
+                }
+                else if(basis_block_x && crossOver_X)
+                {
+                    newPosition.X = SynapseGeneratorHelper.GetRand(0, basePosition.X);
+                }                
 
-        private uint MoveNPositionsY(bool leftOrRight, uint n, uint Y)
-        {            
-            uint y = Y;
-            if (leftOrRight) //left
-            {
-                //for every reduction in x check if point has crossed to another block                
-                while (n > 0 && y > 0)  //check if block is crossed and random block is reached.
+                if ((!basis_block_y && !crossOver_Y) && (basis_block_y && !crossOver_Y))
                 {
-                    n--;
-                    y--;
+                    newPosition.Y = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'X', blockRadius);
                 }
-            }
-            else        //right
-            {
-                while (n > 0 && y < ppd)  //check if block is crossed and random block is reached.
+                else if (!basis_block_y && crossOver_Y)
                 {
-                    n--;
-                    y++;
+                    int ymin = (int)(((-1) * numYPerBlock) + (basePosition.Y - blockRadius));           //To Check what should be multiplied with blockRadius for connection point numbering convention
+                    newPosition.Y = SynapseGeneratorHelper.PredictRandomIntervalInteger(ymin, (int)((-1) * numYPerBlock), 0, (int)basePosition.Y);
                 }
-            }
-            return y;
-        }
+                else if (basis_block_y && crossOver_Y)
+                {
+                    newPosition.Y = SynapseGeneratorHelper.GetRand(0, basePosition.Y);
+                }
 
-        private uint MoveNPositionsZ(bool leftorRight, uint n, uint Z)
-        {            
-            uint z = Z;
-            if (leftorRight) //left
-            {
-                //for every reduction in x check if point has crossed to another block                
-                while (n > 0 && z > 0)  //check if block is crossed and random block is reached.
+                if ( (!basis_block_z && !crossOver_Z) && (basis_block_z && !crossOver_Z))
                 {
-                    n--;
-                    z--;
+                    newPosition.Z = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'Z', blockRadius);
                 }
-            }
-            else        //right
-            {
-                while (n > 0 && z < ppd)  //check if block is crossed and random block is reached.
+                else if (!basis_block_z && crossOver_Z)
                 {
-                    n--;
-                    z++;
+                    int zmin = (int)(((-1) * numZPerBlock) + (basePosition.Z - blockRadius));           //To Check what should be multiplied with blockRadius for connection point numbering convention
+                    newPosition.Z = SynapseGeneratorHelper.PredictRandomIntervalInteger(zmin, (int)((-1) * numZPerBlock), 0, (int)basePosition.Z);
                 }
-            }
-            return z;
-        }
+                else if (basis_block_z && crossOver_Z)
+                {
+                    newPosition.Z = SynapseGeneratorHelper.GetRand(0, basePosition.Z);
+                }
+                /*
+                 * figure out which core basis block it is and then 
+                 * LLO,RLO,LUO,RUO - LLN,RLN,LUN,RUN
+                 * create the adjusted RSB and predict coordinates.
+                */
+                //will do later
+            }                        
+
+
+            return newPosition;
+            ////one coordinate falls outside of 1/3 faces;
+            ////if the block is a basis block then predict it with z/y/z min of 0 and max of blockradius of x/y/z from x/y/z and for the other 2 points that falls inside of the block predict them using PredictSynapseWithoutInterval for both of them
+            ////els if the block is not a basis block then predict the position with PredictSynapseWithanInterval method for the position and for other 2 points use the other method and finally return the position.
+            //if(basis_block_x)
+        }                
     }
 }
