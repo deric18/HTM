@@ -1,5 +1,6 @@
 ﻿using HTM.Enums;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HTM.Models
 {
@@ -8,7 +9,7 @@ namespace HTM.Models
         public uint Length { get; private set; }
         public uint Breadth { get; private set; }
         public List<Position2D> ActiveBits { get; private set; }
-        public InputPatternType IType { get; private set; }        
+        public InputPatternType IType { get; set; }        
 
         public uint Size() => Length * Breadth;                
 
@@ -31,14 +32,24 @@ namespace HTM.Models
                 }
         }
 
-        public bool IsUnionTo(SDR uniounTo, SDR uniounFrom)
+        public bool IsUnionTo(SDR uniounTo)
         {
-            if (uniounTo.Length != uniounFrom.Length || uniounTo.Breadth != uniounFrom.Breadth)           
-                return false;          
-            
-            foreach(var pos in ActiveBits)
+            if (Length != uniounTo.Length || uniounTo.Breadth != uniounTo.Breadth || ActiveBits.Count > uniounTo.ActiveBits.Count)
+                return false;
+
+            ActiveBits.OrderByDescending(x => x.X);
+            uniounTo.ActiveBits.OrderByDescending(y => y.X);
+
+            int counter = 0;
+            foreach (var pos in ActiveBits)
             {
-                if(!sdr2.ActiveBits[pos.X][pos.Y])
+                Position2D uPos = uniounTo.ActiveBits[counter];
+                if ((pos.X == uPos.X && pos.Y == uPos.Y) || uPos.X < pos.X)
+                {
+                    counter++;
+                    continue;
+                }
+                else if(pos.X < uPos.X)
                 {
                     return false;
                 }

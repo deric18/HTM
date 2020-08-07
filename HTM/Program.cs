@@ -58,17 +58,17 @@ namespace HTM
                                PixelFormat.Format32bppArgb);
 
             // Create a graphics object from the bitmap.
-            var gfxScreenshot = Graphics.FromImage(bmpScreenshot);
+            //var gfxScreenshot = Graphics.FromImage(bmpScreenshot);
 
             // Take the screenshot from the upper left corner to the right bottom corner.
-            gfxScreenshot.CopyFromScreen(Screen.PrimaryScreen.Bounds.X,
-                                        Screen.PrimaryScreen.Bounds.Y,
-                                        0,
-                                        0,
-                                        Screen.PrimaryScreen.Bounds.Size,
-                                        CopyPixelOperation.SourceCopy);                        
+            //gfxScreenshot.CopyFromScreen(Screen.PrimaryScreen.Bounds.X,
+            //                            Screen.PrimaryScreen.Bounds.Y,
+            //                            0,
+            //                            0,
+            //                            Screen.PrimaryScreen.Bounds.Size,
+            //                            CopyPixelOperation.SourceCopy);                        
 
-            return bmpScreenshot;
+            //return bmpScreenshot;
         }
     }
 }

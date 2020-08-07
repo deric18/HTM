@@ -1,4 +1,5 @@
 ﻿using HTM.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -42,7 +43,7 @@ namespace HTM.Models
             return toRet;
         }
 
-        internal Neuron GetNeuron(uint z) => Neurons[(int)z];
+        internal Neuron GetNeuron(uint z) => Neurons[Convert.ToInt32(z)];
 
         internal List<Neuron> GetPredictedCells()
         {

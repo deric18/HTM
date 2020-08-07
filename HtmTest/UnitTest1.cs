@@ -11,13 +11,15 @@ namespace HtmTest
         [TestMethod]
         public void TestNeuron()
         {
-            HTM.CPM cpm = new HTM.CPM();
+            HTM.CPM cpm = HTM.CPM.GetInstance;
+            cpm.Initialize(10, 10, 10, null);
 
             SDR testInput = GetTestInput();
+            testInput.IType = HTM.Enums.InputPatternType.SPATIAL;
             SDR expectedOutput = GetTestOutput();
 
 
-            cpm.Process(testInput, HTM.Enums.InputPatternType.SPATIAL);
+            cpm.Process(testInput);
             SDR observedOutput = cpm.Predict();
 
 

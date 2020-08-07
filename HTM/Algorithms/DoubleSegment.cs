@@ -10,11 +10,6 @@
         {
             this.axonID = Claimer;
             this.dendriteID = Connector;
-        }
-
-        internal void InterfaceFire()
-        {
-            CPM.GetInstance.GetNeuronFromSegmentID();
-        }
+        }        
     }
 }

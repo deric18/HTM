@@ -40,7 +40,7 @@ namespace HTM
         private ConnectionTable cTable;
         internal SynapseGenerator synapseGenerator;
 
-        public void Initialize(uint x, uint y, uint z)
+        public void Initialize(uint x, uint y, uint z, BlockConfigProvider bcp)
         {
             //Notes ToDo : BASED ON NUMBER OF CLOUMNS , ROWS AND FILES TO BE CREATED , CREATE THAT MANY BLOCKS IN ORDER WITH X-Y & THEN Z CO-ORDINATE SYSTEM WITH SYNAPSE GENERATOR AND SYNAPSE TABLE AND INTERVAL
             /*LOAD ONE OF THE CONFIGURATIONS FROM NumColumnsPerBlock ,  once loaded intialise the system appropriately 
@@ -73,7 +73,7 @@ namespace HTM
                 return;
             }
 
-            instance.BCP = new BlockConfigProvider(100000);
+            instance.BCP = bcp == null ? new BlockConfigProvider(100000) : bcp;
             instance.NumBlocks = 30;
 
             cTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
@@ -103,7 +103,7 @@ namespace HTM
 
                         foreach(var pos in firingPositions)
                         {                            
-                            instance.ColumnFire(pos.X, pos.Y, inputPattern.IType);
+                            instance.ColumnFire(Convert.ToUInt32(pos.X), Convert.ToUInt32(pos.Y), inputPattern.IType);
                         }
                         _readySpatial = false;
                         _readyApical = true;
