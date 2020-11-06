@@ -1,5 +1,5 @@
 ﻿//TODO : Complete Apical and Temporal axon lines.
-
+//Mark the neuron positions also as NotFiniteNumberException available and mark them as 'D'
 using HTM.Enums;
 using HTM.Models;
 using System;
@@ -41,10 +41,7 @@ namespace HTM.Algorithms
                     for (uint j = 0; j < bcp.NumYperBlock; j++)
                         for (uint k = 0; k < bcp.NumZperBlock; k++)
                             cMap[block, i][j, k] = 'A';
-            //Draw Temporal Lines here
-
-
-            //Draw Apical Lines here
+            
 
         }
 
@@ -172,9 +169,9 @@ namespace HTM.Algorithms
             return new ConnectionType(CType.NotAvailable);
         }
 
-        internal void InterfaceFire(string position)
+        internal SegmentID InterfaceFire(string position)
         {
-
+            return synapses[position].dendriteID;
         }
 
         private void AxonClaim(Position3D pos, SegmentID claimerSegID)

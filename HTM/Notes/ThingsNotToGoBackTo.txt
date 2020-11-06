@@ -1,2 +1,5 @@
 ﻿-There is no way to do this app without storing all the synapses programatically , you will have to come up with a mathematical solution , using the analogy of a private key ,publick key
 -Try to define a synapse in terms of public key , private key and text.
+-This idea is basically just a number graph where numbers connect with each other based on the divisibility. 
+Cons : This idea is just fancy sounding  thereis no mechanism for deplorising neurons & prediction which is basically the whole eseence of entire nerual network.
+

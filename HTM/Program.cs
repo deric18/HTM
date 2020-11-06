@@ -10,20 +10,20 @@ namespace HTM
     {
         static void Main(string[] args)
         {
-            CPM cpm = CPM.GetInstance;            
+            //CPM cpm = CPM.GetInstance;            
 
-            Console.WriteLine("Enter lenth of the block:");
-            uint x = Convert.ToUInt32(Console.ReadLine());
-                                                                                                                                                                                                                                                                                                                                                                                                 Console.WriteLine("Enter breadth of the block:");                                                                                                                                                                                                                                                                                                                                                        
-            uint y = Convert.ToUInt32(Console.ReadLine());
-            Console.WriteLine("Enter width of the block:");
-            uint z = Convert.ToUInt32(Console.ReadLine());
+            //Console.WriteLine("Enter lenth of the block:");
+            //uint x = Convert.ToUInt32(Console.ReadLine());
+            //                                                                                                                                                                                                                                                                                                                                                                                     Console.WriteLine("Enter breadth of the block:");                                                                                                                                                                                                                                                                                                                                                        
+            //uint y = Convert.ToUInt32(Console.ReadLine());
+            //Console.WriteLine("Enter width of the block:");
+            //uint z = Convert.ToUInt32(Console.ReadLine());
 
-            Console.WriteLine("Initializing...");
-            cpm.Initialize(x, y, z);
-            Console.WriteLine("Done.");
-            Console.Clear();
-            Console.WriteLine("System Ready.");
+            //Console.WriteLine("Initializing...");
+            //cpm.Initialize(x, y, z, null);
+            //Console.WriteLine("Done.");
+            //Console.Clear();
+            //Console.WriteLine("System Ready.");
             //Set Up Spatial Input pattern Source
 
             //Set Up Temporal Input Pattern Source
@@ -47,6 +47,11 @@ namespace HTM
             for (int i = 0; i < B.Width; i++)
                 for (int j = 0; j < B.Height; j++)
                 {
+                    Color c =  B.GetPixel(i, j);
+                    uint r = c.R;
+                    uint g = c.G;
+                    uint b = c.B;
+
 
                 }            
         }

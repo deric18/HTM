@@ -5,7 +5,8 @@ using System;
 namespace HTM.Models
 {
     /// <summary>
-    /// 1.Account for both excitatory and inhibitory neurons
+    /// 1.Account for both excitatory and inhibitory neurons . Need o rethink about this, one argument is that this is not neccessary because HTM Model already accounts for this by 
+    /// picking single neurons from one column with highest values using selective firing techniques.
     /// </summary>
     public class Neuron
     {                
@@ -15,7 +16,7 @@ namespace HTM.Models
         private Dictionary<string, Segment> Segments { get; set; }        
         private uint _totalSegments;
         private List<SegmentID> _predictedSegments;                
-        public List<SegmentID> axonEndPoints { get; private set; } 
+        public List<string> axonEndPoints { get; private set; } 
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
         private CPM _cpm;
 
@@ -27,7 +28,7 @@ namespace HTM.Models
             State = NeuronState.RESTING;
             Segments = new Dictionary<string, Segment>();
             _predictedSegments = new List<SegmentID>();
-            axonEndPoints = new List<SegmentID>();
+            axonEndPoints = new List<string>();
             _cpm = CPM.GetInstance;
         }        
 
@@ -65,9 +66,14 @@ namespace HTM.Models
 
         internal void Fire()
         {
-            foreach(var seg in axonEndPoints)
+            foreach(var point in axonEndPoints)
             {
-                
+                //Get connection table and check if any of the axon end points has connections ./AIII 118
+                //Collect those SegmentId's , get Neurons from those segmentID's
+                //start calling methods on those neurons with there respective segmentID's
+
+                SegmentID sId = _cpm.CTable.InterfaceFire(point);
+                _cpm.NeuronFire(Position3D.GetPositionFromString(point), sId, NEURONAL_FIRE_VOLTAGE);
             }
         }
 

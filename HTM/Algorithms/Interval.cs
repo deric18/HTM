@@ -1,4 +1,5 @@
-﻿using HTM.Models;
+﻿//Not Using this Class
+using HTM.Models;
 
 namespace HTM.Algorithms
 {

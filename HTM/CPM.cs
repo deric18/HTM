@@ -27,17 +27,18 @@ namespace HTM
         }
 
         public uint NumX { get; private set; }      //Number of Neuron Rows in the region
-        public uint NumY{ get; private set; }        //Number of Neuron Columns in the region
+        public uint NumY{ get; private set; }       //Number of Neuron Columns in the region
         public uint NumZ { get; private set; }      //Number of Neuron Files in the region
         public uint NumBlocks { get; private set; } //Number of Blocks in the Region        
         public BlockConfigProvider BCP { get; private set; }
         public Column[][] Columns { get; private set; }
-        private Dictionary<string, Neuron> _longPredictedList;        //why 2 lists ? whats the diff ???
+        private List<Neuron> _predictedList;        
         //private List<Neuron> _shortPredictedList;
         private bool _readySpatial;
         private bool _readyTemporal;
         private bool _readyApical;
-        private ConnectionTable cTable;
+        public NeuralSchema NeuralSchema {  get; private set; }
+        public ConnectionTable CTable { get; private set; }
         internal SynapseGenerator synapseGenerator;
 
         public void Initialize(uint x, uint y, uint z, BlockConfigProvider bcp)
@@ -49,12 +50,19 @@ namespace HTM
              **/           
             instance.NumX = x;
             instance.NumY = y;
-            instance.NumZ = z;            
-            instance._longPredictedList = new Dictionary<string, Neuron>();
+            instance.NumZ = z;
+            if (x == 5)
+                NeuralSchema = NeuralSchema.FIVECROSSFIVE;
+            else if(x == 10)
+            {
+                NeuralSchema = NeuralSchema.TENCROSSTEN;
+            }
+
+    instance._predictedList = new List<Neuron>();
             //instance._shortPredictedList = new List<Neuron>();
             instance._readyApical = false;
-            instance._readyTemporal = true;
-            instance._readySpatial = false;
+            instance._readyTemporal = false;
+            instance._readySpatial = true;
 
             try
             {
@@ -76,7 +84,7 @@ namespace HTM
             instance.BCP = bcp == null ? new BlockConfigProvider(100000) : bcp;
             instance.NumBlocks = 30;
 
-            cTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
+            instance.CTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
             synapseGenerator = SynapseGenerator.GetInstance;
         }
         
@@ -170,6 +178,16 @@ namespace HTM
                 toFire.Fire();
             }            
 
+        }
+
+        internal void NeuronFire(Position3D position, SegmentID segmentID, uint potential)
+        {
+            bool willFire = GetNeuronFromPosition(segmentID.NeuronId).Process(segmentID.Position, segmentID, 10);
+
+            if(willFire)
+            {
+                _predictedList.Add(GetNeuronFromPosition(segmentID.NeuronId));
+            }            
         }
 
         

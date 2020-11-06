@@ -6,9 +6,9 @@ namespace HTM.Models
 {    
     public class SegmentID : Position3D
     {
-        private uint SegmentNumber;
-        private Position3D NeuronId;
-        private Position3D Position;
+        public uint SegmentNumber { get; private set; }
+        public Position3D NeuronId { get; private set; }
+        public Position3D Position { get; private set; }
 
         internal SegmentID(Position3D neuronId, uint segNum, Position3D newPosition) : base(newPosition)
         {

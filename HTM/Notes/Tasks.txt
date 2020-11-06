@@ -1,1 +1,2 @@
-﻿-Complete Transform.cs 
+﻿-Complete Transform.cs ----------------------Done.
+-Write byte and Scalar Encoders (steal it from Numenta)

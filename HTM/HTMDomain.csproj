@@ -52,11 +52,12 @@
     <Compile Include="Algorithms\Delete.cs" />
     <Compile Include="Algorithms\ConnectionTable.cs" />
     <Compile Include="Algorithms\SynapseGenerator.cs" />
+    <Compile Include="Enums\NeuralSchema.cs" />
     <Compile Include="Enums\PotentialType.cs" />
     <Compile Include="Enums\SignalType.cs" />
     <Compile Include="Enums\TransformType.cs" />
     <Compile Include="CPM.cs" />
-    <Compile Include="Encoders\IntegerEncoder.cs" />
+    <Compile Include="Encoders\Encoder.cs" />
     <Compile Include="Enums\BranchingTechnique.cs" />
     <Compile Include="Enums\ConnectionType.cs" />
     <Compile Include="Enums\EndPointType.cs" />
