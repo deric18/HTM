@@ -45,9 +45,17 @@ namespace HTM.Models
 
         internal Neuron GetNeuron(uint z) => Neurons[Convert.ToInt32(z)];
 
-        internal List<Neuron> GetPredictedCells()
+        internal List<Position3D> GetFiringCellPositions()
         {
-            return Neurons.Where(pos => (pos.State == NeuronState.PREDICTED || pos.State == NeuronState.SPIKING)).ToList();
+            var neronsList = Neurons.Where(pos => (pos.State == NeuronState.PREDICTED || pos.State == NeuronState.SPIKING)).ToList();
+            List<Position3D> posList = new List<Position3D>();
+
+            foreach(var neuron in neronsList)
+            {
+                posList.Add(neuron.NeuronID);
+            }
+
+            return posList;
         }
         
         internal string GetFiringCellRepresentation()
@@ -66,5 +74,7 @@ namespace HTM.Models
             }
             return toReturn;
         }
+
+        internal List<Neuron> GetPredictedCells() => Neurons.Where(n => n.State != NeuronState.RESTING).ToList();        
     }
 }

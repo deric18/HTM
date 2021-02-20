@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Predict , Grow
+using System;
 using HTM.Models;
 using HTM.Enums;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ namespace HTM
 {
     public class CPM
     {        
-        private static volatile CPM instance;        
+        private static CPM instance;        
 
         private CPM() { }
 
@@ -58,7 +59,7 @@ namespace HTM
                 NeuralSchema = NeuralSchema.TENCROSSTEN;
             }
 
-    instance._predictedList = new List<Neuron>();
+            instance._predictedList = new List<Neuron>();
             //instance._shortPredictedList = new List<Neuron>();
             instance._readyApical = false;
             instance._readyTemporal = false;
@@ -191,15 +192,20 @@ namespace HTM
         }
 
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public SDR Predict()
         {
             SDR toReturn = null;
 
             foreach(var columnArray in Columns)
             {
-                foreach(var column in columnArray)
+                foreach (var column in columnArray)
                 {
-                    //toReturn += column.GetFiringCellRepresentation();
+                    List<Position3D> positions = column.GetFiringCellPositions();
+
 
                 }
             }

@@ -1,4 +1,5 @@
-﻿using HTM.Enums;
+﻿//TODO : Prune, Grow    
+using HTM.Enums;
 using System.Collections.Generic;
 using System;
 
@@ -95,12 +96,14 @@ namespace HTM.Models
 
         internal void Grow()
         {
-            //check which segment is growing the fastest and getting modre NMDA spikes and supply a grow signal
+            //growth signal comes form CPM when neuron exceeds fire index in the fire cycle , we add new positions to both axonal endpoints and dendritic segments
+
+
         }
 
         internal void Prune()
         {
-            //check which segment is most underpeforming and send inhibit signal to such segments.
+            //Need neuron status tracking from CPM.
         }
     } 
 }

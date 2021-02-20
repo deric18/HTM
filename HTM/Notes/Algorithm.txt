@@ -13,3 +13,7 @@ handling Core Basis Block :
 --check x,y,z block radius differences and set it to zero respc.
 -evaluate there counterparts to construct the RSB
 -Predict the new position with that .
+
+
+																GROWTH STRATERGY FOR NEURONS
+1. Growth index defines how many times the neuron needs to fire before we add a new connection point to the neuron or the segment , once the neuron crosses the fire index the neuron will grow the particular segment 

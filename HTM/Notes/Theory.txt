@@ -1,1 +1,2 @@
-﻿1.Hippocampus handles the short term memory , it recieves connections from all the senses and then distributed important info to required parts of the brain or turs it into permanent memories.
+﻿-The whole concept is based upon the idea of single unique connection point ID (position3D) where an axon endpoint and a dendrite endpoint can combine and form a synapse
+1.Hippocampus handles the short term memory , it recieves connections from all the senses and then distributed important info to required parts of the brain or turs it into permanent memories.

@@ -93,6 +93,7 @@
     <Content Include="Notes\Thoughts.txt" />
     <Content Include="Notes\Notes.txt" />
     <Content Include="Notes\QNA.txt" />
+    <Content Include="Notes\ToDo.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

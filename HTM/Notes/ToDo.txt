@@ -1,0 +1,3 @@
+﻿-Write unit tests for generating new connection point
+-Write unit test for creating segment.cs instance and create new dendrites and check how many attempts has to be made in a sample space before it connects to an actual axon end point.
+-Finish grow , prune.
