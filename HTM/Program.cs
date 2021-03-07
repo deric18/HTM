@@ -31,10 +31,9 @@ namespace HTM
             //Set Up Apical Input Pattern Source
 
 
-            Bitmap B = GetInput();
+            Bitmap Bit = GetInput();
 
-            int size = B.Width * B.Height;
-             
+            int size = Bit.Width * Bit.Height;            
 
 
             /*
@@ -43,14 +42,15 @@ namespace HTM
             */
 
 
-      
-            for (int i = 0; i < B.Width; i++)
-                for (int j = 0; j < B.Height; j++)
+
+            for (int i = 0; i < Bit.Width; i++)
+                for (int j = 0; j < Bit.Height; j++)
                 {
-                    Color c =  B.GetPixel(i, j);
-                    uint r = c.R;
-                    uint g = c.G;
-                    uint b = c.B;
+                    Color c = Bit.GetPixel(i, j);
+                    byte r = c.R;
+                    byte g = c.G;
+                    byte b = c.B;
+
 
 
                 }            

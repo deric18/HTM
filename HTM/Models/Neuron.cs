@@ -45,6 +45,7 @@ namespace HTM.Models
         /// <summary>
         /// Process Potential to segment and decide if you are gonna fire or not so CPM can add you to the prediction list.
         /// </summary>
+        /// 
         /// <param name="position"></param>
         /// <param name="segmentID"></param>
         /// <param name="potential"></param>
@@ -95,6 +96,8 @@ namespace HTM.Models
         }
 
         internal void Grow()
+
+
         {
             //growth signal comes form CPM when neuron exceeds fire index in the fire cycle , we add new positions to both axonal endpoints and dendritic segments
 

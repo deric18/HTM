@@ -73,7 +73,7 @@ namespace HTM.Algorithms
         public Position3D PredictNewRandomPosition(Position3D basePosition, string claimerSegId)
         {
             /*
-             * Basis Block 
+             * Edge Block 
              *  if yes
              *  then do random square within the block 
              *    if yes 
@@ -94,15 +94,15 @@ namespace HTM.Algorithms
 
 
             basis_block_x = (XL_BB_Mods(bId) || XR_BB_Mods(bId)) ? true : false;
-            crossOver_X = RSBCheckX(basePosition) ? true : false;
+            crossOver_X = RSBCheckX(basePosition);
 
 
             basis_block_y = ((YU_BB_Mods(bId) || (YD_BB_Mods(bId)) ? true : false && RSBCheckY(basePosition)));
-            crossOver_Y = RSBCheckY(basePosition) ? true : false;
+            crossOver_Y = RSBCheckY(basePosition);
 
 
             basis_block_z = ((ZF_BB_Mods(bId) || (ZB_BB_Mods(bId)) ? true : false && RSBCheckZ(basePosition)));
-            crossOver_Z = RSBCheckZ(basePosition)  ? true : false;
+            crossOver_Z = RSBCheckZ(basePosition);
             
             #endregion
 

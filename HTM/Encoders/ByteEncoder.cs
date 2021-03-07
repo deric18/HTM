@@ -5,23 +5,27 @@ using System.Drawing;
 
 namespace HTM.Encoders
 {
-    public class UnsignedIntegerEncoder
+    public class ByteEncoder
     {
         private int _n;
         private int _w;
         private SDR _outputSdr;
 
-        public UnsignedIntegerEncoder(uint minVal, uint maxVal)
+        public ByteEncoder(uint minVal, uint maxVal)
         {
-            if((CPM.GetInstance.NeuralSchema == Enums.NeuralSchema.FIVECROSSFIVE && maxVal > 300) && (CPM.GetInstance.NeuralSchema == Enums.NeuralSchema.TENCROSSTEN && maxVal > 4950))
+            if(maxVal > 256 || minVal > maxVal)
             {
-                throw new Exception("Invalid limits for the Nerual Schema Crated");
+                throw new Exception("Invalid limits");
             }
             _n = (CPM.GetInstance.NeuralSchema == Enums.NeuralSchema.FIVECROSSFIVE) ? 300 : (CPM.GetInstance.NeuralSchema == Enums.NeuralSchema.TENCROSSTEN ? 4950 : 0);
             _w = ;
+
+
+
+
         }
         
-        public SDR EncodeUnsignedInteger(uint scalar)
+        public SDR EncodeByte(byte byteVal)
         {
 
         }

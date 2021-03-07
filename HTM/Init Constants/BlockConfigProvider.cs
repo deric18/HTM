@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-
+﻿//changed the configurations to make the place blocks much more even and square
 namespace HTM.Models
 {
     public class BlockConfigProvider
@@ -8,7 +7,7 @@ namespace HTM.Models
         public uint NumYperBlock { get; private set; }
         public uint NumZperBlock { get; private set; }        
 
-        //Total Number of Pouints, <Number of Points per Line (x), Number of lines(x) , Number of such files (z)> these are all for a single block
+        //Total Number of Points, <Number of Points per Line (x), Number of lines(x) , Number of such files (z)> these are all for a single block
         public BlockConfigProvider(uint totalPointsPerBlock)
         {
             switch(totalPointsPerBlock)
@@ -18,32 +17,32 @@ namespace HTM.Models
                         NumXperBlock = NumYperBlock = NumZperBlock = 10;
                         break;
                     }
-                case 10000:
+                case 10000:         //9261
                     {
-                        NumXperBlock = 100;
-                        NumYperBlock = 10;
-                        NumZperBlock = 10;
+                        NumXperBlock = 21;
+                        NumYperBlock = 21;
+                        NumZperBlock = 21;
                         break;
                     }
-                case 100000:
+                case 100000:        //97336
                     {
-                        NumXperBlock = 100;
-                        NumYperBlock = 100;
-                        NumZperBlock = 10;
+                        NumXperBlock = 46;
+                        NumYperBlock = 46;
+                        NumZperBlock = 46;
                         break;
                     }
-                case 1000000:
+                case 1000000:       
                     {
                         NumXperBlock = 100;
-                        NumYperBlock = 100;
-                        NumZperBlock = 100;
-                        break;
-                    }
-                case 10000000:
-                    {
-                        NumXperBlock = 1000;
                         NumYperBlock = 100;
                         NumZperBlock = 100;
+                        break;
+                    }
+                case 10000000:      //9938375
+                    {
+                        NumXperBlock = 215;
+                        NumYperBlock = 215;
+                        NumZperBlock = 215;
                         break;
                     }                    
             }            

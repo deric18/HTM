@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿//Grow , Prune
+using System.Configuration;
 using System.Collections.Generic;
 using System;
 using HTM.Enums;
@@ -110,14 +111,7 @@ namespace HTM.Models
             }
             return false;
         }                    
-
-        public void Fire()
-        {
-            if(!this.sType.Equals(SegmentType.Axonal))               //segment should not be of type axonal to recieve potential 
-            {
-                //u need to do fire through CPM otherwise cpm will not know which columns to search for next deplorization after next pattern comes in from SDR to be processed.
-            }
-        }
+        
         //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
         /// <summary>
@@ -154,6 +148,11 @@ namespace HTM.Models
                 //log Information with details , Segment has reached a peak connection pathway , this is essentially a crucial segment for the whole region.
             }            
         }              
+
+        public void Grow()
+        {
+
+        }
 
         public void Prune()
         {
