@@ -1,4 +1,4 @@
-﻿//Predict , Grow
+﻿//Grow
 using System;
 using HTM.Models;
 using HTM.Enums;
@@ -37,8 +37,7 @@ namespace HTM
         //private List<Neuron> _shortPredictedList;
         private bool _readySpatial;
         private bool _readyTemporal;
-        private bool _readyApical;
-        public NeuralSchema NeuralSchema {  get; private set; }
+        private bool _readyApical;        
         public ConnectionTable CTable { get; private set; }
         internal SynapseGenerator synapseGenerator;
 
@@ -51,13 +50,7 @@ namespace HTM
              **/           
             instance.NumX = x;
             instance.NumY = y;
-            instance.NumZ = z;
-            if (x == 5)
-                NeuralSchema = NeuralSchema.FIVECROSSFIVE;
-            else if(x == 10)
-            {
-                NeuralSchema = NeuralSchema.TENCROSSTEN;
-            }
+            instance.NumZ = z;            
 
             instance._predictedList = new List<Neuron>();
             //instance._shortPredictedList = new List<Neuron>();
@@ -83,7 +76,7 @@ namespace HTM
             }
 
             instance.BCP = bcp == null ? new BlockConfigProvider(100000) : bcp;
-            instance.NumBlocks = 30;
+            instance.NumBlocks = x * y * z;
 
             instance.CTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
             synapseGenerator = SynapseGenerator.GetInstance;
@@ -154,9 +147,11 @@ namespace HTM
             }            
         }
 
+
+        //as per the name does a entire colmn fire if no predicted cells otherwise fires the predicted cells
         private void ColumnFire(uint X, uint Y, InputPatternType iType)
         {
-            //check if pos in predicted neuron list if so return else do the full charade.
+            //check if pos is in predicted neuron list if so add potential and then return else do the full charade.
             //check for predicted cells in the column and decide whther to burst or not
             //pick cells and fire
             //return List of positions 
@@ -195,18 +190,17 @@ namespace HTM
         /// <summary>
         /// 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>output sdr should be 2D should only get 1 for columns that are firing and o if none of the cells in the column are firing</returns>
         public SDR Predict()
         {
-            SDR toReturn = null;
+            SDR toReturn = new SDR(NumX, NumY);
 
-            foreach(var columnArray in Columns)
+            for (int i=0; i<NumX; i++)
             {
-                foreach (var column in columnArray)
+                for(int j=0; j<NumY; j++)
                 {
-                    List<Position3D> positions = column.GetFiringCellPositions();
-
-
+                    if (Columns[i][j].GetFiringCellPositions().Count > 0)
+                        toReturn.ActiveBits.Add(Columns[i][j].ID);
                 }
             }
 
@@ -217,10 +211,6 @@ namespace HTM
         {   //ToDo
             //Give a GROW SIGNAL around the network 
             //Can always be tweaked and policies may be constructed for sending these signals based on how much a neuron/Segment has contributed.
-
-
-
-
 
         }                                                          
 

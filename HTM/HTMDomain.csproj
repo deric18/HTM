@@ -52,12 +52,13 @@
     <Compile Include="Algorithms\Delete.cs" />
     <Compile Include="Algorithms\ConnectionTable.cs" />
     <Compile Include="Algorithms\SynapseGenerator.cs" />
-    <Compile Include="Enums\NeuralSchema.cs" />
+    <Compile Include="Encoders\ByteEncoder.cs" />
+    <Compile Include="Encoders\Models\Bucket.cs" />
+    <Compile Include="Encoders\random_scalar.cs" />
     <Compile Include="Enums\PotentialType.cs" />
     <Compile Include="Enums\SignalType.cs" />
     <Compile Include="Enums\TransformType.cs" />
     <Compile Include="CPM.cs" />
-    <Compile Include="Encoders\Encoder.cs" />
     <Compile Include="Enums\BranchingTechnique.cs" />
     <Compile Include="Enums\ConnectionType.cs" />
     <Compile Include="Enums\EndPointType.cs" />
@@ -70,7 +71,7 @@
     <Compile Include="Interfaces\IEncode.cs" />
     <Compile Include="Models\Column.cs" />
     <Compile Include="Models\Neuron.cs" />
-    <Compile Include="Init Constants\ConfigProvider.cs" />
+    <Compile Include="Init Constants\BlockConfigProvider.cs" />
     <Compile Include="Models\Position2D.cs" />
     <Compile Include="Models\Position3D.cs" />
     <Compile Include="Models\SDR.cs" />

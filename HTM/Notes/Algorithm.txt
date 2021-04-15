@@ -17,3 +17,16 @@ handling Core Basis Block :
 
 																GROWTH STRATERGY FOR NEURONS
 1. Growth index defines how many times the neuron needs to fire before we add a new connection point to the neuron or the segment , once the neuron crosses the fire index the neuron will grow the particular segment 
+
+
+																		ENCODERS
+
+BYTE ENCODER
+Compute()
+-Compute the radius
+-If radius is odd ! great create the buckets 
+-else 
+ --rectangular adjustment
+ --understand how many buckets need to be created!
+ --compute start and end indices both along x & y co-ordinates , create the bucket then run a check to see if there is enough space to create another bucket on the x axis if so continue otherwise set x-index to 0 and increment y-start-index to radius
+   repeat the process   

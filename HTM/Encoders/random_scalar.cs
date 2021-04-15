@@ -27,8 +27,7 @@ using System.Linq;
 namespace HTM.Encoders
 {
     public class ByteEncoder
-    {
-               
+    {               
         
         public static object INITIAL_BUCKETS = 1000;
         

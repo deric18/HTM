@@ -47,7 +47,7 @@ namespace HTM.Models
 
         internal List<Position3D> GetFiringCellPositions()
         {
-            var neronsList = Neurons.Where(pos => (pos.State == NeuronState.PREDICTED || pos.State == NeuronState.SPIKING)).ToList();
+            var neronsList = Neurons.Where(pos => (pos.State == NeuronState.FIRED || pos.State == NeuronState.SPIKING)).ToList();
             List<Position3D> posList = new List<Position3D>();
 
             foreach(var neuron in neronsList)

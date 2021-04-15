@@ -16,14 +16,14 @@ namespace HtmTest
 
             SDR testInput = GetTestInput();
             testInput.IType = HTM.Enums.InputPatternType.SPATIAL;
-            SDR expectedOutput = GetTestOutput();
+            SDR observedOutput = GetTestOutput();
 
 
             cpm.Process(testInput);
-            SDR observedOutput = cpm.Predict();
+            SDR predictedOutput = cpm.Predict();
 
 
-            Assert.AreEqual(observedOutput, expectedOutput);
+            Assert.AreEqual(predictedOutput, observedOutput);
 
         }
 

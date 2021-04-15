@@ -3,11 +3,13 @@
 potential space size
 
 
-N - total number of neurons to be usedfor representation.
+N - total number of neurons to be used for representation.
 W - total number of neurons available in the region.
 
 -5 * 5 * 5 = 125 neurons 
 -2% sparsity = 0.02 * 125  = 2.5 => 3
 
 -if u r going to use 3 neurons out of 125 , then toal number of possible representation you can make is 125C3 
+
+there can be 2 types of encoders - a sequential encoder and distributed encoder
 
