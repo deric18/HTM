@@ -36,7 +36,7 @@ namespace HTM.Algorithms
         bool basis_block_x = false;
         bool basis_block_y = false;
         bool basis_block_z = false;
-        bool crossOver_X, crossOver_Y, crossOver_Z;
+        bool crossOver_X_Left, crossOver_X_Right, crossOver_Y_Up, crossOver_Y_Down, crossOver_Z_Front, crossOver_Z_Back;
 
         private SynapseGenerator()
         {
@@ -47,7 +47,7 @@ namespace HTM.Algorithms
             numXPerBlock = CPM.GetInstance.BCP.NumXperBlock;
             numYPerBlock = CPM.GetInstance.BCP.NumYperBlock;
             numZPerBlock = CPM.GetInstance.BCP.NumZperBlock;
-            crossOver_X = crossOver_Y = crossOver_Z = false;
+            crossOver_X_Left = crossOver_X_Right = crossOver_Y_Up = crossOver_Y_Down = crossOver_Z_Front = crossOver_Z_Back = false;
             //based on above values , initialize and populate all the basic block modulos.
 
             //XL_BB_Mods = XR_BB_Mods = YU_BB_Mod = YD_BB_Mod = ZF_BB_Mod = ZB_BB_Mod = 0;
@@ -64,16 +64,17 @@ namespace HTM.Algorithms
         /// </summary>
         /// <param name="pos"></param>
         /// <returns>True if doesnt cross over the block boundaries false otherwise</returns>
-        private bool RSBCheckX(Position3D pos) => (pos.X - blockRadius < 0 || pos.X + blockRadius > numXPerBlock) ? true : false;
-        private bool RSBCheckY(Position3D pos) => (pos.Y - blockRadius < 0 || pos.Y + blockRadius > numYPerBlock) ? true : false;
-        private bool RSBCheckZ(Position3D pos) => (pos.Z - blockRadius < 0 || pos.Z + blockRadius > numZPerBlock) ? true : false;
-
-
+        private bool RSBCheckX_Left(Position3D pos) => (pos.X - blockRadius < 0) ? true : false;
+        private bool RSBCheckX_Right(Position3D pos) => (pos.X + blockRadius > 0) ? true : false;
+        private bool RSBCheckY_Up(Position3D pos) => (pos.Y - blockRadius < 0 ) ? true : false;
+        private bool RSBCheckY_Down(Position3D pos) => pos.Y + blockRadius > numYPerBlock ? true : false;
+        private bool RSBCheckZ_Front(Position3D pos) => (pos.Z - blockRadius < 0) ? true : false;
+        private bool RSBCheckZ_Back(Position3D pos) => (pos.Z + blockRadius > numZPerBlock) ? true : false;
 
         public Position3D PredictNewRandomPosition(Position3D basePosition, string claimerSegId)
         {
             /*
-             * Edge Block 
+             * Basis Block 
              *  if yes
              *  then do random square within the block 
              *    if yes 
@@ -84,46 +85,47 @@ namespace HTM.Algorithms
              *  then compute the intervals and generate new random positions for x,y,z & return new position
              * */
             Position3D newPosition = new Position3D();
-            basis_block_x = false;
-            basis_block_y = false;
-            basis_block_z = false;
-            crossOver_X = crossOver_Y = crossOver_Z = false;
+            
             #region VERIFICATIONS - SETTING FLAGS
 
             uint bId = basePosition.BID;
 
 
-            basis_block_x = (XL_BB_Mods(bId) || XR_BB_Mods(bId)) ? true : false;
-            crossOver_X = RSBCheckX(basePosition);
+            basis_block_x = XL_BB_Mods(bId) || XR_BB_Mods(bId) ? true : false;
+            crossOver_X_Left = RSBCheckX_Left(basePosition);
+            crossOver_X_Right = RSBCheckX_Right(basePosition);
 
 
-            basis_block_y = ((YU_BB_Mods(bId) || (YD_BB_Mods(bId)) ? true : false && RSBCheckY(basePosition)));
-            crossOver_Y = RSBCheckY(basePosition);
+            basis_block_y = YU_BB_Mods(bId) || YD_BB_Mods(bId) ? true : false;
+            crossOver_Y_Up = RSBCheckY_Up(basePosition);
+            crossOver_Y_Down = RSBCheckY_Down(basePosition);
 
 
-            basis_block_z = ((ZF_BB_Mods(bId) || (ZB_BB_Mods(bId)) ? true : false && RSBCheckZ(basePosition)));
-            crossOver_Z = RSBCheckZ(basePosition);
-            
+            basis_block_z = ZF_BB_Mods(bId) || ZB_BB_Mods(bId) ? true : false;
+            crossOver_Z_Front = RSBCheckZ_Front(basePosition);
+            crossOver_Z_Back = RSBCheckZ_Back(basePosition);
+
             #endregion
 
 
             //most probable case will be that it is not a basis block so process them first n return the new position
-            if (!basis_block_x && !basis_block_y && !basis_block_z && !crossOver_X && !crossOver_Y && !crossOver_Z)    //0 coordinate falls outside of 3/3 faces of the block //falls within the neuroblock.
+            if (!basis_block_x && !basis_block_y && !basis_block_z && !crossOver_X_Left && !crossOver_X_Right && !crossOver_Y_Up && !crossOver_Y_Down && !crossOver_Z_Front && !crossOver_Z_Back)    //0 coordinates falls outside of 3/3 faces of the block //falls within the neuroblock.
             {
                 //Randomly predict all the 3 positions using the PredictSynapseWithoutinterval method and return the position
                 return SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(basePosition, 'A', blockRadius);
             }
             else 
             {                       
-                if ((!basis_block_x && !crossOver_X) && (basis_block_x && !crossOver_X))
+                if (!basis_block_x && !crossOver_X_Left && !crossOver_X_Right)
                 {
                     //Not a basis block and not crossing over
                     newPosition.X =  SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'X', blockRadius);
                 }
-                else if(!basis_block_x && crossOver_X)
+                else if(!basis_block_x && (crossOver_X_Left || crossOver_X_Right))
                 {
-                    int xmin = (int)(((-1) * numXPerBlock) + (basePosition.X - blockRadius));
-                    newPosition.X = SynapseGeneratorHelper.PredictRandomIntervalInteger(xmin, (int)((-1) * numXPerBlock), 0, (int)basePosition.X);                    
+                    Interval boundedIntervalX = SynapseGeneratorHelper.ComputeBoundsX(basePosition, false, crossOver_X_Left, crossOver_X_Right);
+
+                    newPosition.X = boundedIntervalX.PredictRandomInteger();                   
                 }
                 else if(basis_block_x && crossOver_X)
                 {

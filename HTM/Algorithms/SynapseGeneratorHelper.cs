@@ -79,6 +79,33 @@ namespace HTM.Algorithms
         }
 
 
+        //not handled for core blocks yet!
+        internal static Interval ComputeBoundsX(Position3D basePosition, bool isBasisBlock, bool crossOver_Left, bool crossOver_Right, bool? isCoreBlock = null)
+        {
+            Interval boundedInterval;
+
+            //Identify which side it is crossing over if its right side or left side , compute bounds and generate rnd int
+            if(!isBasisBlock)
+            {
+                if (crossOver_Left)
+                {
+                    boundedInterval = new Interval()
+                }
+                else if (crossOver_Right)
+                {
+
+                }
+                else
+                    Console.Write("WHAT KIND OF FUCKING STUPID CODE U R RIGHTING DUMBASS!!!!! THIS IS SOOOOOOOOOOOOOOOOOO!!! NOT SUPPOSED TO HAPPEN");
+            }
+            else
+            {
+
+            }
+
+            return boundedInterval;
+        }
+
         //iLow, iLowMid, iHighMid, iHigh
         internal static uint PredictRandomIntervalInteger(int i1, int i2, int i3, int i4)
         {//Use computed bounds to randomly predict a new position inside the random neuro block

@@ -41,7 +41,7 @@ namespace HTM
         public ConnectionTable CTable { get; private set; }
         internal SynapseGenerator synapseGenerator;
 
-        public void Initialize(uint x, uint y, uint z, BlockConfigProvider bcp)
+        public void Initialize(uint x, uint y, uint z, uint pointsPerBlock = 0)
         {
             //Notes ToDo : BASED ON NUMBER OF CLOUMNS , ROWS AND FILES TO BE CREATED , CREATE THAT MANY BLOCKS IN ORDER WITH X-Y & THEN Z CO-ORDINATE SYSTEM WITH SYNAPSE GENERATOR AND SYNAPSE TABLE AND INTERVAL
             /*LOAD ONE OF THE CONFIGURATIONS FROM NumColumnsPerBlock ,  once loaded intialise the system appropriately 
@@ -75,7 +75,7 @@ namespace HTM
                 return;
             }
 
-            instance.BCP = bcp == null ? new BlockConfigProvider(100000) : bcp;
+            instance.BCP = pointsPerBlock == 0 ? new BlockConfigProvider(100000) : new BlockConfigProvider(pointsPerBlock);
             instance.NumBlocks = x * y * z;
 
             instance.CTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);

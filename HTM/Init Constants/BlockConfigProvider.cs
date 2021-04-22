@@ -3,9 +3,9 @@ namespace HTM.Models
 {
     public class BlockConfigProvider
     {
-        public uint NumXperBlock { get; private set; }
-        public uint NumYperBlock { get; private set; }
-        public uint NumZperBlock { get; private set; }        
+        public uint NumXperBlock { get; private set; }      //Number of Columns per Block
+        public uint NumYperBlock { get; private set; }      //Number of Rows per Block
+        public uint NumZperBlock { get; private set; }      //Number of Rows & Columns files per block
 
         //Total Number of Points, <Number of Points per Line (x), Number of lines(x) , Number of such files (z)> these are all for a single block
         public BlockConfigProvider(uint totalPointsPerBlock)
@@ -24,7 +24,8 @@ namespace HTM.Models
                         NumZperBlock = 21;
                         break;
                     }
-                case 100000:        //97336
+                default:
+                case 100000:        //97336     //dEFAULT
                     {
                         NumXperBlock = 46;
                         NumYperBlock = 46;
