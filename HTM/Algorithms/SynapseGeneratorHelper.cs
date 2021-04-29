@@ -4,8 +4,7 @@ using System;
 namespace HTM.Algorithms
 {
     internal static class SynapseGeneratorHelper
-    {
-       
+    {       
         public static uint PredictNewRandomSynapseWithoutInterval(Position3D pos, char dimension, uint blockRadius)
         {
             uint toRet = 0;
@@ -80,26 +79,51 @@ namespace HTM.Algorithms
 
 
         //not handled for core blocks yet!
-        internal static Interval ComputeBoundsX(Position3D basePosition, bool isBasisBlock, bool crossOver_Left, bool crossOver_Right, bool? isCoreBlock = null)
+        internal static Interval ComputeBoundsX(Position3D basePosition, bool isBasisBlock, bool crossOver_Left, bool crossOver_Right, uint blockRadius, bool? isCoreBlock = null)
         {
             Interval boundedInterval;
 
-            //Identify which side it is crossing over if its right side or left side , compute bounds and generate rnd int
+            //Create an interval object , compute bound on the crossover dimension 
             if(!isBasisBlock)
             {
                 if (crossOver_Left)
                 {
-                    boundedInterval = new Interval()
+                    uint bid = basePosition.BID;
+                    uint x = basePosition.X;
+                    //creating interval coordinates
+                    uint blockLengthX = CPM.GetInstance.BCP.NumXperBlock;
+                    uint crossOver = (uint)Math.Abs(x - blockRadius);
+                    uint x1 = blockLengthX - crossOver;
+                    uint x2 = blockLengthX - 1;
+                    uint y1 = 0;
+                    uint y2 = x;
+
+                    boundedInterval = new Interval(x1, x2, y1, y2);                    
+
+                    if (boundedInterval.isBlockChanged)
+                        bid = bid - 1;
+
                 }
                 else if (crossOver_Right)
                 {
+                    uint bid = basePosition.BID;
+                    uint x = basePosition.X;
+                    //creating interval coordinates
+                    uint blockLengthX = CPM.GetInstance.BCP.NumXperBlock;
+                    uint crossOver = (uint)Math.Abs(blockLengthX - (x + blockRadius));
+                    uint x1 = x;
+                    uint x2 = blockLengthX - 1;
+                    uint y1 = 1;
+                    uint y2 = crossOver;
 
+                    boundedInterval = new Interval(x1, x2, y1, y2);                    
                 }
                 else
                     Console.Write("WHAT KIND OF FUCKING STUPID CODE U R RIGHTING DUMBASS!!!!! THIS IS SOOOOOOOOOOOOOOOOOO!!! NOT SUPPOSED TO HAPPEN");
             }
             else
             {
+                // if isBasisBlock , need to figure out which side of the edge is the basis block is in ? if its on the left edge and the cross over is X then needs adjust ments , same for other faces y ,z
 
             }
 

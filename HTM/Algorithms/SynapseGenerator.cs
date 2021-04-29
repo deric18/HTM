@@ -123,7 +123,7 @@ namespace HTM.Algorithms
                 }
                 else if(!basis_block_x && (crossOver_X_Left || crossOver_X_Right))
                 {
-                    Interval boundedIntervalX = SynapseGeneratorHelper.ComputeBoundsX(basePosition, false, crossOver_X_Left, crossOver_X_Right);
+                    Interval boundedIntervalX = SynapseGeneratorHelper.ComputeBoundsX(basePosition, false, crossOver_X_Left, crossOver_X_Right, blockRadius);
 
                     newPosition.X = boundedIntervalX.PredictRandomInteger();                   
                 }
