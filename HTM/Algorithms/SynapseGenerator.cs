@@ -32,7 +32,12 @@ namespace HTM.Algorithms
         private uint num_files_reg;
         private uint numXPerBlock;
         private uint numYPerBlock;
+        private bool isBlockChanges;
+        private uint newBlockId;
         private uint numZPerBlock;
+        private readonly uint YOFFSET;
+        private readonly uint XOFFSET;
+        private readonly uint ZOFFSET;
         bool basis_block_x = false;
         bool basis_block_y = false;
         bool basis_block_z = false;
@@ -48,6 +53,11 @@ namespace HTM.Algorithms
             numYPerBlock = CPM.GetInstance.BCP.NumYperBlock;
             numZPerBlock = CPM.GetInstance.BCP.NumZperBlock;
             crossOver_X_Left = crossOver_X_Right = crossOver_Y_Up = crossOver_Y_Down = crossOver_Z_Front = crossOver_Z_Back = false;
+            isBlockChanges = false;
+            newBlockId = 0;
+            XOFFSET = 1;
+            YOFFSET = num_cols_reg;
+            ZOFFSET = num_files_reg;
             //based on above values , initialize and populate all the basic block modulos.
 
             //XL_BB_Mods = XR_BB_Mods = YU_BB_Mod = YD_BB_Mod = ZF_BB_Mod = ZB_BB_Mod = 0;
@@ -121,16 +131,8 @@ namespace HTM.Algorithms
                     //Not a basis block and not crossing over
                     newPosition.X =  SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'X', blockRadius);
                 }
-                else if(!basis_block_x && (crossOver_X_Left || crossOver_X_Right))
-                {
-                    Interval boundedIntervalX = SynapseGeneratorHelper.ComputeBoundsX(basePosition, false, crossOver_X_Left, crossOver_X_Right, blockRadius);
 
-                    newPosition.X = boundedIntervalX.PredictRandomInteger();                   
-                }
-                else if(basis_block_x && crossOver_X)
-                {
-                    newPosition.X = SynapseGeneratorHelper.GetRand(0, basePosition.X);
-                }                
+                Interval intervalX = ComputeBoundsX(basePosition, basis_block_x, crossOver_X_Left, crossOver_X_Right, blockRadius);
 
                 if ((!basis_block_y && !crossOver_Y) && (basis_block_y && !crossOver_Y))
                 {
@@ -173,6 +175,156 @@ namespace HTM.Algorithms
             ////if the block is a basis block then predict it with z/y/z min of 0 and max of blockradius of x/y/z from x/y/z and for the other 2 points that falls inside of the block predict them using PredictSynapseWithoutInterval for both of them
             ////els if the block is not a basis block then predict the position with PredictSynapseWithanInterval method for the position and for other 2 points use the other method and finally return the position.
             //if(basis_block_x)
-        }                
+        }
+
+        private Interval ComputeBoundsX(Position3D basePosition, bool isBasisBlock, bool crossOver_Left, bool crossOver_Right, uint blockRadius, bool? isCoreBlock = null)
+        {
+            Interval boundedInterval = null;
+
+            //Create an interval object , compute bound on the crossover dimension 
+            if (!isBasisBlock)
+            {
+                if (crossOver_Left)
+                {                    
+                    uint x = basePosition.X;
+                    //creating interval coordinates
+                    uint blockLengthX = CPM.GetInstance.BCP.NumXperBlock;
+                    uint crossOver = (uint)Math.Abs(x - blockRadius);
+                    uint x1 = blockLengthX - crossOver;
+                    uint x2 = blockLengthX - 1;
+                    uint y1 = 0;
+                    uint y2 = x;
+
+                    boundedInterval = new Interval(x1, x2, y1, y2);
+
+                    if (boundedInterval.isBlockChanged)
+                    {
+                        isBlockChanges = true;
+                        newBlockId = basePosition.BID - 1;
+                    }
+
+                }
+                else if (crossOver_Right)
+                {
+                    uint bid = basePosition.BID;
+                    uint x = basePosition.X;
+                    //creating interval coordinates
+                    uint blockLengthX = CPM.GetInstance.BCP.NumXperBlock;
+                    uint crossOver = (uint)Math.Abs(blockLengthX - (x + blockRadius));
+                    uint x1 = x;
+                    uint x2 = blockLengthX - 1;
+                    uint y1 = 1;
+                    uint y2 = crossOver;
+
+                    boundedInterval = new Interval(x1, x2, y1, y2);
+
+                    if (boundedInterval.isBlockChanged)
+                    {
+                        isBlockChanges = true;
+                        newBlockId = basePosition.BID + 1;
+                    }
+                }
+                else    //if its not a basis block and doesnt cross over on X or on cross over on right!
+                {
+                    boundedInterval = new Interval(SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'X', blockRadius));
+                }
+                    
+            }
+            else if(XL_BB_Mods(basePosition.BID) && crossOver_Left)
+            {
+                // if isBasisBlock , need to figure out which side of the edge is the basis block is in ? if its on the left edge and the cross over is X then needs adjustments , same for other faces y ,z
+
+                uint x = SynapseGeneratorHelper.GetRand(0, basePosition.X);
+                isBlockChanges = false;
+                boundedInterval = new Interval(x);
+            }
+            else if(XR_BB_Mods(basePosition.BID) && crossOver_Right)
+            {
+                uint x = SynapseGeneratorHelper.GetRand(basePosition.X, numXPerBlock);
+                isBlockChanges = false;
+                boundedInterval = new Interval(x);
+            }
+            else    //if it is basis block on Left face && crossing over on right is fine OR basis_block on right edge and crossing over on left is fine too!!!
+            {
+                boundedInterval = new Interval(SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'X', blockRadius));
+            }
+
+            return boundedInterval;
+        }
+
+        private Interval ComputeBoundsY(Position3D basePosition, bool isBasisBlock, bool crossOver_Up, bool crossOver_Down, uint blockRadius, bool? isCoreBlock = null)
+        {
+            Interval boundedInterval = null;
+
+            //Create an interval object , compute bound on the crossover dimension 
+            if (!isBasisBlock)
+            {
+                if (crossOver_Up)
+                {                    
+                    uint y = basePosition.Y;
+                    //creating interval coordinates                    
+                    uint crossOver = (uint)Math.Abs(y + blockRadius);
+                    uint x1 = y;
+                    uint x2 = numYPerBlock - 1;
+                    uint y1 = 0;
+                    uint y2 = crossOver;
+
+                    boundedInterval = new Interval(x1, x2, y1, y2);
+
+                    if (boundedInterval.isBlockChanged)
+                    {
+                        isBlockChanges = true;
+                        newBlockId = basePosition.BID + (YOFFSET);
+                    }
+
+                }
+                else if (crossOver_Down)
+                {                    
+                    uint x = basePosition.X;
+                    //creating interval coordinates
+                    uint blockLengthX = CPM.GetInstance.BCP.NumXperBlock;
+                    uint crossOver = (uint)Math.Abs(blockLengthX - (x + blockRadius));
+                    uint x1 = x;
+                    uint x2 = blockLengthX - 1;
+                    uint y1 = 1;
+                    uint y2 = crossOver;
+
+                    boundedInterval = new Interval(x1, x2, y1, y2);
+
+                    if (boundedInterval.isBlockChanged)
+                    {
+                        isBlockChanges = true;
+                        newBlockId = basePosition.BID + 1;
+                    }
+                }
+                else    //if its not a basis block and doesnt cross over on X or on cross over on right!
+                {
+                    boundedInterval = new Interval(SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'X', blockRadius));
+                }
+
+            }
+            else if (XL_BB_Mods(basePosition.BID) && crossOver_Left)
+            {
+                // if isBasisBlock , need to figure out which side of the edge is the basis block is in ? if its on the left edge and the cross over is X then needs adjustments , same for other faces y ,z
+
+                uint x = SynapseGeneratorHelper.GetRand(0, basePosition.X);
+                isBlockChanges = false;
+                boundedInterval = new Interval(x);
+            }
+            else if (XR_BB_Mods(basePosition.BID) && crossOver_Right)
+            {
+                uint x = SynapseGeneratorHelper.GetRand(basePosition.X, numXPerBlock);
+                isBlockChanges = false;
+                boundedInterval = new Interval(x);
+            }
+            else    //if it is basis block on Left face && crossing over on right is fine OR basis_block on right edge and crossing over on left is fine too!!!
+            {
+                boundedInterval = new Interval(SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'X', blockRadius));
+            }
+
+            return boundedInterval;
+        }
+
+
     }
 }

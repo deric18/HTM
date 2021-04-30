@@ -123,7 +123,7 @@ namespace HTM.Algorithms
             }
             else
             {
-                // if isBasisBlock , need to figure out which side of the edge is the basis block is in ? if its on the left edge and the cross over is X then needs adjust ments , same for other faces y ,z
+                // if isBasisBlock , need to figure out which side of the edge is the basis block is in ? if its on the left edge and the cross over is X then needs adjustments , same for other faces y ,z
 
             }
 

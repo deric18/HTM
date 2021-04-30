@@ -9,6 +9,7 @@
         private uint i4;
         private bool isInited;
         public bool isBlockChanged;
+        private uint hardCodedX;
 
         public Interval(uint x1, uint x2, uint y1, uint y2)
         {            
@@ -18,7 +19,15 @@
             this.i4 = y2;
             this.isInited = true;
             this.isBlockChanged = false;
+            this.hardCodedX = 0;
         }                                                               
+
+        public Interval(uint x)
+        {
+            this.hardCodedX = x;
+            this.isInited = false;
+            this.isBlockChanged = false;            
+        }
 
         public uint PredictRandomInteger()
         {
