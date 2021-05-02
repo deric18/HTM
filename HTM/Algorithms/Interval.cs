@@ -11,12 +11,12 @@
         public bool isBlockChanged;
         private uint hardCodedX;
 
-        public Interval(uint x1, uint x2, uint y1, uint y2)
+        public Interval(uint x1min, uint x2max, uint y1min, uint y2max)
         {            
-            this.i1 = x1;
-            this.i2 = x2;
-            this.i3 = y1;
-            this.i4 = y2;
+            this.i1 = x1min;
+            this.i2 = x2max;
+            this.i3 = y1min;
+            this.i4 = y2max;
             this.isInited = true;
             this.isBlockChanged = false;
             this.hardCodedX = 0;
@@ -34,8 +34,8 @@
             if (isInited)
             {
                 Random r = new Random();
-                uint rnd1 = (uint)r.Next((int)i1, (int)i2);
-                uint rnd2 = (uint)r.Next((int)i3, (int)i4);
+                uint rnd1 = i1 < i2 ? (uint)r.Next((int)i1, (int)i2) : (uint)r.Next((int)i2, (int)i1);
+                uint rnd2 = i3 < i4 ? (uint)r.Next((int)i3, (int)i4) : (uint)r.Next((int)i4, (int)i3);
                 uint retInt = (rnd1 + rnd2) % 2 == 0 ? rnd1 : rnd2;
 
                 isBlockChanged = (i3 <= retInt && retInt >= i4) ? false : (i1 <= retInt && retInt >= i2);
