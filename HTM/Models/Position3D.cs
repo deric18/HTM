@@ -6,9 +6,9 @@ namespace HTM.Models
     public class Position3D 
     {                       
         public uint BID { get; set; }
-        public uint X { get; set; }
-        public uint Y { get; set; }
-        public uint Z { get; set; }                
+        public uint X { get; set; }         //Position Index within the block 
+        public uint Y { get; set; }         //Position Index within the block
+        public uint Z { get; set; }         //Position Index within the block
 
         public Position3D() { }
 
@@ -39,7 +39,7 @@ namespace HTM.Models
         internal string StringIDWithBID =>        
             X.ToString() + "-" + Y.ToString() + "-" + Z.ToString() + "-" + BID.ToString();
 
-        internal string StringID =>
+        internal string StringIDWithoutBID =>
             X.ToString() + "-" + Y.ToString() + "-" + Z.ToString();
         
         internal static Position3D GetPositionFromString(string str)

@@ -1,4 +1,5 @@
 ﻿//Grow , Prune
+//Segment ID Syntax : << Neuron Position3D > -- < Segment Number > -- < Segment Position3D >>
 using System.Configuration;
 using System.Collections.Generic;
 using System;
@@ -19,7 +20,9 @@ namespace HTM.Models
         public Position3D BasePosition { get; private set; }
         public uint _sumVoltage { get; private set; }
         public Position3D NeuronID { get; private set; }
-       
+
+        private SegmentID _segID;
+        private uint _segmentNumber;
         private bool _fullyConnected;
         private Dictionary<Position3D, uint> _synapses;     //uint helps in prunning anything thats zero is taken out and flushed to connection table.
         private Lazy<List<Segment>> SubSegments;        
@@ -34,7 +37,9 @@ namespace HTM.Models
 
         public Segment(Position3D basePos, SegmentType sType, Position3D neuronID, uint segCount)
         {
-            this.SegmentId = ComputeSegmentID(neuronID, segCount.ToString(), basePos);
+
+            this.SegmentId = ComputeSegmentIDasString(neuronID, segCount.ToString(), basePos);
+            this._segmentNumber = segCount;
             NeuronID = neuronID;
             this.BasePosition = basePos;
             this.sType = sType;
@@ -49,7 +54,10 @@ namespace HTM.Models
             NEW_SYNAPSE_CONNECTION_DEF = uint.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]);
         }
 
-        private string ComputeSegmentID(Position3D neuronID, string segCount, Position3D basePos) => neuronID.StringID + "/" + segCount + "/" + basePos.StringID;
+        private string ComputeSegmentIDasString(Position3D neuronID, string segCount, Position3D basePos)
+        {
+            return neuronID.StringIDWithoutBID + "/" + segCount + "/" + basePos.StringIDWithoutBID;
+        }
 
         internal Segment GetSegment(int v)
         {
@@ -132,13 +140,20 @@ namespace HTM.Models
 
             if ((_synapses.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])))
             {//Below number of synapses threshold for segment 
-                newPosition = sg.PredictNewRandomPosition(this.BasePosition, SegmentId);
+                
+                newPosition = sg.PredictNewRandomPosition(this.BasePosition);                                
+
+                ConnectionType cPos = CPM.GetInstance.CTable.ClaimPosition(newPosition, _segID, EndPointType.Dendrite);
+
                 AddConnection(newPosition);
             } 
             else if(SubSegments.Value.Count < int.Parse(ConfigurationManager.AppSettings["MAX_SEGMENTS_PER_NEURON"]))
             {//Below number of subsegments threshold for segment 
                 //handle logic for if this position is already marked in ctable then do a new position. basically dont do anything everything is already handled in ctable.
-                newPosition = sg.PredictNewRandomPosition(this.BasePosition, SegmentId);
+                newPosition = sg.PredictNewRandomPosition(this.BasePosition);
+
+                ConnectionType cPos = CPM.GetInstance.CTable.ClaimPosition(newPosition, _segID, EndPointType.Dendrite);
+
                 CreateSubSegment(newPosition);
             }
             else

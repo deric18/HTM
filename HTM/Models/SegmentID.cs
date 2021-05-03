@@ -8,15 +8,15 @@ namespace HTM.Models
     {
         public uint SegmentNumber { get; private set; }
         public Position3D NeuronId { get; private set; }
-        public Position3D Position { get; private set; }
+        public Position3D BasePosition { get; private set; }
 
-        internal SegmentID(Position3D neuronId, uint segNum, Position3D newPosition) : base(newPosition)
+        internal SegmentID(Position3D neuronId, uint segNum, Position3D basePositionSegment) : base(basePositionSegment)
         {
             NeuronId = neuronId;
             SegmentNumber = segNum;
-            Position = newPosition;
+            BasePosition = basePositionSegment;
         }        
 
-        internal string GetSegmentID() => NeuronId.StringID + "--" + SegmentNumber.ToString() + "--" + Position.StringID;
+        internal string GetSegmentID() => NeuronId.StringIDWithoutBID + "--" + SegmentNumber.ToString() + "--" + BasePosition.StringIDWithoutBID;
     }
 }

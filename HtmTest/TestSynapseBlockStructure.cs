@@ -1,9 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using HTM;
-using HTM.Algorithms;
-
-namespace HtmTest
+﻿namespace HtmTest
 {
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using HTM;
+    using HTM.Algorithms;
+    using HTM.Models;
+
     [TestClass]    
     public class TestSynapseBlockStructure
     {
@@ -15,24 +16,26 @@ namespace HtmTest
         public void Initialze()
         {
             instance = CPM.GetInstance;
-            instance.Initialize(10, 10, 10, 100000);
-            cTable = ConnectionTable.Singleton();
+            instance.Initialize(10, 100000);
+            //cTable = ConnectionTable.Singleton();
         }
         
 
         [TestMethod]
-        public void TestEdgeBlockSynapseCreation()
+        public void CreateNewPositionBasisBlock_WithintheBlock()
         {
-            //Create a synapses at  Edge blocks and check the created synapses are at within those blocks , also cehck cTable
+            //Create a synapses at  Edge blocks and check the created synapses are at within those blocks , also check cTable
             synGen = SynapseGenerator.GetInstance;
+            Position3D basePosition = new Position3D(1, 1, 1, 1);
             
+            synGen.PredictNewRandomPosition(basePosition, )
 
         }
 
         [TestMethod]
-        public void TestBasisBlockSynapseCreation()
+        public void CreateNewPositionAcrosXL_XR_YU_YD_ZF_ZD()
         {
-            //Create a synapses at basis block and check the created synapses are at the within those blocks , also cehck cTable
+            //Create a synapses at basis block and check the created synapses are at the within those blocks , also check cTable
         }
 
         [TestMethod]

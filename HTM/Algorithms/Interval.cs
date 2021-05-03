@@ -29,11 +29,14 @@
             this.isBlockChanged = false;            
         }
 
-        public uint PredictRandomInteger()
+        public uint PredictRandomInteger(int? seed = null)
         {
             if (isInited)
             {
-                Random r = new Random();
+                Random r;
+
+                r = seed == null ? new Random() : new Random((int)seed);
+                
                 uint rnd1 = i1 < i2 ? (uint)r.Next((int)i1, (int)i2) : (uint)r.Next((int)i2, (int)i1);
                 uint rnd2 = i3 < i4 ? (uint)r.Next((int)i3, (int)i4) : (uint)r.Next((int)i4, (int)i3);
                 uint retInt = (rnd1 + rnd2) % 2 == 0 ? rnd1 : rnd2;
@@ -43,7 +46,7 @@
                 return retInt;
             }
             else
-                throw new InvalidOperationException();
+                return hardCodedX;
         }
     }
 }

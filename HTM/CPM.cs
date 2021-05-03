@@ -41,16 +41,16 @@ namespace HTM
         public ConnectionTable CTable { get; private set; }
         internal SynapseGenerator synapseGenerator;
 
-        public void Initialize(uint x, uint y, uint z, uint pointsPerBlock = 0)
+        public void Initialize(uint xyz, uint pointsPerBlock = 0)
         {
             //Notes ToDo : BASED ON NUMBER OF CLOUMNS , ROWS AND FILES TO BE CREATED , CREATE THAT MANY BLOCKS IN ORDER WITH X-Y & THEN Z CO-ORDINATE SYSTEM WITH SYNAPSE GENERATOR AND SYNAPSE TABLE AND INTERVAL
             /*LOAD ONE OF THE CONFIGURATIONS FROM NumColumnsPerBlock ,  once loaded intialise the system appropriately 
              * Initialie the synapse table 
              * Intialise interval , SynapseGenerator
              **/           
-            instance.NumX = x;
-            instance.NumY = y;
-            instance.NumZ = z;            
+            instance.NumX = xyz;
+            instance.NumY = xyz;
+            instance.NumZ = xyz;            
 
             instance._predictedList = new List<Neuron>();
             //instance._shortPredictedList = new List<Neuron>();
@@ -60,10 +60,10 @@ namespace HTM
 
             try
             {
-                for (uint i = 0; i < x; i++)
-                    for (uint j = 0; j < y; j++)
+                for (uint i = 0; i < xyz; i++)
+                    for (uint j = 0; j < xyz; j++)
                     {
-                        Column toAdd = new Column(i, j, z);
+                        Column toAdd = new Column(i, j, xyz);
                         instance.Columns[i][j] = toAdd;
                     }
             }
@@ -178,7 +178,7 @@ namespace HTM
 
         internal void NeuronFire(Position3D position, SegmentID segmentID, uint potential)
         {
-            bool willFire = GetNeuronFromPosition(segmentID.NeuronId).Process(segmentID.Position, segmentID, 10);
+            bool willFire = GetNeuronFromPosition(segmentID.NeuronId).Process(segmentID.BasePosition, segmentID, 10);
 
             if(willFire)
             {

@@ -12,7 +12,7 @@ namespace HtmTest
         public void TestNeuron()
         {
             HTM.CPM cpm = HTM.CPM.GetInstance;
-            cpm.Initialize(10, 10, 10, null);
+            cpm.Initialize(10, 0);
 
             SDR testInput = GetTestInput();
             testInput.IType = HTM.Enums.InputPatternType.SPATIAL;

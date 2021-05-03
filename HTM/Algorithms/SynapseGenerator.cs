@@ -2,6 +2,7 @@
 //1. Check multiplier for block radius for its dimensions 
 //2. Check and register the generated position with connection Table
 //3. Option to take seed in from segment Id's
+//4. Computing Block ID for new position
 namespace HTM.Algorithms
 {
     using System;
@@ -43,6 +44,7 @@ namespace HTM.Algorithms
         bool basis_block_z = false;
         bool crossOver_X_Left, crossOver_X_Right, crossOver_Y_Up, crossOver_Y_Down, crossOver_Z_Front, crossOver_Z_Back;
 
+        #region PRIVATE METHODS & CONSTRUCTOR
         private SynapseGenerator()
         {
             blockRadius = Convert.ToUInt32(ConfigurationManager.AppSettings["BLOCKRADIUS"]);        //Radius for the random block 
@@ -81,7 +83,24 @@ namespace HTM.Algorithms
         private bool RSBCheckZ_Front(Position3D pos) => (pos.Z - blockRadius < 0) ? true : false;
         private bool RSBCheckZ_Back(Position3D pos) => (pos.Z + blockRadius > numZPerBlock) ? true : false;
 
-        public Position3D PredictNewRandomPosition(Position3D basePosition, string claimerSegId)
+        private bool IsCoreBlock(Position3D pos) => ((XL_BB_Mods(pos.BID) && YD_BB_Mods(pos.BID) && ZF_BB_Mods(pos.BID)) || (XR_BB_Mods(pos.BID) && YU_BB_Mods(pos.BID) && ZB_BB_Mods(pos.BID)));
+
+        #endregion
+
+
+        /// <summary>
+        /// Positioning Logic : dont get the center point always get 4 point behind the center point , if something is registered already four points away , if its dendrite 
+        /// put a axonal block or vice versa 
+        /// core block only 1 A & 1 D , double basis 1 A & 1 D, single basis block 2 A & 2 D, normal block then 4 A & 4 D
+        /// </summary>
+        /// <param name="neuronId"></param>
+        /// <returns></returns>
+        public Position3D AddProximalSegment(Position3D neuronId)
+        {            
+
+        }
+
+        public Position3D PredictNewRandomPosition(Position3D basePosition)
         {
             /*
              * Basis Block 
@@ -95,23 +114,23 @@ namespace HTM.Algorithms
              *  then compute the intervals and generate new random positions for x,y,z & return new position
              * */
             Position3D newPosition = new Position3D();
-            
+
             #region VERIFICATIONS - SETTING FLAGS
 
-            uint bId = basePosition.BID;
+            newBlockId = basePosition.BID;
 
 
-            basis_block_x = XL_BB_Mods(bId) || XR_BB_Mods(bId) ? true : false;
+            basis_block_x = XL_BB_Mods(newBlockId) || XR_BB_Mods(newBlockId) ? true : false;
             crossOver_X_Left = RSBCheckX_Left(basePosition);
             crossOver_X_Right = RSBCheckX_Right(basePosition);
 
 
-            basis_block_y = YU_BB_Mods(bId) || YD_BB_Mods(bId) ? true : false;
+            basis_block_y = YU_BB_Mods(newBlockId) || YD_BB_Mods(newBlockId) ? true : false;
             crossOver_Y_Up = RSBCheckY_Up(basePosition);
             crossOver_Y_Down = RSBCheckY_Down(basePosition);
 
 
-            basis_block_z = ZF_BB_Mods(bId) || ZB_BB_Mods(bId) ? true : false;
+            basis_block_z = ZF_BB_Mods(newBlockId) || ZB_BB_Mods(newBlockId) ? true : false;
             crossOver_Z_Front = RSBCheckZ_Front(basePosition);
             crossOver_Z_Back = RSBCheckZ_Back(basePosition);
 
@@ -137,6 +156,23 @@ namespace HTM.Algorithms
                 Interval intervalY = ComputeBoundsY(basePosition, basis_block_y, crossOver_Y_Up, crossOver_Y_Down, blockRadius);
 
                 Interval intervalZ = ComputeBoundsZ(basePosition, basis_block_z, crossOver_Z_Front, crossOver_Z_Back, blockRadius);
+
+
+                if(!intervalX.isBlockChanged || !intervalY.isBlockChanged || !intervalZ.isBlockChanged)
+                {
+                    newPosition.BID = newBlockId;
+                    newPosition.X = intervalX.PredictRandomInteger();
+                    newPosition.Y = intervalY.PredictRandomInteger();
+                    newPosition.Z = intervalZ.PredictRandomInteger();
+                }
+
+                if (!CPM.GetInstance.CTable.IsPositionAvailable(newPosition))
+                    return PredictNewRandomPosition(basePosition);
+
+                return newPosition;
+                //need to compute the new block Id
+
+
                 /*
                  * figure out which core basis block it is and then 
                  * LLO,RLO,LUO,RUO - LLN,RLN,LUN,RUN
@@ -175,13 +211,12 @@ namespace HTM.Algorithms
                     if (boundedInterval.isBlockChanged)
                     {
                         isBlockChanges = true;
-                        newBlockId = basePosition.BID - 1;
+                        newBlockId -= 1;
                     }
 
                 }
                 else if (crossOver_Right)
-                {
-                    uint bid = basePosition.BID;
+                {                    
                     uint x = basePosition.X;
                     //creating interval coordinates                    
                     uint crossOver = (uint)Math.Abs(numXPerBlock - (x + blockRadius));
@@ -195,9 +230,9 @@ namespace HTM.Algorithms
                     if (boundedInterval.isBlockChanged)
                     {
                         isBlockChanges = true;
-                        newBlockId = basePosition.BID + 1;
+                        newBlockId += 1;
                     }
-                }
+                }                
                 else    //if its not a basis block and doesnt cross over on X or on cross over on right!
                 {
                     boundedInterval = new Interval(SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'X', blockRadius));
@@ -217,6 +252,42 @@ namespace HTM.Algorithms
                 uint x = SynapseGeneratorHelper.GetRand(basePosition.X - blockRadius , numXPerBlock);
                 isBlockChanges = false;
                 boundedInterval = new Interval(x);
+            }
+            else if(XR_BB_Mods(basePosition.BID) && crossOver_Left)
+            {
+                uint x = basePosition.X;
+                //creating interval coordinates                    
+                uint crossOver = (uint)Math.Abs(x - blockRadius);
+                uint x1 = 0;
+                uint x2 = x + blockRadius;
+                uint y1 = numXPerBlock - crossOver;
+                uint y2 = numXPerBlock;
+
+                boundedInterval = new Interval(x1, x2, y1, y2);
+
+                if (boundedInterval.isBlockChanged)
+                {
+                    isBlockChanges = true;
+                    newBlockId -= 1;
+                }
+            }
+            else if (XR_BB_Mods(basePosition.BID) && crossOver_Left)
+            {
+                uint x = basePosition.X;
+                //creating interval coordinates                    
+                uint crossOver = (uint)Math.Abs(numXPerBlock - (x + blockRadius));
+                uint x1 = x - blockRadius;
+                uint x2 = numXPerBlock;
+                uint y1 = 1;
+                uint y2 = crossOver;
+
+                boundedInterval = new Interval(x1, x2, y1, y2);
+
+                if (boundedInterval.isBlockChanged)
+                {
+                    isBlockChanges = true;
+                    newBlockId += 1;
+                }
             }
             else    //if it is basis block on Left face && crossing over on right is fine OR basis_block on right edge and crossing over on left is fine too!!!
             {
@@ -248,7 +319,7 @@ namespace HTM.Algorithms
                     if (boundedInterval.isBlockChanged)
                     {
                         isBlockChanges = true;
-                        newBlockId = basePosition.BID + (YOFFSET);
+                        newBlockId += (YOFFSET);
                     }
 
                 }
@@ -268,14 +339,13 @@ namespace HTM.Algorithms
                     if (boundedInterval.isBlockChanged)
                     {
                         isBlockChanges = true;
-                        newBlockId = basePosition.BID + YOFFSET;
+                        newBlockId -= YOFFSET;
                     }
                 }
                 else    //if its not a basis block and doesnt cross over on X or on cross over on right!
                 {
                     boundedInterval = new Interval(SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'Y', blockRadius));
                 }
-
             }
             else if (YU_BB_Mods(basePosition.BID) && crossOver_Up)
             {
@@ -290,6 +360,43 @@ namespace HTM.Algorithms
                 uint y = SynapseGeneratorHelper.GetRand(0, basePosition.Y + blockRadius);
                 isBlockChanges = false;
                 boundedInterval = new Interval(y);
+            }
+            else if(YU_BB_Mods(basePosition.BID) && crossOver_Down)     //Not a problem basis block on upper face but crossing over on below block
+            {
+                uint y = basePosition.Y;
+                //creating interval coordinates
+                uint blockLengthY = CPM.GetInstance.BCP.NumYperBlock;
+                uint crossOver = (uint)Math.Abs(y - blockRadius);
+                uint x1 = 0;
+                uint x2 = y + blockRadius;
+                uint y1 = numYPerBlock - crossOver;
+                uint y2 = numYPerBlock;
+
+                boundedInterval = new Interval(x1, x2, y1, y2);
+
+                if (boundedInterval.isBlockChanged)
+                {
+                    isBlockChanges = true;
+                    newBlockId -= YOFFSET;
+                }
+            }
+            else if (YD_BB_Mods(basePosition.BID) && crossOver_Up)  //Not a problem basis block on down face but crossing over on upper block
+            {
+                uint y = basePosition.Y;
+                //creating interval coordinates                    
+                uint crossOver = (uint)Math.Abs(y + blockRadius);
+                uint x1 = y;
+                uint x2 = numYPerBlock - 1;
+                uint y1 = 0;
+                uint y2 = crossOver;
+
+                boundedInterval = new Interval(x1, x2, y1, y2);
+
+                if (boundedInterval.isBlockChanged)
+                {
+                    isBlockChanges = true;
+                    newBlockId += (YOFFSET);
+                }
             }
             else    //if it is basis block on Left face && crossing over on right is fine OR basis_block on right edge and crossing over on left is fine too!!!
             {
@@ -321,9 +428,8 @@ namespace HTM.Algorithms
                     if (boundedInterval.isBlockChanged)
                     {
                         isBlockChanges = true;
-                        newBlockId = basePosition.BID + (ZOFFSET);
+                        newBlockId += ZOFFSET;
                     }
-
                 }
                 else if (crossOver_Back)
                 {
@@ -340,7 +446,7 @@ namespace HTM.Algorithms
                     if (boundedInterval.isBlockChanged)
                     {
                         isBlockChanges = true;
-                        newBlockId = basePosition.BID + ZOFFSET;
+                        newBlockId -= ZOFFSET;
                     }
                 }
                 else    //if its not a basis block and doesnt cross over on X or on cross over on right!
@@ -363,9 +469,45 @@ namespace HTM.Algorithms
                 isBlockChanges = false;
                 boundedInterval = new Interval(x);
             }
+            else if(ZF_BB_Mods(basePosition.BID) && crossOver_Back)
+            {
+                uint z = basePosition.Z;
+                //creating interval coordinates                    
+                uint crossOver = (uint)Math.Abs(z + blockRadius - numZPerBlock);
+                uint x1 = z - blockRadius;
+                uint x2 = numZPerBlock;
+                uint y1 = 0;
+                uint y2 = crossOver;
+
+                boundedInterval = new Interval(x1, x2, y1, y2);
+
+                if (boundedInterval.isBlockChanged)
+                {
+                    isBlockChanges = true;
+                    newBlockId -= ZOFFSET;
+                }
+            }
+            else if (ZF_BB_Mods(basePosition.BID) && crossOver_Front)
+            {
+                uint z = basePosition.Z;
+                //creating interval coordinates                    
+                uint crossOver = (uint)Math.Abs(z - blockRadius);
+                uint x1 = 0;
+                uint x2 = z;
+                uint y1 = numZPerBlock - crossOver;
+                uint y2 = numZPerBlock;
+
+                boundedInterval = new Interval(x1, x2, y1, y2);
+
+                if (boundedInterval.isBlockChanged)
+                {
+                    isBlockChanges = true;
+                    newBlockId += ZOFFSET;
+                }
+            }
             else    //if it is basis block on Left face && crossing over on right is fine OR basis_block on right edge and crossing over on left is fine too!!!
             {
-                boundedInterval = new Interval(SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'Y', blockRadius));
+                boundedInterval = new Interval(SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'Z', blockRadius));
             }
 
             return boundedInterval;

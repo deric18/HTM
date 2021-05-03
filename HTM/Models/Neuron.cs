@@ -1,4 +1,4 @@
-﻿//TODO : Prune, Grow    
+﻿//TODO : AddSegment, Prune, Grow    
 using HTM.Enums;
 using System.Collections.Generic;
 using System;
@@ -6,7 +6,7 @@ using System;
 namespace HTM.Models
 {
     /// <summary>
-    /// 1.Account for both excitatory and inhibitory neurons . Need o rethink about this, one argument is that this is not neccessary because HTM Model already accounts for this by 
+    /// 1.Account for both excitatory and inhibitory neurons . Need to rethink about this, one argument is that this is not neccessary because HTM Model already accounts for this by 
     /// picking single neurons from one column with highest values using selective firing techniques.
     /// </summary>
     public class Neuron
@@ -33,10 +33,22 @@ namespace HTM.Models
             _cpm = CPM.GetInstance;
         }        
 
+        public void CreateProximalSegments()
+        {
+            //create 6 baseposition points on each side of the face of the neuron close to its nearby neurons ( atelast half way ) 
+
+
+        }
+
+        public void AddSegment()
+        {
+
+        }
+
         internal Segment GetSegment(SegmentID segID)
         {
             Segment seg;
-            if (Segments.TryGetValue(segID.StringID, out seg))
+            if (Segments.TryGetValue(segID.StringIDWithoutBID, out seg))
                 return seg;
 
             throw new InvalidOperationException("Invalid Segment ID Access");
@@ -79,15 +91,17 @@ namespace HTM.Models
             }
         }
 
-        public string GetString() => NeuronID.StringID;
+        public string GetString() => NeuronID.StringIDWithoutBID;
 
-        private void FlushVoltage() =>        
-            Voltage = 0;        
+        private void FlushVoltage()
+        {
+            Voltage = 0;
+        }
 
         internal bool AddNewConnection(Position3D pos, SegmentID segmentID)
         {
             Segment segment;
-            if(!Segments.TryGetValue(pos.StringID, out segment))
+            if(!Segments.TryGetValue(pos.StringIDWithoutBID, out segment))
             {
                 segment.AddNewConnection(pos);
                 return true;
