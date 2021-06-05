@@ -25,7 +25,7 @@ namespace HTM.Models
 
         internal void Fire()
         {
-
+            Neurons.ForEach(x => x.Fire());
         }
 
         internal Neuron GetMaxVoltageNeuronInColumn()
