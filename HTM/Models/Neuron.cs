@@ -14,6 +14,7 @@ namespace HTM.Models
         internal uint Voltage { get; private set; }
         internal Position3D NeuronID { get; private set; }
         internal NeuronState State { get; private set; }
+        private List<Position3D> _proximalSynapseList { get; set; }
         private Dictionary<string, Segment> Segments { get; set; }        
         private uint _totalSegments;
         private List<SegmentID> _predictedSegments;                

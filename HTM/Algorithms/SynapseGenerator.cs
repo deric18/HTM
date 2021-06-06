@@ -71,6 +71,12 @@ namespace HTM.Algorithms
         private bool YD_BB_Mods(uint bId) => (0 <= bId ? bId < num_cols_reg ? true : false : false);
         private bool ZF_BB_Mods(uint bId) => (0 <= bId ? 0   < num_rows_reg * num_cols_reg ? true : false : false);
         private bool ZB_BB_Mods(uint bId) => ((num_cols_reg * num_rows_reg * num_files_reg) - (num_rows_reg * num_cols_reg) <= bId ? bId < (num_rows_reg * num_cols_reg * num_files_reg) ? true : false : false);
+
+        private bool X_BB_Mods(uint bId) => (XL_BB_Mods(bId) && XR_BB_Mods(bId));
+
+        private bool Y_BB_Mods(uint bId) => (YU_BB_Mods(bId) && YD_BB_Mods(bId));
+
+        private bool Z_BB_Mods(uint bId) => (ZF_BB_Mods(bId) && ZB_BB_Mods(bId));
         /// <summary>
         /// Checks if the RSB for the pos falls out of the existing block or not
         /// </summary>
@@ -85,23 +91,53 @@ namespace HTM.Algorithms
 
         private bool IsCoreBlock(Position3D pos) => ((XL_BB_Mods(pos.BID) && YD_BB_Mods(pos.BID) && ZF_BB_Mods(pos.BID)) || (XR_BB_Mods(pos.BID) && YU_BB_Mods(pos.BID) && ZB_BB_Mods(pos.BID)));
 
+        private bool IsDoubleBasisBlock(Position3D pos) => (X_BB_Mods(pos.BID) || Y_BB_Mods(pos.BID)) && (Y_BB_Mods(pos.BID) || Z_BB_Mods(pos.BID)) && (Z_BB_Mods(pos.BID) || X_BB_Mods(pos.BID));
+
+        private bool IsSingleBasisBlock(Position3D pos)
+        {
+            int BBcount = 0;
+
+            if (XL_BB_Mods(pos.BID))
+                BBcount++;
+            else if (XR_BB_Mods(pos.BID))
+                BBcount++;
+            else if (YU_BB_Mods(pos.BID))
+                BBcount++;
+            else if (YD_BB_Mods(pos.BID))
+                BBcount++;
+            else if (ZF_BB_Mods(pos.BID))
+                BBcount++;
+            else if (ZB_BB_Mods(pos.BID))
+                BBcount++;
+
+            return BBcount == 1;
+        }
+
         #endregion
 
 
         /// <summary>
         /// Positioning Logic : dont get the center point always get 4 point behind the center point , if something is registered already four points away , if its dendrite 
         /// put a axonal block or vice versa 
-        /// core block only 1 A & 1 D , double basis 1 A & 1 D, single basis block 2 A & 2 D, normal block then 4 A & 4 D
+        /// core block : CREATE only 1 A & 1 D.
+        /// double basis : CREATE 1 A & 1 D
+        /// single basis block : 2 A & 2 D
+        /// normal block: Create 4 A & 4 D
         /// </summary>
         /// <param name="neuronId"></param>
-        /// <returns></returns>
+        /// <returns>Synpase position for the Neuron</returns>
         public Position3D AddProximalSegment(Position3D neuronId)
         {            
 
         }
 
-        public Position3D PredictNewRandomPosition(Position3D basePosition)
+        public Position3D PredictNewRandomPosition(Position3D basePosition, uint retryCount)
         {
+            if(retryCount > 4)
+            {
+                Console.WriteLine("RETRY TIMEOUT HIT THE LIMIT FOR MAX RETRY ON PREDICT NEW RANDOM POSITION!!!");
+                return null;
+            }
             /*
              * Basis Block 
              *  if yes
@@ -167,7 +203,7 @@ namespace HTM.Algorithms
                 }
 
                 if (!CPM.GetInstance.CTable.IsPositionAvailable(newPosition))
-                    return PredictNewRandomPosition(basePosition);
+                    return PredictNewRandomPosition(basePosition, ++retryCount);
 
                 return newPosition;
                 //need to compute the new block Id
