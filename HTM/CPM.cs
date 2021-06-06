@@ -76,7 +76,7 @@ namespace HTM
             }
 
             instance.BCP = pointsPerBlock == 0 ? new BlockConfigProvider(100000) : new BlockConfigProvider(pointsPerBlock);
-            instance.NumBlocks = x * y * z;
+            instance.NumBlocks = xyz * xyz * xyz;
 
             instance.CTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
             synapseGenerator = SynapseGenerator.GetInstance;

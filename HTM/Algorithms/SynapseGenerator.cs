@@ -217,8 +217,7 @@ namespace HTM.Algorithms
                 //will do later
             }                        
 
-
-            return newPosition;
+            
             ////one coordinate falls outside of 1/3 faces;
             ////if the block is a basis block then predict it with z/y/z min of 0 and max of blockradius of x/y/z from x/y/z and for the other 2 points that falls inside of the block predict them using PredictSynapseWithoutInterval for both of them
             ////els if the block is not a basis block then predict the position with PredictSynapseWithanInterval method for the position and for other 2 points use the other method and finally return the position.
