@@ -13,6 +13,8 @@ namespace HTM
         {
             CPM cpm = CPM.Instance;
 
+
+
             Console.WriteLine("Enter X:");
             uint x = Convert.ToUInt32(Console.ReadLine());
             Console.WriteLine("Enter Y:");
