@@ -8,6 +8,7 @@ namespace HTM.Algorithms
     using System;
     using System.Configuration;
     using HTM.Models;
+    using HTM.Enums;
 
     //Notes: Make sure to make blockRadius to include the number of cells in a column to be multiplied with the size of the square radius.
 
@@ -43,8 +44,11 @@ namespace HTM.Algorithms
         bool basis_block_y = false;
         bool basis_block_z = false;
         bool crossOver_X_Left, crossOver_X_Right, crossOver_Y_Up, crossOver_Y_Down, crossOver_Z_Front, crossOver_Z_Back;
+        BasisBlockType basisBlockType;
 
         #region PRIVATE METHODS & CONSTRUCTOR
+
+
         private SynapseGenerator()
         {
             blockRadius = Convert.ToUInt32(ConfigurationManager.AppSettings["BLOCKRADIUS"]);        //Radius for the random block 
@@ -77,6 +81,8 @@ namespace HTM.Algorithms
         private bool Y_BB_Mods(uint bId) => (YU_BB_Mods(bId) && YD_BB_Mods(bId));
 
         private bool Z_BB_Mods(uint bId) => (ZF_BB_Mods(bId) && ZB_BB_Mods(bId));
+
+
         /// <summary>
         /// Checks if the RSB for the pos falls out of the existing block or not
         /// </summary>
@@ -88,6 +94,11 @@ namespace HTM.Algorithms
         private bool RSBCheckY_Down(Position3D pos) => pos.Y + blockRadius > numYPerBlock ? true : false;
         private bool RSBCheckZ_Front(Position3D pos) => (pos.Z - blockRadius < 0) ? true : false;
         private bool RSBCheckZ_Back(Position3D pos) => (pos.Z + blockRadius > numZPerBlock) ? true : false;
+
+        private void InitializeChecks(Position3D pos)
+        {
+            basisBlockType = IsSingleBasisBlock(pos) ? BasisBlockType.SingleBasisBlock : ( (IsCoreBlock(pos) ? BasisBlockType.CoreBasisBlock : (IsDoubleBasisBlock(pos) ? BasisBlockType.DoubleBasisBlock : BasisBlockType.NotApplicable)));
+        }
 
         private bool IsCoreBlock(Position3D pos) => ((XL_BB_Mods(pos.BID) && YD_BB_Mods(pos.BID) && ZF_BB_Mods(pos.BID)) || (XR_BB_Mods(pos.BID) && YU_BB_Mods(pos.BID) && ZB_BB_Mods(pos.BID)));
 
@@ -112,7 +123,7 @@ namespace HTM.Algorithms
 
             return BBcount == 1;
         }
-
+         
         #endregion
 
 
@@ -127,7 +138,11 @@ namespace HTM.Algorithms
         /// <param name="neuronId"></param>
         /// <returns>Synpase position for the Neuron</returns>
         public Position3D AddProximalSegment(Position3D neuronId)
-        {            
+        {
+            if (basisBlockType.Equals(BasisBlockType.NotApplicable))
+                InitializeChecks(neuronId);
+
+
 
         }
 
@@ -135,7 +150,7 @@ namespace HTM.Algorithms
         {
             if(retryCount > 4)
             {
-                Console.WriteLine("RETRY TIMEOUT HIT THE LIMIT FOR MAX RETRY ON PREDICT NEW RANDOM POSITION!!!");
+                Console.WriteLine("ERROR : ERROR : ERROR : ERROR : ERROR : RETRY TIMEOUT HIT THE LIMIT FOR MAX RETRY ON PREDICT NEW RANDOM POSITION!!!");
                 return null;
             }
             /*
