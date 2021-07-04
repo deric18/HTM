@@ -147,7 +147,7 @@ namespace HTM.Algorithms
         /// <returns>Synpase position for the Neuron</returns>
         public List<Position3D> AddProximalSegment(Position3D neuronId)
         {
-            List<Position3D> NewProximalSynapse;
+            List<Position3D> NewProximalSynapse = null;
 
             if (basisBlockType.Equals(BasisBlockType.NotApplicable))
                 InitializeChecks(neuronId);
@@ -162,12 +162,12 @@ namespace HTM.Algorithms
 
                 case BasisBlockType.DoubleBasisBlock:
                     {
-
+                        NewProximalSynapse = ComputeProximalCoordinatesForDoubleBB(neuronId);
                         break;
                     };
                 case BasisBlockType.CoreBasisBlock:
                     {
-
+                        NewProximalSynapse = ComputeProximalCoordinatesForCoreBB(neuronId);
                         break;
                     };
                 case BasisBlockType.NormalBlock:
@@ -176,10 +176,7 @@ namespace HTM.Algorithms
                         break;
                     };
                 default:
-                    {
-
                         break;
-                    };
             };
 
             return NewProximalSynapse;
@@ -285,6 +282,15 @@ namespace HTM.Algorithms
 
         #region PRIVATE HELPER METHODS
 
+        private List<Position3D> ComputeProximalCoordinatesForCoreBB(Position3D neuronPos)
+        {
+            List<Position3D> toReturn = new List<Position3D>();
+
+
+
+
+        }
+
         private List<Position3D> ComputeProximalCoordinatesForNormalBB(Position3D neuronId)
         {
 
@@ -296,21 +302,17 @@ namespace HTM.Algorithms
             //4 axons and 4 dendrites
             //pick all the 8 neighbhouring blocks and start getting positions
 
-
-
-
-
+            
 
             throw new NotImplementedException();
         }
 
-
-        private Position3D ComputeProximalCoordinatesForDoubleBB(Position3D neuronPos)
+        private List<Position3D> ComputeProximalCoordinatesForSingleBB(Position3D neuronPos)
         {
 
         }
 
-        private Position3D ComputeProximalCoordinatesForCoreBB(Position3D neuronPos)
+        private List<Position3D> ComputeProximalCoordinatesForDoubleBB(Position3D neuronPos)
         {
 
         }
