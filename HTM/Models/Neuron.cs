@@ -1,4 +1,4 @@
-﻿//TODO : AddSegment, Prune, Grow    
+﻿//TODO : CreateProximalSegment, AddSegment, Prune, Grow    
 using HTM.Enums;
 using System.Collections.Generic;
 using System;

@@ -1,9 +1,11 @@
 ﻿namespace HTM.Enums
 {
-    public enum BranchingTechnique
+    public enum BasisBlockType
     {
-        BranchBinary,
-        LeftBranch,
-        RightBranch
+        NotApplicable,
+        SingleBasisBlock,
+        DoubleBasisBlock,
+        NormalBlock,
+        CoreBasisBlock
     }
 }

@@ -9,11 +9,14 @@ namespace HTM.Algorithms
     using System.Configuration;
     using HTM.Models;
     using HTM.Enums;
+    using System.Collections.Generic;
 
     //Notes: Make sure to make blockRadius to include the number of cells in a column to be multiplied with the size of the square radius.
 
     public class SynapseGenerator
     {
+
+        #region VARIABLES & INSTANCE GETTER
         private static SynapseGenerator Instance;
 
         public static SynapseGenerator GetInstance
@@ -46,6 +49,9 @@ namespace HTM.Algorithms
         bool crossOver_X_Left, crossOver_X_Right, crossOver_Y_Up, crossOver_Y_Down, crossOver_Z_Front, crossOver_Z_Back;
         BasisBlockType basisBlockType;
 
+        #endregion
+
+
         #region PRIVATE METHODS & CONSTRUCTOR
 
 
@@ -65,7 +71,7 @@ namespace HTM.Algorithms
             YOFFSET = num_cols_reg;
             ZOFFSET = (num_rows_reg * num_cols_reg);
             //based on above values , initialize and populate all the basic block modulos.
-
+            basisBlockType = BasisBlockType.NotApplicable;
             //XL_BB_Mods = XR_BB_Mods = YU_BB_Mod = YD_BB_Mod = ZF_BB_Mod = ZB_BB_Mod = 0;
         }
 
@@ -123,9 +129,11 @@ namespace HTM.Algorithms
 
             return BBcount == 1;
         }
-         
+
         #endregion
 
+
+        #region PUBLIC API METHODS
 
         /// <summary>
         /// Positioning Logic : dont get the center point always get 4 point behind the center point , if something is registered already four points away , if its dendrite 
@@ -137,15 +145,48 @@ namespace HTM.Algorithms
         /// </summary>
         /// <param name="neuronId"></param>
         /// <returns>Synpase position for the Neuron</returns>
-        public Position3D AddProximalSegment(Position3D neuronId)
+        public List<Position3D> AddProximalSegment(Position3D neuronId)
         {
+            List<Position3D> NewProximalSynapse;
+
             if (basisBlockType.Equals(BasisBlockType.NotApplicable))
                 InitializeChecks(neuronId);
 
+            switch(basisBlockType) 
+            {
+                case BasisBlockType.SingleBasisBlock:
+                    {
+                        NewProximalSynapse = ComputeProximalCoordinatesForSingleBB(neuronId);
+                        break;
+                    };
 
+                case BasisBlockType.DoubleBasisBlock:
+                    {
+
+                        break;
+                    };
+                case BasisBlockType.CoreBasisBlock:
+                    {
+
+                        break;
+                    };
+                case BasisBlockType.NormalBlock:
+                    {
+                        NewProximalSynapse = ComputeProximalCoordinatesForNormalBB(neuronId);
+                        break;
+                    };
+                default:
+                    {
+
+                        break;
+                    };
+            };
+
+            return NewProximalSynapse;
 
         }
 
+        
         public Position3D PredictNewRandomPosition(Position3D basePosition, uint retryCount)
         {
             if(retryCount > 4)
@@ -237,6 +278,41 @@ namespace HTM.Algorithms
             ////if the block is a basis block then predict it with z/y/z min of 0 and max of blockradius of x/y/z from x/y/z and for the other 2 points that falls inside of the block predict them using PredictSynapseWithoutInterval for both of them
             ////els if the block is not a basis block then predict the position with PredictSynapseWithanInterval method for the position and for other 2 points use the other method and finally return the position.
             //if(basis_block_x)
+        }
+
+        #endregion
+
+
+        #region PRIVATE HELPER METHODS
+
+        private List<Position3D> ComputeProximalCoordinatesForNormalBB(Position3D neuronId)
+        {
+
+        }
+
+        private List<Position3D> ComputeProximalCoordinatesForSingleBB(Position3D neuronId)
+        {
+            //There will be 8 different positions that needs to be predicted
+            //4 axons and 4 dendrites
+            //pick all the 8 neighbhouring blocks and start getting positions
+
+
+
+
+
+
+            throw new NotImplementedException();
+        }
+
+
+        private Position3D ComputeProximalCoordinatesForDoubleBB(Position3D neuronPos)
+        {
+
+        }
+
+        private Position3D ComputeProximalCoordinatesForCoreBB(Position3D neuronPos)
+        {
+
         }
 
         private Interval ComputeBoundsX(Position3D basePosition, bool isBasisBlock, bool crossOver_Left, bool crossOver_Right, uint blockRadius, bool? isCoreBlock = null)
@@ -562,5 +638,7 @@ namespace HTM.Algorithms
 
             return boundedInterval;
         }
+
+        #endregion
     }
 }

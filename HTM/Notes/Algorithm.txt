@@ -15,6 +15,10 @@ handling Core Basis Block :
 -Predict the new position with that .
 
 
+															  CREATING DENDRITIC AND AXONAL SEGMENTS
+1. Dendrites close to the chest & Axons up far away to the stars
+-Every neuron creates axonal and dendritic proximal segments firzt close to it in its own block and then there by expanding away from it out into the block.
+
 																GROWTH STRATERGY FOR NEURONS
 1. Growth index defines how many times the neuron needs to fire before we add a new connection point to the neuron or the segment , once the neuron crosses the fire index the neuron will grow the particular segment 
 

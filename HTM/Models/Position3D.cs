@@ -29,9 +29,8 @@ namespace HTM.Models
             this.BID = blockId;
         }       
 
-        //private uint ComputeBID(uint x, uint y, uint z) =>              //Computes BlockID
-        
-        //    (z * CPM.GetInstance.NumX * CPM.GetInstance.NumY + y * CPM.GetInstance.NumX + x);        
+        private uint ComputeBID(uint x, uint y, uint z) =>              //Computes BlockID
+        (z * CPM.GetInstance.NumX * CPM.GetInstance.NumY + y * CPM.GetInstance.NumX + x);        
 
         public  bool Equals(Position3D segId) =>         
             this.X.Equals(segId.X) && this.Y.Equals(segId.Y) && this.Z.Equals(segId.Z) && this.BID.Equals(segId.BID);        
