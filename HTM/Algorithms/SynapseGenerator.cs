@@ -239,7 +239,7 @@ namespace HTM.Algorithms
                     //Not a basis block and not crossing over
                     newPosition.X =  SynapseGeneratorHelper.PredictNewRandomSynapseWithoutInterval(basePosition, 'X', blockRadius);
                 }
-
+                
                 Interval intervalX = ComputeBoundsX(basePosition, basis_block_x, crossOver_X_Left, crossOver_X_Right, blockRadius);
 
                 Interval intervalY = ComputeBoundsY(basePosition, basis_block_y, crossOver_Y_Up, crossOver_Y_Down, blockRadius);
@@ -282,17 +282,118 @@ namespace HTM.Algorithms
 
         #region PRIVATE HELPER METHODS
 
-        private List<Position3D> ComputeProximalCoordinatesForCoreBB(Position3D neuronPos)
+        private List<Position3D> ComputeProximalCoordinatesForCoreBB(Position3D neuronPos)      // 1 AXON & 1 DENDRITE PER BLOCK
         {
             List<Position3D> toReturn = new List<Position3D>();
+            Position3D axonPos = null;
+            Position3D dendriticPos = null;
 
+            //pick the center of the block and then create a random square block the size of the block and call create new random position , just in case perform check
+            //if we are creating a position for axon and it falls over the central axon point then pick a different position. this is not needed because it wont happen CTable wont let that happen as the point is already registered
+            Position3D blockCenter = CPM.GetInstance.BCP.BlockCenter;
+            blockCenter.BID = neuronPos.BID;
+            uint blockRadius = blockCenter.X;
+            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            
+            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
 
+            toReturn.Add(axonPos);
+            toReturn.Add(dendriticPos);
 
-
+            return toReturn;
         }
 
-        private List<Position3D> ComputeProximalCoordinatesForNormalBB(Position3D neuronId)
+        private List<Position3D> ComputeProximalCoordinatesForNormalBlock(Position3D neuronId)     // 8 AXONS & 8 DENDRITES - 1 AXON AND DENDRITE PER BLOCK
         {
+            List<Position3D> toReturn = new List<Position3D>();
+            Position3D axonPos = null;
+            Position3D dendriticPos = null;
+
+            //pick the center of the block and then create a random square block the size of the block and call create new random position , just in case perform check
+            //if we are creating a position for axon and it falls over the central axon point then pick a different position. this is not needed because it wont happen CTable wont let that happen as the point is already registered
+            Position3D blockCenter = CPM.GetInstance.BCP.BlockCenter;
+            blockCenter.BID = neuronId.BID;
+            uint blockRadius = blockCenter.X;
+            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+
+            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+
+            //current
+            toReturn.Add(axonPos);
+            toReturn.Add(dendriticPos);
+
+            //-z offset
+            blockCenter.BID = neuronId.BID - ZOFFSET;
+            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+
+            toReturn.Add(axonPos);
+            toReturn.Add(dendriticPos);
+
+            //-x offset
+            blockCenter.BID = neuronId.BID - XOFFSET;
+            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+
+            toReturn.Add(axonPos);
+            toReturn.Add(dendriticPos);
+
+            //-y offset
+            blockCenter.BID = neuronId.BID - YOFFSET;
+            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+
+            toReturn.Add(axonPos);
+            toReturn.Add(dendriticPos);
+
+            // -z,& -x
+            blockCenter.BID = neuronId.BID - ZOFFSET - XOFFSET;
+            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+
+            toReturn.Add(axonPos);
+            toReturn.Add(dendriticPos);
+
+
+            // -z , & -y
+            blockCenter.BID = neuronId.BID - ZOFFSET - YOFFSET;
+            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+
+            toReturn.Add(axonPos);
+            toReturn.Add(dendriticPos);
+
+
+            // -x , & -y
+            blockCenter.BID = neuronId.BID - XOFFSET - YOFFSET;
+            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+
+            toReturn.Add(axonPos);
+            toReturn.Add(dendriticPos);
+
+            // -z , -x, & -y
+            blockCenter.BID = neuronId.BID - ZOFFSET - YOFFSET - XOFFSET;
+            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+
+            toReturn.Add(axonPos);
+            toReturn.Add(dendriticPos);
+
+            //8 near by blocks
+
+            //get blockID's of all the near by 8 blocks and start getting axonal & dendritic positions for all of them
+
+            //need to do block id addition and substraction now :(
+
+            // current
+            // - z offset
+            // - x offset
+            // - y offset
+            // -z & -x , -z & -y, -x & -y
+            // -z & -x & -y
+
+
 
         }
 
@@ -301,6 +402,8 @@ namespace HTM.Algorithms
             //There will be 8 different positions that needs to be predicted
             //4 axons and 4 dendrites
             //pick all the 8 neighbhouring blocks and start getting positions
+
+
 
             
 
@@ -313,6 +416,11 @@ namespace HTM.Algorithms
         }
 
         private List<Position3D> ComputeProximalCoordinatesForDoubleBB(Position3D neuronPos)
+        {
+
+        }
+
+        private Position3D GetCentreOfGivenBlock(Position3D position)
         {
 
         }

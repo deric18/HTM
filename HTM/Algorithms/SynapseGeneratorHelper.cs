@@ -67,6 +67,7 @@ namespace HTM.Algorithms
                         toRet.X = GetRand(pos.X - blockRadius, pos.X + blockRadius);
                         toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius);
                         toRet.Z = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
+                        toRet.BID = pos.BID;
                         break;
                     }
                 default: break;

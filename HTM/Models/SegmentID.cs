@@ -1,5 +1,5 @@
 ﻿/*
- * Segment ID Syntax : <<Neuron Position3D>--<Segment Number>--<Segment Position3D>> 
+ * Segment ID Syntax : <<Neuron Position3D>--<Segment Number>--<Segment Base Position-Position3D>> 
  */
 
 namespace HTM.Models

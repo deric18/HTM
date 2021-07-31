@@ -37,7 +37,7 @@ namespace HTM
         //private List<Neuron> _shortPredictedList;
         private bool _readySpatial;
         private bool _readyTemporal;
-        private bool _readyApical;        
+        private bool _readyApical;
         public ConnectionTable CTable { get; private set; }
         internal SynapseGenerator synapseGenerator;
 
@@ -71,13 +71,11 @@ namespace HTM
             {
                 Console.WriteLine("Out Of Memory Allocated for the Service via Operating System! , Please reduce the dimensions of the Neuroblock \n NumRows : " + NumY + "\n NumColumns : " + NumX + "\n NumFiles : " + NumZ);
                 Console.WriteLine(e.Message);
-                Console.ReadKey();
+                Console.ReadKey();|
                 return;
             }
 
             instance.BCP = pointsPerBlock == 0 ? new BlockConfigProvider(100000) : new BlockConfigProvider(pointsPerBlock);
-            instance.NumBlocks = xyz * xyz * xyz;
-
             instance.CTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
             synapseGenerator = SynapseGenerator.GetInstance;
         }

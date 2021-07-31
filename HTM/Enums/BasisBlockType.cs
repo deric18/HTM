@@ -6,6 +6,14 @@
         SingleBasisBlock,
         DoubleBasisBlock,
         NormalBlock,
-        CoreBasisBlock
+        CoreBasisBlock,
+        FrontLeftBottomCBB,
+        FrontRightBottomCBB,
+        FrontLeftUpperCBB,
+        FrontRightUpperCBB,
+        BackLeftBottomCBB,
+        BackRightBottomCBB,
+        BackLeftUpperCBB,
+        BackRightUpperCBB
     }
 }
