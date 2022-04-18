@@ -5,7 +5,7 @@ namespace HTM.Models
     {
         public uint NumXperBlock { get; private set; }      //Number of Columns per Block
         public uint NumYperBlock { get; private set; }      //Number of Rows per Block
-        public uint NumZperBlock { get; private set; }      //Number of Rows & Columns files per block
+        public uint NumZperBlock { get; private set; }      //Number of Rows & Column files per block
         public Position3D BlockCenter { get; private set; }
 
         //Total Number of Points, <Number of Points per Line (x), Number of lines(x) , Number of such files (z)> these are all for a single block

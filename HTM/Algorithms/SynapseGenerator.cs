@@ -3,6 +3,8 @@
 //2. Check and register the generated position with connection Table
 //3. Option to take seed in from segment Id's
 //4. Computing Block ID for new position
+
+
 namespace HTM.Algorithms
 {
     using System;
@@ -187,6 +189,7 @@ namespace HTM.Algorithms
         #region PUBLIC API METHODS
 
         /// <summary>
+        /// Building the main proximal segments for neurons
         /// Positioning Logic : dont get the center point always get 4 point behind the center point , if something is registered already four points away , if its dendrite 
         /// put a axonal block or vice versa 
         /// core block : CREATE only 1 A & 1 D.
@@ -223,7 +226,7 @@ namespace HTM.Algorithms
                     };
                 case BasisBlockType.NormalBlock:
                     {
-                        NewProximalSynapse = ComputeProximalCoordinatesForNormalBB(neuronId);
+                        NewProximalSynapse = ComputeProximalCoordinatesForNormalBlock(neuronId);
                         break;
                     };
                 default:
@@ -463,7 +466,7 @@ namespace HTM.Algorithms
 
             List<Position3D> toReturn = new List<Position3D>();
             Position3D axonPos = null;
-            Dictionary<(int, int, int), char> dict = new Dictionary<(int, int, int), char>();
+            //Dictionary<(int, int, int), char> dict = new Dictionary<(int, int, int), char>();
             Position3D dendriticPos = null;
 
             BasisBlockType sbbType = CheckTypeOfSSB(neuronId);
@@ -697,18 +700,28 @@ namespace HTM.Algorithms
             return toReturn;
         }
 
-        private List<Position3D> ComputeProximalCoordinatesForDoubleBB(Position3D neuronPos)            // 2 AXONS & 2 DENDRITES
+
+        /// <summary>
+        /// Adding more points for proximal dendritic and axonal connections
+        /// </summary>
+        /// <param name="neuronPos"></param>
+        /// <returns></returns>
+        //NOTE : The reason why DBB's get only 2 axons and dendrites is becuase there are no more neurons on two sides of there block so we can reduce the A&D's by exactly half.
+        //Points to Ponder :
+        //1. Can achieve Better NEural Connectivity with 2 Axons & Dendrites to DBB.
+        //2. Its always better to have Connection with one Normal Block That way Signal Loss is Minimal.
+        private List<Position3D> ComputeProximalCoordinatesForDoubleBB(Position3D neuronPos)            // 2 AXONS & 2 DENDRITES PER BLOCK
         {
             //figure out which face of the block is the block on ? then figure out which offsets should be applied.
-            //There will be 8 different positions that needs to be predicted
+            //There will be 4 different positions that needs to be predicted
             //4 axons and 4 dendrites
-            //pick all the 8 neighbhouring blocks and start getting positions
-
+            //pick all the 4 neighbhouring blocks and start getting positions
+            
             BasisBlockType bbt = CheckTypeOfDBB(neuronPos);
 
             List<Position3D> toReturn = new List<Position3D>();
             Position3D axonPos = null;
-            Dictionary<(int, int, int), char> dict = new Dictionary<(int, int, int), char>();
+            //Dictionary<(int, int, int), char> dict = new Dictionary<(int, int, int), char>();
             Position3D dendriticPos = null;
 
             //pick the center of the block and then create a random square block the size of the block and call create new random position , just in case perform check
@@ -722,16 +735,85 @@ namespace HTM.Algorithms
             dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
 
 
+            //Hint : Upon generating a dendrite / axon in DBB , Always extend towards normal blocks. that way neurons will not remain unused.
             switch (bbt)
             {
-                case BasisBlockType.FUDBB:
+                case BasisBlockType.FUDBB:      //Means Front Facing Block which intersects with Upper Facing Block. So we can only apply -YZX  & -Z OFFSETS to it.
+                    {
+                        //Figure out which offsets are to be applied to every DBB type , apply it , compute it.
+                        //-z offset
+                        blockCenter.BID = neuronPos.BID - ZOFFSET - YOFFSET -XOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        blockCenter.BID = neuronPos.BID - YOFFSET -XOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        break;
+                    }
+                case BasisBlockType.FBDBB:  // Front Facing Block With Bottom Intersection DBB , Need to Add Z & Y OFFSETS to it.
+                    {
+                        blockCenter.BID = neuronPos.BID + ZOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        blockCenter.BID = neuronPos.BID + YOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+                        break;
+                    }
+                case BasisBlockType.LUDBB:  // Left Face Uppser Side Intersection Block , -Y & +X OFFSETS
+                    {
+                        blockCenter.BID = neuronPos.BID + XOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        blockCenter.BID = neuronPos.BID - YOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+                        break;
+                    }
+                case BasisBlockType.LBDBB:  // Left Face Back Side Intersection Block , +Y & +X OFFSETS
                     {
 
                         break;
                     }
+                case BasisBlockType.BUDBB:  // Back Face Upper Side Intersection Block , -XY & -Y OFFSETS 
+                    {
+                        break;
+                    }
+                case BasisBlockType.BBDBB:
+                    {
+                        break;
+                    }
+                case BasisBlockType.RUDBB:
+                    {
+                        break;
+                    }
+                case BasisBlockType.RBDBB:
+                    {
+                        break;
+                    }
+                default:
+                    {
+                        Console.WriteLine("Incorrect Double Basis Block Type Identified while trying to find a new synapse!! ERROR ERROR!!!");
+                        break;
+                    }
             }
         }
-
 
         private Position3D DoWhile(Position3D blockCenter, Dictionary<(int,int,int), char> positions, uint blockRadius, char cTypechar)
         {
