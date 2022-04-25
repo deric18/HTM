@@ -80,16 +80,16 @@ namespace HTM.Algorithms
                             AxonClaim(pos, claimerSegID);
                             cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'A';
                             ++openCounter;
-                            return new ConnectionType(CType.SuccesfullyOccupied);                            
+                            return new ConnectionType(CType.SuccesfullyClaimed);                            
                         case EndPointType.Dendrite:
                             DendriteClaim(pos, claimerSegID);
                             cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'D';
                             ++openCounter;
-                            return new ConnectionType(CType.SuccesfullyOccupied);
+                            return new ConnectionType(CType.SuccesfullyClaimed);
 
                         default: break;
                     }
-                    ++openCounter;
+                    ++openCounter;                    
                     break;
                 case 'D'://Dendrite
                     switch (eType)
@@ -167,9 +167,19 @@ namespace HTM.Algorithms
             return new ConnectionType(CType.NotAvailable);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         internal SegmentID InterfaceFire(string position)
         {
-            return synapses[position].dendriteID;
+            if(synapses.TryGetValue(position, out DoubleSegment doubleObject))
+            {
+                return synapses[position].dendriteID;
+            }
+
+            return null;
         }
 
         private void AxonClaim(Position3D pos, SegmentID claimerSegID)

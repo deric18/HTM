@@ -39,6 +39,9 @@ namespace HTM.Algorithms
 
         public static Position3D PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(Position3D pos, char dimension, uint blockRadius, uint? count = 0)
         {
+            if (count >= 5)
+                return null;
+
             Position3D toRet = pos;
 
             switch (dimension)
@@ -92,7 +95,7 @@ namespace HTM.Algorithms
 
 
             //making sure its available or recurse again.
-            return ConnectionTable.SingleTon.IsPositionAvailable(toRet) ? toRet : PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(pos, dimension, blockRadius);
+            return ConnectionTable.SingleTon.IsPositionAvailable(toRet) ? toRet : PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(pos, dimension, blockRadius, ++count);
 
         }
 

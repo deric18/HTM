@@ -3,6 +3,9 @@
     using HTM.Enums;
     using HTM.Models;
 
+    /// <summary>
+    /// Return Type for Calling Segment Typess to let them know if there are potential Connection Points have accidentally connected to a Dendrite / Axon.
+    /// </summary>
     public class ConnectionType
     {
         public CType ConType { get; set; }

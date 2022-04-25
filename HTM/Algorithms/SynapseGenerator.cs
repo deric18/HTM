@@ -238,6 +238,39 @@ namespace HTM.Algorithms
 
 
             //Register the new position.
+            uint axonSegCount = 0;
+            uint dendriteSegCount = 0;
+            foreach(var pos in NewProximalConnectionPoints)
+            {
+
+                if(pos.cType == CType.ConnectedToAxon)
+                {
+                    //Claim Axon Position
+                    SegmentID segId = new SegmentID(neuronId, axonSegCount, pos);
+                    var connectionType = CPM.GetInstance.CTable.ClaimPosition(pos, segId, EndPointType.Axon);
+
+                    if(connectionType.ConType == CType.ConnectedToDendrite)
+                    {
+                        //Proximal Axon Segment  immediately connected to a nearby Dendrite
+                        //Now we have to get the dendrites segmentID to the calling axon
+
+
+                    }
+                    else if(connectionType.ConType == CType.SuccesfullyClaimed)
+                    { 
+                        //Method worked as expected log it and do nothing
+                        Console.WriteLine("New connection for Neuron \n BLOCK ID : " + neuronId.BID + "\n X:" + neuronId.X + "\n Y:" + neuronId.Y + "\n Z:" + neuronId.Z);
+                        Console.WriteLine(pos.StringIDWithBID);
+                    }
+
+                    axonSegCount++;
+                }
+                else if(pos.cType == CType.ConnectedToDendrite)
+                {
+                    
+                    //Claim Dendrite
+                }
+            }
 
             return NewProximalConnectionPoints;
 
