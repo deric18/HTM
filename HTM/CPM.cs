@@ -33,6 +33,7 @@ namespace HTM
         public uint NumBlocks { get; private set; } //Number of Blocks in the Region        
         public BlockConfigProvider BCP { get; private set; }
         public Column[][] Columns { get; private set; }
+        private List<Neuron> _firingNeurons { get; set; }
         private List<Neuron> _predictedList;        
         //private List<Neuron> _shortPredictedList;
         private bool _readySpatial;
@@ -40,6 +41,7 @@ namespace HTM
         private bool _readyApical;
         public ConnectionTable CTable { get; private set; }
         internal SynapseGenerator synapseGenerator;
+        private ulong cycle;
 
         public void Initialize(uint xyz, uint pointsPerBlock = 0)
         {
@@ -53,10 +55,12 @@ namespace HTM
             instance.NumZ = xyz;            
 
             instance._predictedList = new List<Neuron>();
+            instance._firingNeurons = new List<Neuron>();
             //instance._shortPredictedList = new List<Neuron>();
             instance._readyApical = false;
             instance._readyTemporal = false;
             instance._readySpatial = true;
+            instance.cycle = 0;
 
             try
             {
@@ -208,13 +212,20 @@ namespace HTM
 
             return toReturn;
         }        
-        
+
+
+        /// <summary>
+        /// 1.Neurons that are predicted in this cycle , all the neurons that contributed to the last cycle for these neurons to be predicted should be incremented.
+        /// 2.System should be advanced enough to recognise any neurons that usually dont fire and are firing in this iteration , should be analysed.
+        /// </summary>
         private void Grow()
-        {   //ToDo
-            //Give a GROW SIGNAL around the network 
+        {
+            //ToDo
+            //Give a GROW SIGNAL around the network
             //Can always be tweaked and policies may be constructed for sending these signals based on how much a neuron/Segment has contributed.
 
         }                                                          
+        1
 
         private IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
         {

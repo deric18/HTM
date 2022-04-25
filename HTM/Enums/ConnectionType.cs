@@ -6,6 +6,7 @@
         ConnectedToDendrite,
         SuccesfullyOccupied,
         NotAvailable,
-        Available
+        Available,
+        Synapse
     }
 }

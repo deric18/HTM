@@ -14,11 +14,12 @@ namespace HTM.Models
         internal uint Voltage { get; private set; }
         internal Position3D NeuronID { get; private set; }
         internal NeuronState State { get; private set; }
-        private List<Position3D> _proximalSynapseList { get; set; }
-        private Dictionary<string, Segment> Segments { get; set; }        
-        private uint _totalSegments;
-        private List<SegmentID> _predictedSegments;                
-        public List<Position3D> axonEndPoints { get; private set; } 
+        private List<Position3D> _proximalSegmentList { get; set; }     //list of proximal segments with higher connectivity threshold
+        private Dictionary<string, Segment> Segments { get; set; }      //List of all segments the neuron has
+        private uint _totalSegments;                                    // total number of segments
+        private List<SegmentID> _predictedSegments;                     
+        public List<Position3D> axonEndPoints { get; private set; }
+        public List<Position3D> dendriticEndPoints { get; private set; }
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
         private CPM _cpm;
 
@@ -31,31 +32,55 @@ namespace HTM.Models
             Segments = new Dictionary<string, Segment>();
             _predictedSegments = new List<SegmentID>();
             axonEndPoints = new List<Position3D>();
+            dendriticEndPoints = new List<Position3D>();
             _cpm = CPM.GetInstance;
         }        
 
         public void CreateProximalSegments()
         {
             //create 6 baseposition points on each side of the face of the neuron close to its nearby neurons ( atelast half way )
+            //Create Segments with bae positions as the the once you recieve from synapseGenerator
             List<Position3D> proximalSegList;
-            proximalSegList = CPM.GetInstance.synapseGenerator.AddProximalSegment(NeuronID);
-
+            proximalSegList = (CPM.GetInstance.synapseGenerator.AddProximalSegment(NeuronID));
+            uint i = 0;
             foreach(Position3D pos in proximalSegList)
             {
+                Segment newSegment = null;
+                //TODO : Need bit more reasearch about the SegmentType
+
                 if(pos.cType == CType.ConnectedToAxon)
                 {
+                    newSegment = new Segment(pos, SegmentType.Axonal, NeuronID, i);
                     axonEndPoints.Add(pos);
                 }
                 else if(pos.cType == CType.ConnectedToDendrite)
                 {
-                    _proximalSynapseList.Add(pos);
+                    newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i);
+                    _proximalSegmentList.Add(pos);
                 }
+                else if(pos.cType == CType.Synapse)
+                {
+                    throw new Exception();
+                    //To be Done.
+                }
+
+                if(Segments.TryGetValue(newSegment.ComputeSegmentIDAsString() , out Segment segment))
+                {
+                    //Segment exists at this position , this should not have happened unless a bug in CTable is messing up this part of the logic
+
+                    throw new Exception("You Fucked Up BITCH!!!! CTable mess" + newSegment.ComputeSegmentIDAsString());
+                }
+
+                Segments.Add(newSegment.ComputeSegmentIDAsString(), newSegment);
+
+                i++;
             }
         }
 
         internal Segment GetSegment(SegmentID segID)
         {
             Segment seg;
+
             if (Segments.TryGetValue(segID.StringIDWithoutBID, out seg))
                 return seg;
 
@@ -101,10 +126,8 @@ namespace HTM.Models
 
         public string GetString() => NeuronID.StringIDWithoutBID;
 
-        private void FlushVoltage()
-        {
+        private void FlushVoltage() =>
             Voltage = 0;
-        }
 
         internal bool AddNewConnection(Position3D pos, SegmentID segmentID)
         {
@@ -118,11 +141,11 @@ namespace HTM.Models
         }
 
         internal void Grow()
-
-
         {
-            //growth signal comes form CPM when neuron exceeds fire index in the fire cycle , we add new positions to both axonal endpoints and dendritic segments
+            //growth signal comes from CPM when neuron exceeds fire index in the fire cycle , we add new positions to both axonal endpoints and dendritic segments.
+            // Will need some details on which dendrites or axons are exactly firing.
 
+            ƒ
 
         }
 

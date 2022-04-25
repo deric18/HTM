@@ -85,6 +85,8 @@ namespace HTM.Algorithms
 
             }
 
+            //TODO : Need to account for some logic where dendrites need to connect to an existing axonal endpoint , in that case it need be registered as synapse and return appropriate enum.
+
             //just making sure we dont accidentlly pick the same position back to the caller)
             toRet = (toRet.X == pos.X && toRet.Y == pos.Y && toRet.Z == pos.Z ) ? PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(toRet, dimension, blockRadius, ++count) : toRet ;
 

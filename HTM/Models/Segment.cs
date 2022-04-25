@@ -17,7 +17,7 @@ namespace HTM.Models
     public class Segment
     {                        
         public string SegmentId { get; private set; }           //makes every segmentId unique and also helps in getting its neuron id ,base position , * count at the same time.
-        public Position3D BasePosition { get; private set; }
+        public Position3D BasePosition { get; private set; }    // Position where the Semgnet Originates and grows out of!.
         public uint _sumVoltage { get; private set; }
         public Position3D NeuronID { get; private set; }
 
@@ -57,6 +57,11 @@ namespace HTM.Models
         private string ComputeSegmentIDasString(Position3D neuronID, string segCount, Position3D basePos)
         {
             return neuronID.StringIDWithoutBID + "/" + segCount + "/" + basePos.StringIDWithoutBID;
+        }
+
+        public string ComputeSegmentIDAsString()
+        {
+            return NeuronID.StringIDWithoutBID + "/" + this._segmentNumber + BasePosition.StringIDWithoutBID;
         }
 
         internal Segment GetSegment(int v)
@@ -238,6 +243,7 @@ namespace HTM.Models
 
             return true;
         }
+
         private bool DoesConnectionExist(Position3D pos)
         {
             //Do we have a synapse at this position already ?

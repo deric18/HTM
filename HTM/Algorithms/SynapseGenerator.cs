@@ -244,7 +244,7 @@ namespace HTM.Algorithms
         }
 
         
-        public Position3D PredictNewRandomPosition(Position3D basePosition, uint retryCount)
+        public Position3D PredictNewRandomPosition(Position3D basePosition, uint? retryCount = 0)
         {
             if(retryCount > 4)
             {
