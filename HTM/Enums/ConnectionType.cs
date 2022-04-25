@@ -5,6 +5,7 @@
         ConnectedToAxon,
         ConnectedToDendrite,
         SuccesfullyOccupied,
-        NotAvailable
+        NotAvailable,
+        Available
     }
 }

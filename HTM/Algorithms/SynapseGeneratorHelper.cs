@@ -37,7 +37,7 @@ namespace HTM.Algorithms
 
         }
 
-        public static Position3D PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(Position3D pos, char dimension, uint blockRadius)
+        public static Position3D PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(Position3D pos, char dimension, uint blockRadius, uint? count = 0)
         {
             Position3D toRet = pos;
 
@@ -68,12 +68,28 @@ namespace HTM.Algorithms
                         toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius);
                         toRet.Z = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
                         toRet.BID = pos.BID;
+                        toRet.cType = Enums.CType.ConnectedToAxon;
+                        break;
+                    }
+                case 'D':
+                case 'd':
+                    {
+                        toRet.X = GetRand(pos.X - blockRadius, pos.X + blockRadius);
+                        toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius);
+                        toRet.Z = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
+                        toRet.BID = pos.BID;
+                        toRet.cType = Enums.CType.ConnectedToDendrite;
                         break;
                     }
                 default: break;
 
             }
 
+            //just making sure we dont accidentlly pick the same position back to the caller)
+            toRet = (toRet.X == pos.X && toRet.Y == pos.Y && toRet.Z == pos.Z ) ? PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(toRet, dimension, blockRadius, ++count) : toRet ;
+
+
+            //making sure its available or recurse again.
             return ConnectionTable.SingleTon.IsPositionAvailable(toRet) ? toRet : PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(pos, dimension, blockRadius);
 
         }

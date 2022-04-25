@@ -1,4 +1,5 @@
 ﻿using System;
+using HTM.Enums;
 
 namespace HTM.Models
 {
@@ -9,6 +10,7 @@ namespace HTM.Models
         public uint X { get; set; }         //Position Index within the block 
         public uint Y { get; set; }         //Position Index within the block
         public uint Z { get; set; }         //Position Index within the block
+        public CType cType { get; set; }    //CType for the Connection Point
 
         public Position3D() { }
 
@@ -19,6 +21,7 @@ namespace HTM.Models
             Y = y;
             Z = z;
             this.BID = default;
+            cType = CType.Available;
         }
 
         public Position3D(uint x, uint y, uint z, uint blockId)
@@ -27,6 +30,7 @@ namespace HTM.Models
             Y = y;
             Z = z;
             this.BID = blockId;
+            cType = CType.Available;
         }       
 
         private uint ComputeBID(uint x, uint y, uint z) =>              //Computes BlockID

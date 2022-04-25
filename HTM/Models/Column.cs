@@ -20,6 +20,21 @@ namespace HTM.Models
             {
                 Neuron n = new Neuron(new Position3D(x,y,i));
                 Neurons.Add(n);
+                Initialize(n);
+            }
+        }
+
+        private void Initialize(Neuron n)
+        {
+            //proximal segments always need to have higher initial synaptic connection potential.
+            n.CreateProximalSegments();
+        }
+
+        private void SetupProximalSegments()
+        {
+            foreach (Neuron neuron in Neurons)
+            {
+
             }
         }
 

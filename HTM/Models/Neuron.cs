@@ -18,7 +18,7 @@ namespace HTM.Models
         private Dictionary<string, Segment> Segments { get; set; }        
         private uint _totalSegments;
         private List<SegmentID> _predictedSegments;                
-        public List<string> axonEndPoints { get; private set; } 
+        public List<Position3D> axonEndPoints { get; private set; } 
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
         private CPM _cpm;
 
@@ -30,20 +30,27 @@ namespace HTM.Models
             State = NeuronState.RESTING;
             Segments = new Dictionary<string, Segment>();
             _predictedSegments = new List<SegmentID>();
-            axonEndPoints = new List<string>();
+            axonEndPoints = new List<Position3D>();
             _cpm = CPM.GetInstance;
         }        
 
         public void CreateProximalSegments()
         {
-            //create 6 baseposition points on each side of the face of the neuron close to its nearby neurons ( atelast half way ) 
+            //create 6 baseposition points on each side of the face of the neuron close to its nearby neurons ( atelast half way )
+            List<Position3D> proximalSegList;
+            proximalSegList = CPM.GetInstance.synapseGenerator.AddProximalSegment(NeuronID);
 
-
-        }
-
-        public void AddSegment()
-        {
-
+            foreach(Position3D pos in proximalSegList)
+            {
+                if(pos.cType == CType.ConnectedToAxon)
+                {
+                    axonEndPoints.Add(pos);
+                }
+                else if(pos.cType == CType.ConnectedToDendrite)
+                {
+                    _proximalSynapseList.Add(pos);
+                }
+            }
         }
 
         internal Segment GetSegment(SegmentID segID)
@@ -87,8 +94,8 @@ namespace HTM.Models
                 //Collect those SegmentId's , get Neurons from those segmentID's
                 //start calling methods on those neurons with there respective segmentID's
 
-                SegmentID sId = _cpm.CTable.InterfaceFire(point);
-                _cpm.NeuronFire(Position3D.GetPositionFromString(point), sId, NEURONAL_FIRE_VOLTAGE);
+                SegmentID sId = _cpm.CTable.InterfaceFire(point.StringIDWithBID);
+                _cpm.NeuronFire(point, sId, NEURONAL_FIRE_VOLTAGE);
             }
         }
 

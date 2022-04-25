@@ -71,13 +71,18 @@ namespace HTM
             {
                 Console.WriteLine("Out Of Memory Allocated for the Service via Operating System! , Please reduce the dimensions of the Neuroblock \n NumRows : " + NumY + "\n NumColumns : " + NumX + "\n NumFiles : " + NumZ);
                 Console.WriteLine(e.Message);
-                Console.ReadKey();|
+                Console.ReadKey();
                 return;
             }
 
             instance.BCP = pointsPerBlock == 0 ? new BlockConfigProvider(100000) : new BlockConfigProvider(pointsPerBlock);
             instance.CTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
             synapseGenerator = SynapseGenerator.GetInstance;
+
+            //Setup all the proximal Segments of all the neurons
+            //Setup and Register all the Spatial vertical Axon Lines
+            //Setup all the Temproal Horizontal Axon Lines.
+
         }
         
         internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
@@ -183,7 +188,6 @@ namespace HTM
                 _predictedList.Add(GetNeuronFromPosition(segmentID.NeuronId));
             }            
         }
-
         
         /// <summary>
         /// 
@@ -224,7 +228,26 @@ namespace HTM
             return toReturn;
         }        
 
-        #region HELPER METHODS 
+        #region HELPER METHODS
+
+        //private void SetupAllProximalNeuronalSegments()
+        //{
+        //    for(int i=0; i<NumX; i++)
+        //    {
+        //        for(int j=0; j<NumY; j++)
+        //        {
+        //            Columns[i][j].Initialize();
+        //        }
+        //    }
+        //}
+
+        private void RegisterAxonLines()
+        {
+
+            //REgister Vertical Lines
+
+            //Register Temporal Lines
+        }
 
         private Column GetSpatialColumn(Position2D position) => Columns[position.X][position.Y];
 
