@@ -154,7 +154,6 @@ namespace HTM
             }            
         }
 
-
         //as per the name does a entire colmn fire if no predicted cells otherwise fires the predicted cells
         private void ColumnFire(uint X, uint Y, InputPatternType iType)
         {
@@ -168,16 +167,19 @@ namespace HTM
             {
                 //Burst 
                 instance.Columns[X][Y].Fire();
+                _firingNeurons.AddRange(instance.Columns[X][Y].Neurons);
             }
             else if (predictedCells.Count == 1)
             {
                 //fire                
+                _firingNeurons.Add(predictedCells[0]);
                 predictedCells[0].Fire();
             }
-            else
+            else            
             {
                 //pick the cell with highest voltage & fire , inhibitting the others.
                 Neuron toFire = instance.Columns[X][Y].GetMaxVoltageNeuronInColumn();
+                _firingNeurons.Add(toFire);
                 toFire.Fire();
             }            
 
@@ -185,6 +187,7 @@ namespace HTM
 
         internal void NeuronFire(Position3D position, SegmentID segmentID, uint potential)
         {
+            //TODO : Need to flush voltage from all the neurons that are not going to fire in the next cycle , offcourse only after the Post cycle SDR comes in
             bool willFire = GetNeuronFromPosition(segmentID.NeuronId).Process(segmentID.BasePosition, segmentID, 10);
 
             if(willFire)
@@ -220,12 +223,16 @@ namespace HTM
         /// </summary>
         private void Grow()
         {
-            //ToDo
+            //TODO
             //Give a GROW SIGNAL around the network
             //Can always be tweaked and policies may be constructed for sending these signals based on how much a neuron/Segment has contributed.
 
-        }                                                          
-        1
+
+
+            //At the end clear _firingCells list very important!!!!!
+
+
+        }                                                                  
 
         private IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
         {

@@ -34,3 +34,13 @@ Compute()
  --understand how many buckets need to be created!
  --compute start and end indices both along x & y co-ordinates , create the bucket then run a check to see if there is enough space to create another bucket on the x axis if so continue otherwise set x-index to 0 and increment y-start-index to radius
    repeat the process   
+
+
+																	    GROW
+GROW SIGNAL	
+grow()
+-collect all the firing neurons from the last cycle that fired
+-and get all the predicted neurons from this cycle that will fire
+-got Ctable see if there is a intersection :
+	-get the segment that directly connects these two neurons 
+		-in case if there are multiple segments that 

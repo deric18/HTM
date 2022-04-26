@@ -4,7 +4,7 @@
     {
         ConnectedToAxon,
         ConnectedToDendrite,
-        SuccesfullyOccupied,
+        SuccesfullyClaimed,
         NotAvailable,
         Available,
         Synapse

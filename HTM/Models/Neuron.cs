@@ -20,7 +20,9 @@ namespace HTM.Models
         private List<SegmentID> _predictedSegments;                     
         public List<Position3D> axonEndPoints { get; private set; }
         public List<Position3D> dendriticEndPoints { get; private set; }
+
         private const uint NEURONAL_FIRE_VOLTAGE = 10;
+
         private CPM _cpm;
 
         public Neuron(Position3D pos)
@@ -64,24 +66,23 @@ namespace HTM.Models
                     //To be Done.
                 }
 
-                if(Segments.TryGetValue(newSegment.ComputeSegmentIDAsString() , out Segment segment))
+                if(Segments.TryGetValue(newSegment.ComputeSegmentIdAsString() , out Segment segment))
                 {
                     //Segment exists at this position , this should not have happened unless a bug in CTable is messing up this part of the logic
 
-                    throw new Exception("You Fucked Up BITCH!!!! CTable mess" + newSegment.ComputeSegmentIDAsString());
+                    throw new Exception("You Fucked Up BITCH!!!! CTable is messed Up" + newSegment.ComputeSegmentIdAsString());
                 }
 
-                Segments.Add(newSegment.ComputeSegmentIDAsString(), newSegment);
+                Segments.Add(newSegment.ComputeSegmentIdAsString(), newSegment);
 
                 i++;
             }
         }
 
         internal Segment GetSegment(SegmentID segID)
-        {
-            Segment seg;
+        {            
 
-            if (Segments.TryGetValue(segID.StringIDWithoutBID, out seg))
+            if (Segments.TryGetValue(segID.StringIDWithoutBID, out Segment seg))
                 return seg;
 
             throw new InvalidOperationException("Invalid Segment ID Access");
@@ -111,6 +112,9 @@ namespace HTM.Models
             return false;
         }
 
+        /// <summary>
+        /// Handles Firing of a Neuron
+        /// </summary>
         internal void Fire()
         {
             foreach(var point in axonEndPoints)

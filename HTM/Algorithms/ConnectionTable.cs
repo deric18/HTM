@@ -16,7 +16,7 @@ namespace HTM.Algorithms
         private uint apicalCounter;
         private Dictionary<string, SegmentID> axonalEndPoints;          //holds only unconnected axonal ( active axonal connections)
         private Dictionary<string, SegmentID> dendriticEndPoints;       //holds only unconnected dendrites ( active dendritic connections)
-        private Dictionary<string, DoubleSegment> synapses;
+        private Dictionary<string, DoubleSegment> synapses;             //Dictionary of strings with unqiue positions linked to there potential Double Segmetns
         public static ConnectionTable SingleTon;
 
 
@@ -52,6 +52,9 @@ namespace HTM.Algorithms
          *  A = Available , D - Occupied by Dendrite , a - Occupied by axon , N - Not Available , 
          
              */
+
+
+
 
         public char Position(uint blockID, uint x, uint y, uint z) => cMap[blockID, x][y, z];
 

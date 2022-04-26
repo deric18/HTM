@@ -15,12 +15,10 @@ namespace HTM.Models
     /// -Segment Growth.
     /// </summary>
     public class Segment
-    {                        
-        public string SegmentId { get; private set; }           //makes every segmentId unique and also helps in getting its neuron id ,base position , * count at the same time.
+    {        
         public Position3D BasePosition { get; private set; }    // Position where the Semgnet Originates and grows out of!.
         public uint _sumVoltage { get; private set; }
         public Position3D NeuronID { get; private set; }
-
         private SegmentID _segID;
         private uint _segmentNumber;
         private bool _fullyConnected;
@@ -36,9 +34,7 @@ namespace HTM.Models
         private uint MAX_SUBSEGMENTS_SEGMENT;
 
         public Segment(Position3D basePos, SegmentType sType, Position3D neuronID, uint segCount)
-        {
-
-            this.SegmentId = ComputeSegmentIDasString(neuronID, segCount.ToString(), basePos);
+        {            
             this._segmentNumber = segCount;
             NeuronID = neuronID;
             this.BasePosition = basePos;
@@ -59,7 +55,7 @@ namespace HTM.Models
             return neuronID.StringIDWithoutBID + "/" + segCount + "/" + basePos.StringIDWithoutBID;
         }
 
-        public string ComputeSegmentIDAsString()
+        public string ComputeSegmentIdAsString()
         {
             return NeuronID.StringIDWithoutBID + "/" + this._segmentNumber + BasePosition.StringIDWithoutBID;
         }
@@ -195,7 +191,7 @@ namespace HTM.Models
 
         private void PrintSegmnetID()
         {
-            Console.Write(SegmentId);
+            Console.Write(ComputeSegmentIdAsString());
         }
 
         //private Position3D GetNewPositionFromBound(Position3D segmentBound)
@@ -212,7 +208,7 @@ namespace HTM.Models
             if (!this.SubSegments.IsValueCreated)
             {
                 uint count = (uint)SubSegments.Value.Count;
-                string newSegId = SegmentId + "-" + (++count).ToString();
+                string newSegId = ComputeSegmentIdAsString() + "-" + (++count).ToString();
                 Segment newSegment = new Segment(basePosition, this.sType, NeuronID, count);
                 SubSegments.Value.Add(newSegment);
             }                        
@@ -235,7 +231,7 @@ namespace HTM.Models
         {
             foreach(var seg in SubSegments.Value)
             {
-                if(seg.SegmentId.Equals(newPosition))
+                if(seg.ComputeSegmentIdAsString().Equals(newPosition))
                 {
                     return false;
                 }
