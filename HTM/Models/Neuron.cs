@@ -121,6 +121,7 @@ namespace HTM.Models
 
                 SegmentID sId = _cpm.CTable.InterfaceFire(point.StringIDWithBID);
                 _cpm.NeuronFire(point, sId, NEURONAL_FIRE_VOLTAGE);
+                _cpm.CTable.RecordFire(point);
             }
         }
 

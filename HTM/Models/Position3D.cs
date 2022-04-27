@@ -42,7 +42,7 @@ namespace HTM.Models
         internal string StringIDWithBID =>        
             X.ToString() + "-" + Y.ToString() + "-" + Z.ToString() + "-" + BID.ToString();
 
-        internal string StringIDWithoutBID =>
+        internal string StringIDWithoutBID =>       //Only this is unqiue
             X.ToString() + "-" + Y.ToString() + "-" + Z.ToString();
         
         internal static Position3D GetPositionFromString(string str)

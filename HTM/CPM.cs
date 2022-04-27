@@ -221,11 +221,15 @@ namespace HTM
         private void Grow()
         {
             //ToDo
-            //Give a GROW SIGNAL around the network
-            //Can always be tweaked and policies may be constructed for sending these signals based on how much a neuron/Segment has contributed.
+            //Once the Firing Cycle has finished
+            //Call Connection Tables & Get aLl the DoubleSegment Objects
+            //Strengthen all the connections using the DoubleSegments.
 
-        }                                                          
-        1
+
+            //Flush the predicted segment
+            CPM.GetInstance.CTable.FlushPredictedSegments();
+
+        }                                                        
 
         private IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
         {

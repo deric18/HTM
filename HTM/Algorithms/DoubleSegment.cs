@@ -6,13 +6,15 @@
     /// </summary>
     public class DoubleSegment
     {
-        public Position3D axonID { get; set; }
-        public SegmentID dendriteID { get; set; }
+        public SegmentID axonalSegmentID { get; private set; }
+        public Position3D synapsePosition { get; private set; }
+        public SegmentID dendriteISegmentD { get; private set; }
 
-        public DoubleSegment(Position3D Claimer, SegmentID Connector)
+        public DoubleSegment(Position3D synapsePosition, SegmentID axonalSegmentID, SegmentID dendriticSegmentID)
         {
-            this.axonID = Claimer;
-            this.dendriteID = Connector;
+            this.synapsePosition = synapsePosition;
+            this.axonalSegmentID = axonalSegmentID;
+            this.dendriteISegmentD = dendriticSegmentID;
         }        
     }
 }
