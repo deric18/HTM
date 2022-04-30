@@ -1,7 +1,9 @@
-﻿//TODO : CreateProximalSegment, AddSegment, Prune, Grow    
+﻿//TODO : CreateProximalSegment, AddSegment, Prune, Grow
+//If more than 3 cycles and neuron has not fired then flushall the voltage that came in before 3 cycles.
 using HTM.Enums;
 using System.Collections.Generic;
 using System;
+using HTM.Algorithms;
 
 namespace HTM.Models
 {
@@ -9,7 +11,7 @@ namespace HTM.Models
     /// 1.Account for both excitatory and inhibitory neurons . Need to rethink about this, one argument is that this is not neccessary because HTM Model already accounts for this by 
     /// picking single neurons from one column with highest values using selective firing techniques.
     /// </summary>
-    public class Neuron
+    public class Neuron : IEqualityComparer<Neuron>
     {                
         internal uint Voltage { get; private set; }
         internal Position3D NeuronID { get; private set; }
@@ -123,8 +125,13 @@ namespace HTM.Models
                 //Collect those SegmentId's , get Neurons from those segmentID's
                 //start calling methods on those neurons with there respective segmentID's
 
-                SegmentID sId = _cpm.CTable.InterfaceFire(point.StringIDWithBID);
-                _cpm.NeuronFire(point, sId, NEURONAL_FIRE_VOLTAGE);
+                DoubleSegment dSegment = _cpm.CTable.InterfaceFire(point.StringIDWithBID);
+
+                //_cpm.AddtoPredictedList(point, sId, NEURONAL_FIRE_VOLTAGE);
+                //_cpm.CTable.RecordFire(point);
+
+                //Get the doublesegment asociated with this position and directly send a grow signal to the denditic neuron.
+                _cpm.GetNeuronFromPositionID(dSegment.dendriteISegmentD.NeuronId).Grow( _cpm.GetSegmentFromSegmentID(dSegment.dendriteISegmentD), dSegment.synapsePosition);
             }
         }
 
@@ -144,18 +151,30 @@ namespace HTM.Models
             return false;
         }
 
-        internal void Grow()
+        internal void Grow(Segment seg, Position3D synapse)
         {
+            //TODO:
             //growth signal comes from CPM when neuron exceeds fire index in the fire cycle , we add new positions to both axonal endpoints and dendritic segments.
             // Will need some details on which dendrites or axons are exactly firing.
 
-            ƒ
+            seg.Grow(synapse);
+            
 
         }
 
         internal void Prune()
         {
             //Need neuron status tracking from CPM.
+        }
+
+        public bool Equals(Neuron x, Neuron y)
+        {
+            return x.NeuronID.StringIDWithBID.Equals(y.NeuronID.StringIDWithBID);
+        }
+
+        public int GetHashCode(Neuron obj)
+        {
+            return (int)(obj.NeuronID.X * obj.NeuronID.Y * obj.NeuronID.Z);
         }
     } 
 }

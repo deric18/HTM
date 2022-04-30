@@ -142,7 +142,7 @@ namespace HTM.Models
             if ((_synapses.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])))
             {//Below number of synapses threshold for segment 
                 
-                newPosition = sg.PredictNewRandomPosition(this.BasePosition);                                
+                newPosition = sg.PredictNewRandomPosition(this.BasePosition);                                 
 
                 ConnectionType cPos = CPM.GetInstance.CTable.ClaimPosition(newPosition, _segID, EndPointType.Dendrite);
 
@@ -165,9 +165,32 @@ namespace HTM.Models
             }            
         }              
 
-        public void Grow()
+        public void Grow(Position3D synapseId) 
         {
             //TBD
+            if(_synapses.TryGetValue(synapseId, out uint synapticStrength))
+            {
+                synapticStrength++;
+                _synapses.Remove(synapseId);
+                _synapses.Add(synapseId, synapticStrength);
+            }
+            else
+            {
+                //Search in subsegments
+                if(SubSegments.IsValueCreated)
+                {
+
+                }
+                else
+                {
+                    //No Sub Segments created yet , The synapseId sent to grow does not exist here , Code is MEssed Up , This should never happen throw na ex
+
+                    throw new Exception("ERROR ERROR !!! This should never happen ! : Synapse Id sent to grow doesnt exist in the segment!!!");
+                }
+
+            }
+
+
         }
 
         public void Prune()
@@ -210,6 +233,8 @@ namespace HTM.Models
                 uint count = (uint)SubSegments.Value.Count;
                 string newSegId = ComputeSegmentIdAsString() + "-" + (++count).ToString();
                 Segment newSegment = new Segment(basePosition, this.sType, NeuronID, count);
+
+                //Might also need to register this subsegment in Neuron. otherwise it wont be able to send the grow signal
                 SubSegments.Value.Add(newSegment);
             }                        
         }

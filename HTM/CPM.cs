@@ -3,6 +3,7 @@ using System;
 using HTM.Models;
 using HTM.Enums;
 using System.Collections.Generic;
+using System.Linq;
 using HTM.Algorithms;
 
 namespace HTM
@@ -34,7 +35,7 @@ namespace HTM
         public BlockConfigProvider BCP { get; private set; }
         public Column[][] Columns { get; private set; }
         private List<Neuron> _firingNeurons { get; set; }
-        private List<Neuron> _predictedList;        
+        private List<KeyValuePair<Segment, Neuron>> _predictedList;        
         //private List<Neuron> _shortPredictedList;
         private bool _readySpatial;
         private bool _readyTemporal;
@@ -42,6 +43,7 @@ namespace HTM
         public ConnectionTable CTable { get; private set; }
         internal SynapseGenerator synapseGenerator;
         private ulong cycle;
+        private SDR nextPattern;
 
         public void Initialize(uint xyz, uint pointsPerBlock = 0)
         {
@@ -54,13 +56,14 @@ namespace HTM
             instance.NumY = xyz;
             instance.NumZ = xyz;            
 
-            instance._predictedList = new List<Neuron>();
+            instance._predictedList = new List<KeyValuePair<Segment, Neuron>>();
             instance._firingNeurons = new List<Neuron>();
             //instance._shortPredictedList = new List<Neuron>();
             instance._readyApical = false;
             instance._readyTemporal = false;
             instance._readySpatial = true;
             instance.cycle = 0;
+            instance.nextPattern = null;
 
             try
             {
@@ -91,15 +94,16 @@ namespace HTM
         
         internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
         internal Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.X][segId.Y].GetNeuron(segId.Z);
-          
+
         /// <summary>
         /// All the Firing modules update the predicted list , changing the current state of the system.
         /// </summary>
-        /// <param name="inputPattern"></param>
+        /// <param name="firstPattern"></param>
         /// <param name="iType"></param>
-        public void Process(SDR inputPattern)
+        public void Process(SDR firstPattern, SDR secondPattern)
         {
-            switch(inputPattern.IType)
+            instance.nextPattern = secondPattern;
+            switch(firstPattern.IType)
             {
                 case InputPatternType.SPATIAL:
                     {
@@ -108,11 +112,11 @@ namespace HTM
                         if (!_readySpatial)
                             throw new Exception("Invalid Input Pattern Type");
 
-                        List<Position2D> firingPositions = inputPattern.ActiveBits;
+                        List<Position2D> firingPositions = firstPattern.ActiveBits;
 
                         foreach(var pos in firingPositions)
                         {                            
-                            instance.ColumnFire(Convert.ToUInt32(pos.X), Convert.ToUInt32(pos.Y), inputPattern.IType);
+                            instance.ColumnFire(Convert.ToUInt32(pos.X), Convert.ToUInt32(pos.Y), firstPattern.IType);
                         }
                         _readySpatial = false;
                         _readyApical = true;
@@ -124,11 +128,11 @@ namespace HTM
                         if (!_readyTemporal)
                             throw new Exception("Invalid Input Pattern Type");
 
-                        List<Position2D> firingPositions = inputPattern.ActiveBits;
+                        List<Position2D> firingPositions = firstPattern.ActiveBits;
 
                         foreach (var pos in firingPositions)
                         {
-                            instance.ColumnFire(pos.X, pos.Y, inputPattern.IType);
+                            instance.ColumnFire(pos.X, pos.Y, firstPattern.IType);
                         }
                         _readySpatial = true;
                         _readyTemporal = false;
@@ -141,11 +145,11 @@ namespace HTM
                         if (!_readyApical)
                             throw new Exception("Invalid Input Pattern Type");
 
-                        List<Position2D> firingPositions = inputPattern.ActiveBits;
+                        List<Position2D> firingPositions = firstPattern.ActiveBits;
 
                         foreach (var pos in firingPositions)
                         {
-                            instance.ColumnFire(pos.X, pos.Y, inputPattern.IType);
+                            instance.ColumnFire(pos.X, pos.Y, firstPattern.IType);
                         }
                         _readyApical = false;
                         _readyTemporal = true;
@@ -153,6 +157,7 @@ namespace HTM
                     }
             }            
         }
+
 
         //as per the name does a entire colmn fire if no predicted cells otherwise fires the predicted cells
         private void ColumnFire(uint X, uint Y, InputPatternType iType)
@@ -163,36 +168,35 @@ namespace HTM
             //return List of positions 
 
             List<Neuron> predictedCells = instance.Columns[X][Y].GetPredictedCells();
+
             if (predictedCells.Count == 0)
             {
                 //Burst 
                 instance.Columns[X][Y].Fire();
-                _firingNeurons.AddRange(instance.Columns[X][Y].Neurons);
             }
             else if (predictedCells.Count == 1)
             {
-                //fire                
-                _firingNeurons.Add(predictedCells[0]);
+                //fire
                 predictedCells[0].Fire();
             }
-            else            
+            else
             {
                 //pick the cell with highest voltage & fire , inhibitting the others.
-                Neuron toFire = instance.Columns[X][Y].GetMaxVoltageNeuronInColumn();
-                _firingNeurons.Add(toFire);
-                toFire.Fire();
+
+                List<Neuron> toFire = instance.Columns[X][Y].GetMaxVoltageNeuronInColumn();
+
+                toFire.ForEach(neuron => neuron.Fire());
             }            
 
         }
 
-        internal void NeuronFire(Position3D position, SegmentID segmentID, uint potential)
+        internal void AddtoPredictedList(Position3D position, SegmentID segmentID, uint potential)
         {
-            //TODO : Need to flush voltage from all the neurons that are not going to fire in the next cycle , offcourse only after the Post cycle SDR comes in
-            bool willFire = GetNeuronFromPosition(segmentID.NeuronId).Process(segmentID.BasePosition, segmentID, 10);
+            bool willFire = GetNeuronFromPosition(segmentID.NeuronId).Process(segmentID.BasePosition, segmentID, potential);
 
             if(willFire)
             {
-                _predictedList.Add(GetNeuronFromPosition(segmentID.NeuronId));
+                _predictedList.Add(new KeyValuePair<Segment, Neuron>(GetSegmentFromSegmentID(segmentID), GetNeuronFromSegmentID(segmentID)));
             }            
         }
         
@@ -221,18 +225,73 @@ namespace HTM
         /// 1.Neurons that are predicted in this cycle , all the neurons that contributed to the last cycle for these neurons to be predicted should be incremented.
         /// 2.System should be advanced enough to recognise any neurons that usually dont fire and are firing in this iteration , should be analysed.
         /// </summary>
-        private void Grow()
+        //private void Grow()
+        //{
+        //    //ToDo
+        //    //Once the Firing Cycle has finished
+        //    //Call Connection Tables & Get aLl the DoubleSegment Objects
+        //    //Strengthen all the connections using the DoubleSegments.
+        //    //var predictedSegments = instance.CTable.GetAllPredictedSegments();
+
+        //    //for each item in predictedsegments contains a double segment and number of hits the segment has received
+        //    //first order of business , get only the segments which belong to neurons which are going to fire this cycle and strengthen only those segments that have conrtibited
+        //    //to the neuronal segments
+        //    //Also if there too high of a count on one of the segments detect
+
+        //    foreach (var item in GetIntersectionSet())
+        //    {
+        //        item.Key.Grow(item.Value, instance.CTable.InterfaceFire()
+
+        //    }
+
+
+        //    //Flush the predicted segment
+        //    CPM.GetInstance.CTable.FlushPredictedSegments();
+
+        //}
+
+
+        /// <summary>
+        /// Takes in an SDR and a keyvaluepair enumerable set and spits out list of neurons
+        /// </summary>
+        /// <returns></returns>
+        private List<KeyValuePair<Neuron, Segment>> GetIntersectionSet()
         {
-            //TODO
-            //Give a GROW SIGNAL around the network
-            //Can always be tweaked and policies may be constructed for sending these signals based on how much a neuron/Segment has contributed.
+            List<Neuron> list1 = GetPredictedNeuronsFromSDR(nextPattern);
 
+            List<KeyValuePair<Neuron, Segment>> toRet = new List<KeyValuePair<Neuron, Segment>>();
 
+            if (_predictedList.Count == 0)
+            {
+                Console.WriteLine("There are no predicted Neurons nor segments !! , THis is never supposed to happen!!!");
+                throw new Exception("There are no predicted Neurons nor segments !! , THis is never supposed to happen!!!");
+            }
 
-            //At the end clear _firingCells list very important!!!!!
+           foreach(var kvp in _predictedList)
+            {
+                foreach(var neuron in list1)
+                {
+                    if(kvp.Value.Equals(neuron))
+                    {
+                        toRet.Add(new KeyValuePair<Neuron, Segment>(neuron, kvp.Key));
+                    }
+                }
+            }
 
+            return toRet;
+        }
 
-        }                                                                  
+        private List<Neuron> GetPredictedNeuronsFromSDR(SDR pattern)
+        {
+            List<Neuron> toRet = new List<Neuron>();
+
+            foreach(var item in pattern.ActiveBits)
+            {
+                toRet.AddRange(instance.Columns[item.X][item.Y].GetMaxVoltageNeuronInColumn());
+            }
+
+            return toRet;
+        }
 
         private IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
         {
@@ -244,10 +303,14 @@ namespace HTM
             }
 
             return toReturn;
-        }        
+        }
+
+        public Segment GetSegmentFromSegmentID(SegmentID segId) =>
+            GetNeuronFromPositionID(segId.NeuronId).GetSegment(segId);
 
         #region HELPER METHODS
 
+        //TODO:
         //private void SetupAllProximalNeuronalSegments()
         //{
         //    for(int i=0; i<NumX; i++)
@@ -259,6 +322,8 @@ namespace HTM
         //    }
         //}
 
+
+        //TODO:
         private void RegisterAxonLines()
         {
 

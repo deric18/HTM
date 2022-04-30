@@ -43,18 +43,25 @@ namespace HTM.Models
             Neurons.ForEach(x => x.Fire());
         }
 
-        internal Neuron GetMaxVoltageNeuronInColumn()
+        internal List<Neuron> GetMaxVoltageNeuronInColumn()
         {
-            Neuron toRet = null;
+            List<Neuron> toRet = null;
             uint max = 0;
+            Neuron n = null;
             Neurons.ForEach(q =>
             {
                 if (max < q.Voltage)
                 {
                     max = q.Voltage;
-                    toRet = q;
+                    n = q;
                 }
             });
+
+            if (n == null)
+                return Neurons;
+
+            toRet.Add(n);
+
             return toRet;
         }
 
