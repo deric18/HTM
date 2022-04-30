@@ -17,6 +17,6 @@ namespace HTM.Models
             BasePosition = basePositionSegment;
         }        
 
-        internal string GetSegmentID() => NeuronId.StringIDWithoutBID + "--" + SegmentNumber.ToString() + "--" + BasePosition.StringIDWithoutBID;
+        internal string GetSegmentID() => NeuronId.StringIDWithBID + "--" + SegmentNumber.ToString() + "--" + BasePosition.StringIDWithoutBID;
     }
 }
