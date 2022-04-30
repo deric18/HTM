@@ -169,9 +169,10 @@ namespace HTM.Models
             }            
         }              
 
-        public void Grow()
+        public void Grow(Position3D synapseId) 
         {
             //TBD
+
         }
 
         public void Prune()

@@ -56,30 +56,30 @@ namespace HTM.Algorithms
          
              */
 
-        public void RecordFire(Position3D pos)
-        {
-            if(synapses.TryGetValue(pos.StringIDWithBID, out DoubleSegment dubSeg))
-            {
-                Console.WriteLine("RECORD FIRE : Good News we found the synapse");
+        //public void RecordFire(Position3D pos)
+        //{
+        //    if(synapses.TryGetValue(pos.StringIDWithBID, out DoubleSegment dubSeg))
+        //    {
+        //        Console.WriteLine("RECORD FIRE : Good News we found the synapse");
 
-                if(PredictedSegments.TryGetValue(pos.StringIDWithBID, out var valueItem))
-                {
-                    uint repeatCount = valueItem.Key;
-                    repeatCount++;
-                    synapses.Remove(pos.StringIDWithBID);
-                    valueItem = new KeyValuePair<uint, DoubleSegment>(repeatCount, valueItem.Value);
-                    PredictedSegments.Add(pos.StringIDWithBID, valueItem);
-                }
-                else
-                {
-                    PredictedSegments.Add(pos.StringIDWithBID, new KeyValuePair<uint, DoubleSegment>(0, dubSeg));
-                }
-            }
-            else
-            {
-                // Do Nothing & Return. Nothing to Record.
-            }
-        }
+        //        if(PredictedSegments.TryGetValue(pos.StringIDWithBID, out var valueItem))
+        //        {
+        //            uint repeatCount = valueItem.Key;
+        //            repeatCount++;
+        //            synapses.Remove(pos.StringIDWithBID);
+        //            valueItem = new KeyValuePair<uint, DoubleSegment>(repeatCount, valueItem.Value);
+        //            PredictedSegments.Add(pos.StringIDWithBID, valueItem);
+        //        }
+        //        else
+        //        {
+        //            PredictedSegments.Add(pos.StringIDWithBID, new KeyValuePair<uint, DoubleSegment>(0, dubSeg));
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // Do Nothing & Return. Nothing to Record.
+        //    }
+        //}
 
         public Dictionary<string, KeyValuePair<uint, DoubleSegment>>.ValueCollection GetAllPredictedSegments()
         {
@@ -210,9 +210,15 @@ namespace HTM.Algorithms
             return new ConnectionType(CType.NotAvailable);
         }
 
-        internal SegmentID InterfaceFire(string position)
+
+        /// <summary>
+        /// Returns the dendrites position 3D object that segments axon is connected to.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        internal DoubleSegment InterfaceFire(string position)
         {
-            return synapses[position].dendriteISegmentD;
+            return synapses[position];
         }
 
 
