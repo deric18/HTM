@@ -18,7 +18,7 @@ namespace HTM.Models
             ID = new Position2D(x, y);
             for(uint i=0;i< Size; i++)
             {
-                Neuron n = new Neuron(new Position3D(x,y,i));
+                Neuron n = new Neuron(new Position3D(x, y, i, (x + (y * 10) + (i * 100))));         //Potential Bug Reolved. Incorrect Block Id Allocation can cause potential fuck up's hard to track! Lesson : give 100% focus to modules you are working on !!!!!
                 Neurons.Add(n);
                 Initialize(n);
             }

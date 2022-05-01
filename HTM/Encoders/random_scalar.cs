@@ -19,12 +19,10 @@ using capnp;
 using RandomDistributedScalarEncoderProto = nupic.encoders.random_distributed_scalar_capnp.RandomDistributedScalarEncoderProto;
 
 using System;
-
 using System.Collections.Generic;
 
 using System.Linq;
 
-namespace HTM.Encoders
 {
     public class ByteEncoder
     {               
@@ -131,7 +129,7 @@ namespace HTM.Encoders
                 this.verbosity = verbosity;
                 this.w = w;
                 this.n = n;
-                this.resolution = float(resolution);
+                this.resolution = (float)(resolution);
                 // The largest overlap we allow for non-adjacent encodings
                 this._maxOverlap = 2;
                 // initialize the random number generators

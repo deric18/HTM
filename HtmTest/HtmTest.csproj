@@ -49,8 +49,10 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestConnectionTable.cs" />
+    <Compile Include="TestSegmentManipulation.cs" />
     <Compile Include="TestSynapseBlockStructure.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="TestCPM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -3,7 +3,6 @@ using System;
 using HTM.Models;
 using HTM.Enums;
 using System.Collections.Generic;
-using System.Linq;
 using HTM.Algorithms;
 
 namespace HTM
@@ -93,6 +92,7 @@ namespace HTM
         }
         
         internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
+
         internal Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.X][segId.Y].GetNeuron(segId.Z);
 
         /// <summary>
@@ -267,7 +267,7 @@ namespace HTM
                 throw new Exception("There are no predicted Neurons nor segments !! , THis is never supposed to happen!!!");
             }
 
-           foreach(var kvp in _predictedList)
+            foreach(var kvp in _predictedList)
             {
                 foreach(var neuron in list1)
                 {

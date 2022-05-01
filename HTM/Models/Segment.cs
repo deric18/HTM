@@ -7,8 +7,7 @@ using HTM.Enums;
 using HTM.Algorithms;
 
 namespace HTM.Models
-{
-    //NOTE: line : 103
+{    
     /// <summary>
     /// -If Proximal Polarization  of the system
     /// -NMDA
@@ -19,23 +18,26 @@ namespace HTM.Models
         public Position3D BasePosition { get; private set; }    // Position where the Semgnet Originates and grows out of!.
         public uint _sumVoltage { get; private set; }
         public Position3D NeuronID { get; private set; }
-        private SegmentID _segID;
+        public string LineageString { get; private set; }
+        public  SegmentID SegmentID { get; private set; }
         private uint _segmentNumber;
         private bool _fullyConnected;
         private Dictionary<Position3D, uint> _synapses;     //uint helps in prunning anything thats zero is taken out and flushed to connection table.
         private Lazy<List<Segment>> SubSegments;        
         private List<Position3D> _predictedSynapses;
         private uint _lastAccesedCycle;                     //helps in prunning of segments
-
+        private bool IsSubSegment;                          //True if yes , False if no
         private SegmentType sType;
         private static uint NMDA_Spike_Potential;
         private static uint MAX_Connection_Strength;
         private static uint NEW_SYNAPSE_CONNECTION_DEF;
         private uint MAX_SUBSEGMENTS_SEGMENT;
 
-        public Segment(Position3D basePos, SegmentType sType, Position3D neuronID, uint segCount)
+        public Segment(Position3D basePos, SegmentType sType, Position3D neuronID, uint segCount, string lineageString, bool isSubSegment = false)
         {            
             this._segmentNumber = segCount;
+            this.IsSubSegment = isSubSegment;            
+            SegmentID = isSubSegment ? new SegmentID(neuronID, segCount, basePos, lineageString + basePos.StringIDWithBID + segCount.ToString() ) : new SegmentID(neuronID, segCount, basePos);
             NeuronID = neuronID;
             this.BasePosition = basePos;
             this.sType = sType;
@@ -44,21 +46,29 @@ namespace HTM.Models
             _synapses = new Dictionary<Position3D, uint>();
             _lastAccesedCycle = 0;
             _predictedSynapses = new List<Position3D>();            
+
+            if(isSubSegment)
+            {
+                LineageString = lineageString + basePos.StringIDWithBID + segCount.ToString();
+            }
+            else
+            {
+                if(lineageString == null)
+                {
+                    LineageString = neuronID.StringIDWithBID + "/" + segCount.ToString() + "/" + BasePosition.StringIDWithBID;
+                }                
+            }
+
             NMDA_Spike_Potential = uint.Parse(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]);
             MAX_Connection_Strength = uint.Parse(ConfigurationManager.AppSettings["MAX_CONNECTION_STRENGTH"]);
             MAX_SUBSEGMENTS_SEGMENT = uint.Parse(ConfigurationManager.AppSettings["MAX_SUBSEGMENTS_SEGMENT"]);
             NEW_SYNAPSE_CONNECTION_DEF = uint.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]);
         }
 
-        private string ComputeSegmentIDasString(Position3D neuronID, string segCount, Position3D basePos)
-        {
-            return neuronID.StringIDWithoutBID + "/" + segCount + "/" + basePos.StringIDWithoutBID;
-        }
-
-        public string ComputeSegmentIdAsString()
-        {
-            return NeuronID.StringIDWithoutBID + "/" + this._segmentNumber + BasePosition.StringIDWithoutBID;
-        }
+        //private string ComputeSegmentIDasString(Position3D neuronID, string segCount, Position3D basePos)
+        //{
+        //    return neuronID.StringIDWithoutBID + "/" + segCount + "/" + basePos.StringIDWithoutBID;
+        //}        
 
         internal Segment GetSegment(int v)
         {
@@ -144,7 +154,7 @@ namespace HTM.Models
                 
                 newPosition = sg.PredictNewRandomPosition(this.BasePosition);                                 
 
-                ConnectionType cPos = CPM.GetInstance.CTable.ClaimPosition(newPosition, _segID, EndPointType.Dendrite);
+                ConnectionType cPos = CPM.GetInstance.CTable.ClaimPosition(newPosition, SegmentID, EndPointType.Dendrite);
 
                 AddConnection(newPosition);
             } 
@@ -153,7 +163,7 @@ namespace HTM.Models
                 //handle logic for if this position is already marked in ctable then do a new position. basically dont do anything everything is already handled in ctable.
                 newPosition = sg.PredictNewRandomPosition(this.BasePosition);
 
-                ConnectionType cPos = CPM.GetInstance.CTable.ClaimPosition(newPosition, _segID, EndPointType.Dendrite);
+                ConnectionType cPos = CPM.GetInstance.CTable.ClaimPosition(newPosition, SegmentID, EndPointType.Dendrite);
 
                 CreateSubSegment(newPosition);
             }
@@ -166,31 +176,13 @@ namespace HTM.Models
         }              
 
         public void Grow(Position3D synapseId) 
-        {
-            //TBD
+        {            
             if(_synapses.TryGetValue(synapseId, out uint synapticStrength))
             {
                 synapticStrength++;
                 _synapses.Remove(synapseId);
                 _synapses.Add(synapseId, synapticStrength);
-            }
-            else
-            {
-                //Search in subsegments
-                if(SubSegments.IsValueCreated)
-                {
-
-                }
-                else
-                {
-                    //No Sub Segments created yet , The synapseId sent to grow does not exist here , Code is MEssed Up , This should never happen throw na ex
-
-                    throw new Exception("ERROR ERROR !!! This should never happen ! : Synapse Id sent to grow doesnt exist in the segment!!!");
-                }
-
-            }
-
-
+            }            
         }
 
         public void Prune()
@@ -214,7 +206,7 @@ namespace HTM.Models
 
         private void PrintSegmnetID()
         {
-            Console.Write(ComputeSegmentIdAsString());
+            Console.Write(SegmentID.StringIDWithBID);
         }
 
         //private Position3D GetNewPositionFromBound(Position3D segmentBound)
@@ -230,13 +222,19 @@ namespace HTM.Models
         {
             if (!this.SubSegments.IsValueCreated)
             {
-                uint count = (uint)SubSegments.Value.Count;
-                string newSegId = ComputeSegmentIdAsString() + "-" + (++count).ToString();
-                Segment newSegment = new Segment(basePosition, this.sType, NeuronID, count);
+                uint count = (uint)SubSegments.Value.Count;                
+                Segment newSegment = new Segment(basePosition, this.sType, NeuronID, count, LineageString, true);
+                
+                Console.WriteLine("New Segment Added to Neuron " + this.NeuronID.StringIDWithoutBID + "Segment ID : ");
+                newSegment.PrintSegmnetID();
 
-                //Might also need to register this subsegment in Neuron. otherwise it wont be able to send the grow signal
+                
                 SubSegments.Value.Add(newSegment);
-            }                        
+
+                //Need to register this subsegment in Neuron. otherwise it wont be able to send the grow signal
+                CPM.GetInstance.GetNeuronFromSegmentID(this.SegmentID).RegisterSubSegmentToNeuron(newSegment);
+
+            }
         }
 
         internal void FlushVoltage()
@@ -250,19 +248,19 @@ namespace HTM.Models
             return " X: " + pos4d.X.ToString() + " Y:" + pos4d.Y.ToString() + " Z:" + pos4d.Z.ToString();
         }
 
-
+        
         //finds out if there are any other segments that have already created a sub segmetn here , this might need to create a standard of segment ID syntax and this function needs to be done at the base segment level.
         private bool DoesSubSegmentExist(Position3D newPosition)
         {
             foreach(var seg in SubSegments.Value)
             {
-                if(seg.ComputeSegmentIdAsString().Equals(newPosition))
+                if(seg.BasePosition.Equals(newPosition))
                 {
-                    return false;
+                    return true;
                 }
             }
 
-            return true;
+            return false;
         }
 
         private bool DoesConnectionExist(Position3D pos)

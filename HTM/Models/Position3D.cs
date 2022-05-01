@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using HTM.Enums;
 
 namespace HTM.Models
 {
     //3Dimensional cordinate system to pin point neuronal synapses
-    public class Position3D 
+    public class Position3D : IEquatable<Position3D>
     {                       
         public uint BID { get; set; }
         public uint X { get; set; }         //Position Index within the block 
@@ -34,15 +35,15 @@ namespace HTM.Models
         }       
 
         private uint ComputeBID(uint x, uint y, uint z) =>              //Computes BlockID
-        (z * CPM.GetInstance.NumX * CPM.GetInstance.NumY + y * CPM.GetInstance.NumX + x);        
+        (z * CPM.GetInstance.NumX * CPM.GetInstance.NumY + y * CPM.GetInstance.NumX + x);
 
         public  bool Equals(Position3D segId) =>         
-            this.X.Equals(segId.X) && this.Y.Equals(segId.Y) && this.Z.Equals(segId.Z) && this.BID.Equals(segId.BID);        
+            this.X.Equals(segId.X) && this.Y.Equals(segId.Y) && this.Z.Equals(segId.Z) && this.BID.Equals(segId.BID);
 
-        internal string StringIDWithBID =>        
+        internal string StringIDWithBID =>          //Only this is unqiue
             X.ToString() + "-" + Y.ToString() + "-" + Z.ToString() + "-" + BID.ToString();
 
-        internal string StringIDWithoutBID =>       //Only this is unqiue
+        internal string StringIDWithoutBID =>       
             X.ToString() + "-" + Y.ToString() + "-" + Z.ToString();
         
         internal static Position3D GetPositionFromString(string str)

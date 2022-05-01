@@ -44,7 +44,9 @@ namespace HTM.Algorithms
                     for (uint j = 0; j < bcp.NumYperBlock; j++)
                         for (uint k = 0; k < bcp.NumZperBlock; k++)
                             cMap[block, i][j, k] = 'A';
-            
+            /*
+             * 
+             * */
 
         }
 
@@ -121,14 +123,14 @@ namespace HTM.Algorithms
                     {
                         case EndPointType.Axon:
                             AxonClaim(pos, claimerSegID);
-                            cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'A';
+                            cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'a';
                             ++openCounter;
-                            return new ConnectionType(CType.SuccesfullyOccupied);                            
+                            return new ConnectionType(CType.SuccesfullyClaimed);                            
                         case EndPointType.Dendrite:
                             DendriteClaim(pos, claimerSegID);
                             cMap[pos.BID, pos.X][pos.Y, pos.Z] = 'D';
                             ++openCounter;
-                            return new ConnectionType(CType.SuccesfullyOccupied);
+                            return new ConnectionType(CType.SuccesfullyClaimed);
 
                         default: break;
                     }

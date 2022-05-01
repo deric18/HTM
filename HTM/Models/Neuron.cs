@@ -11,13 +11,16 @@ namespace HTM.Models
     /// 1.Account for both excitatory and inhibitory neurons . Need to rethink about this, one argument is that this is not neccessary because HTM Model already accounts for this by 
     /// picking single neurons from one column with highest values using selective firing techniques.
     /// </summary>
-    public class Neuron : IEqualityComparer<Neuron>
+    public class Neuron : IEqualityComparer<Neuron> , IEquatable<Neuron>
     {                
         internal uint Voltage { get; private set; }
         internal Position3D NeuronID { get; private set; }
         internal NeuronState State { get; private set; }
         private List<Position3D> _proximalSegmentList { get; set; }     //list of proximal segments with higher connectivity threshold
-        private Dictionary<string, Segment> Segments { get; set; }      //List of all segments the neuron has
+
+        //Question : Should proximal Segments be also added to the segment List
+        //Answer : No , coz you can make the logic in the method to look into both lists rather than duping data , bad practice!
+        private Dictionary<string, Segment> Segments { get; set; }      // List of all segments the neuron has
         private uint _totalSegments;                                    // total number of segments
         private List<SegmentID> _predictedSegments;                     
         public List<Position3D> axonEndPoints { get; private set; }
@@ -54,12 +57,12 @@ namespace HTM.Models
 
                 if(pos.cType == CType.ConnectedToAxon)
                 {
-                    newSegment = new Segment(pos, SegmentType.Axonal, NeuronID, i);
+                    newSegment = new Segment(pos, SegmentType.Axonal, NeuronID, i, null, false);
                     axonEndPoints.Add(pos);
                 }
                 else if(pos.cType == CType.ConnectedToDendrite)
                 {
-                    newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i);
+                    newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i, null, false);
                     _proximalSegmentList.Add(pos);
                 }
                 else if(pos.cType == CType.Synapse)
@@ -68,27 +71,51 @@ namespace HTM.Models
                     //To be Done.
                 }
 
-                if(Segments.TryGetValue(newSegment.ComputeSegmentIdAsString() , out Segment segment))
+                if(Segments.TryGetValue(newSegment.SegmentID.StringIDWithBID , out Segment segment))
                 {
                     //Segment exists at this position , this should not have happened unless a bug in CTable is messing up this part of the logic
 
-                    throw new Exception("You Fucked Up BITCH!!!! CTable is messed Up" + newSegment.ComputeSegmentIdAsString());
+                    throw new Exception("You Fucked Up BITCH!!!! CTable is messed Up" + newSegment.SegmentID.StringIDWithBID);
                 }
 
-                Segments.Add(newSegment.ComputeSegmentIdAsString(), newSegment);
+                Segments.Add(newSegment.SegmentID.StringIDWithBID, newSegment);
 
                 i++;
             }
         }
 
+
+        public void RegisterSubSegmentToNeuron(Segment segment)
+        {
+            if (segment.NeuronID.Equals(NeuronID))
+            {
+                if(Segments.TryGetValue(segment.SegmentID.StringIDWithBID, out Segment seg))
+                {
+                    throw new Exception("ERROR : RegisterSubSegmentToNeuron : There is already a segment registered at this position");
+                }
+
+                Segments.Add(segment.SegmentID.GetSegmentID(), segment);
+            }
+            else
+            {
+                throw new Exception("Invalid Neuropn trying to be registered");
+            }
+
+        }
+
         internal Segment GetSegment(SegmentID segID)
         {            
 
-            if (Segments.TryGetValue(segID.StringIDWithoutBID, out Segment seg))
-                return seg;
+            if (Segments.TryGetValue(segID.StringIDWithBID, out Segment seg))
+                return seg;            
+
+
+
 
             throw new InvalidOperationException("Invalid Segment ID Access");
         }        
+
+
 
         /// <summary>
         /// Process Potential to segment and decide if you are gonna fire or not so CPM can add you to the prediction list.
@@ -135,7 +162,7 @@ namespace HTM.Models
             }
         }
 
-        public string GetString() => NeuronID.StringIDWithoutBID;
+        public string GetString() => NeuronID.StringIDWithBID;
 
         private void FlushVoltage() =>
             Voltage = 0;
@@ -143,7 +170,7 @@ namespace HTM.Models
         internal bool AddNewConnection(Position3D pos, SegmentID segmentID)
         {
             Segment segment;
-            if(!Segments.TryGetValue(pos.StringIDWithoutBID, out segment))
+            if(!Segments.TryGetValue(pos.StringIDWithBID, out segment))
             {
                 segment.AddNewConnection(pos);
                 return true;
@@ -158,8 +185,6 @@ namespace HTM.Models
             // Will need some details on which dendrites or axons are exactly firing.
 
             seg.Grow(synapse);
-            
-
         }
 
         internal void Prune()
@@ -175,6 +200,11 @@ namespace HTM.Models
         public int GetHashCode(Neuron obj)
         {
             return (int)(obj.NeuronID.X * obj.NeuronID.Y * obj.NeuronID.Z);
+        }
+
+        public bool Equals(Neuron obj)
+        {
+            return this.NeuronID.StringIDWithBID.Equals(obj.NeuronID.StringIDWithBID);
         }
     } 
 }

@@ -1,13 +1,27 @@
 ﻿using System;
-using HTM.Models ;
+using HTM.Models;
+using HTM.Algorithms;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+using HTM;
 
 namespace HtmTest
 {
     [TestClass]
-    public class UnitTest1
+    public class TestCPM
     {
+        CPM instance;
+        ConnectionTable cTable;
+        SynapseGenerator synGen;
+
+        [TestInitialize]
+        public void Initialze()
+        {
+            instance = CPM.GetInstance;
+            instance.Initialize(10, 100000);
+            //cTable = ConnectionTable.Singleton();
+        }
+
+
         [TestMethod]
         public void TestNeuron()
         {

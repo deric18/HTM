@@ -59,7 +59,6 @@
     <Compile Include="Algorithms\SynapseGenerator.cs" />
     <Compile Include="Encoders\ByteEncoder.cs" />
     <Compile Include="Encoders\Models\Bucket.cs" />
-    <Compile Include="Encoders\random_scalar.cs" />
     <Compile Include="Enums\PotentialType.cs" />
     <Compile Include="Enums\SignalType.cs" />
     <Compile Include="Enums\TransformType.cs" />
