@@ -38,7 +38,7 @@ namespace HtmTest
                 for(uint j=0;j<xyz;j++)
                     for(uint k=0;k<xyz;k++)
                     {
-                        neuron = instance.Columns[i][j].GetNeuron(k);
+                        neuron = instance.Columns[i,j].GetNeuron(k);
                         Assert.AreEqual(neuron.NeuronID.X, i);
                         Assert.AreEqual(neuron.NeuronID.Y, j);
                         Assert.AreEqual(neuron.NeuronID.Z, k);

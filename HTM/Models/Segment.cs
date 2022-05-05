@@ -30,6 +30,8 @@ namespace HTM.Models
         private SegmentType sType;
         private static uint NMDA_Spike_Potential;
         private static uint MAX_Connection_Strength;
+        private static uint DISTAL_NEW_SYNAPSE_STRENGTH;
+        private static uint PROXIMAL_NEW_SYNAPSE_STRENGTH;
         private static uint NEW_SYNAPSE_CONNECTION_DEF;
         private uint MAX_SUBSEGMENTS_SEGMENT;
 
@@ -58,9 +60,10 @@ namespace HTM.Models
                     LineageString = neuronID.StringIDWithBID + "/" + segCount.ToString() + "/" + BasePosition.StringIDWithBID;
                 }                
             }
+            
 
             NMDA_Spike_Potential = uint.Parse(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]);
-            MAX_Connection_Strength = uint.Parse(ConfigurationManager.AppSettings["MAX_CONNECTION_STRENGTH"]);
+            MAX_Connection_Strength = uint.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_STRENGTH_FOR_SYNAPSE"]);
             MAX_SUBSEGMENTS_SEGMENT = uint.Parse(ConfigurationManager.AppSettings["MAX_SUBSEGMENTS_SEGMENT"]);
             NEW_SYNAPSE_CONNECTION_DEF = uint.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]);
         }

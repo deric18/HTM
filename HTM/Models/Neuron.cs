@@ -80,6 +80,8 @@ namespace HTM.Models
 
                 Segments.Add(newSegment.SegmentID.GetSegmentID, newSegment);
 
+
+                //TODO : Need to add these positions to synapses as well.
                 i++;
             }
         }

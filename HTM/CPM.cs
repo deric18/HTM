@@ -32,7 +32,7 @@ namespace HTM
         public uint NumZ { get; private set; }      //Number of Neuron Files in the region
         public uint NumBlocks { get; private set; } //Number of Blocks in the Region        
         public BlockConfigProvider BCP { get; private set; }
-        public Column[][] Columns { get; private set; }
+        public Column[,] Columns { get; private set; }
         private List<Neuron> _firingNeurons { get; set; }
         private List<KeyValuePair<Segment, Neuron>> _predictedList;        
         //private List<Neuron> _shortPredictedList;
@@ -53,8 +53,8 @@ namespace HTM
              **/           
             instance.NumX = xyz;
             instance.NumY = xyz;
-            instance.NumZ = xyz;            
-
+            instance.NumZ = xyz;
+            instance.NumBlocks = xyz * xyz * xyz;
             instance._predictedList = new List<KeyValuePair<Segment, Neuron>>();
             instance._firingNeurons = new List<Neuron>();
             //instance._shortPredictedList = new List<Neuron>();
@@ -64,8 +64,9 @@ namespace HTM
             instance.cycle = 0;
             instance.nextPattern = null;
             instance.BCP = pointsPerBlock == 0 ? new BlockConfigProvider(100000) : new BlockConfigProvider(pointsPerBlock);
-            instance.CTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
+            instance.CTable = ConnectionTable.Singleton(instance.NumBlocks, instance.BCP);
             synapseGenerator = SynapseGenerator.GetInstance;
+            instance.Columns = new Column[xyz,xyz];
 
             try
             {
@@ -73,7 +74,7 @@ namespace HTM
                     for (uint j = 0; j < xyz; j++)
                     {
                         Column toAdd = new Column(i, j, xyz);
-                        instance.Columns[i][j] = toAdd;
+                        instance.Columns[i,j] = toAdd;
                     }
             }
             catch(Exception e)
@@ -90,9 +91,9 @@ namespace HTM
             //Setup all the Temproal Horizontal Axon Lines.
         }
         
-        internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
+        internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X,pos.Y].GetNeuron(pos.Z);
 
-        public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.NeuronId.X][segId.NeuronId.Y].GetNeuron(segId.NeuronId.Z);
+        public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.NeuronId.X,segId.NeuronId.Y].GetNeuron(segId.NeuronId.Z);
 
         /// <summary>
         /// All the Firing modules update the predicted list , changing the current state of the system.
@@ -166,12 +167,12 @@ namespace HTM
             //pick cells and fire
             //return List of positions 
 
-            List<Neuron> predictedCells = instance.Columns[X][Y].GetPredictedCells();
+            List<Neuron> predictedCells = instance.Columns[X,Y].GetPredictedCells();
 
             if (predictedCells.Count == 0)
             {
                 //Burst 
-                instance.Columns[X][Y].Fire();
+                instance.Columns[X,Y].Fire();
             }
             else if (predictedCells.Count == 1)
             {
@@ -182,7 +183,7 @@ namespace HTM
             {
                 //pick the cell with highest voltage & fire , inhibitting the others.
 
-                List<Neuron> toFire = instance.Columns[X][Y].GetMaxVoltageNeuronInColumn();
+                List<Neuron> toFire = instance.Columns[X,Y].GetMaxVoltageNeuronInColumn();
 
                 toFire.ForEach(neuron => neuron.Fire());
             }            
@@ -211,8 +212,8 @@ namespace HTM
             {
                 for (int j = 0; j < NumY; j++)
                 {
-                    if (Columns[i][j].GetFiringCellPositions().Count > 0)
-                        toReturn.ActiveBits.Add(Columns[i][j].ID);
+                    if (Columns[i,j].GetFiringCellPositions().Count > 0)
+                        toReturn.ActiveBits.Add(Columns[i,j].ID);
                 }
             }
 
@@ -286,7 +287,7 @@ namespace HTM
 
             foreach(var item in pattern.ActiveBits)
             {
-                toRet.AddRange(instance.Columns[item.X][item.Y].GetMaxVoltageNeuronInColumn());
+                toRet.AddRange(instance.Columns[item.X,item.Y].GetMaxVoltageNeuronInColumn());
             }
 
             return toRet;
@@ -331,11 +332,11 @@ namespace HTM
             //Register Temporal Lines
         }
 
-        private Column GetSpatialColumn(Position2D position) => Columns[position.X][position.Y];
+        private Column GetSpatialColumn(Position2D position) => Columns[position.X,position.Y];
 
-        private Neuron GetNeuronFromPosition(uint x, uint y, uint z) => Columns[x][y].GetNeuron(z);
+        private Neuron GetNeuronFromPosition(uint x, uint y, uint z) => Columns[x,y].GetNeuron(z);
 
-        private Neuron GetNeuronFromPosition(Position3D pos3d) => Columns[pos3d.X][pos3d.Y].GetNeuron(pos3d.Z);
+        private Neuron GetNeuronFromPosition(Position3D pos3d) => Columns[pos3d.X,pos3d.Y].GetNeuron(pos3d.Z);
 
         private Neuron GetNeuronFromSegmentID(string SegmentID)
         {

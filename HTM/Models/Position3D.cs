@@ -5,7 +5,7 @@ using HTM.Enums;
 namespace HTM.Models
 {
     //3Dimensional cordinate system to pin point neuronal synapses
-    public class Position3D : IEquatable<Position3D>
+    public class Position3D : IEquatable<Position3D>, ICloneable
     {                       
         public uint BID { get; set; }
         public uint X { get; set; }         //Position Index within the block 
@@ -32,7 +32,19 @@ namespace HTM.Models
             Z = z;
             this.BID = blockId;
             cType = CType.Available;
-        }       
+        }
+
+        public object Clone()
+        {
+            return new Position3D()
+            {
+                BID = this.BID,
+                X = this.X,
+                Y = this.Y,
+                Z = this.Z,
+                cType = this.cType
+            };
+        }
 
         private uint ComputeBID(uint x, uint y, uint z) =>              //Computes BlockID
         (z * CPM.GetInstance.NumX * CPM.GetInstance.NumY + y * CPM.GetInstance.NumX + x);
@@ -61,6 +73,7 @@ namespace HTM.Models
 
             return pos;
         }
+        
     }
 }
 

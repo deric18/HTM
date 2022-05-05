@@ -106,7 +106,7 @@ namespace HTM.Algorithms
 
         private void InitializeChecks(Position3D pos)
         {
-            basisBlockType = IsSingleBasisBlock(pos) ? BasisBlockType.SingleBasisBlock : ( (IsCoreBlock(pos) ? BasisBlockType.CoreBasisBlock : (IsDoubleBasisBlock(pos) ? BasisBlockType.DoubleBasisBlock : BasisBlockType.NotApplicable)));
+            basisBlockType = (IsCoreBlock(pos) ? BasisBlockType.CoreBasisBlock : ( IsDoubleBasisBlock(pos) ? BasisBlockType.DoubleBasisBlock : ( IsSingleBasisBlock(pos) ? BasisBlockType.SingleBasisBlock  : BasisBlockType.NormalBlock)));
         }
 
         private bool IsCoreBlock(Position3D pos) => ((XL_BB_Mods(pos.BID) && YD_BB_Mods(pos.BID) && ZF_BB_Mods(pos.BID)) || (XR_BB_Mods(pos.BID) && YU_BB_Mods(pos.BID) && ZB_BB_Mods(pos.BID)));

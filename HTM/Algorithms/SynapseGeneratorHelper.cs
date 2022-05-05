@@ -42,7 +42,7 @@ namespace HTM.Algorithms
             if (count >= 5)
                 return null;
 
-            Position3D toRet = pos;
+            Position3D toRet = (Position3D)pos.Clone();
 
             switch (dimension)
             {
@@ -93,6 +93,10 @@ namespace HTM.Algorithms
             //just making sure we dont accidentlly pick the same position back to the caller)
             toRet = (toRet.X == pos.X && toRet.Y == pos.Y && toRet.Z == pos.Z ) ? PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(toRet, dimension, blockRadius, ++count) : toRet ;
 
+            if(toRet.BID>= CPM.GetInstance.NumBlocks || toRet == null || ( toRet.X >= CPM.GetInstance.BCP.NumXperBlock || toRet.Y >= CPM.GetInstance.BCP.NumYperBlock || toRet.Z >= CPM.GetInstance.BCP.NumZperBlock))
+            {
+                Console.WriteLine("Catch this exception");
+            }
 
             //making sure its available or recurse again.
             return ConnectionTable.SingleTon.IsPositionAvailable(toRet) ? toRet : PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(pos, dimension, blockRadius, ++count);
