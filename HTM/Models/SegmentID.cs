@@ -7,7 +7,7 @@ namespace HTM.Models
     /// <summary>
     /// Used to uniquely represent every single Segment in the Region
     /// </summary>
-    public class SegmentID : Position3D
+    public class SegmentID
     {
         //Should also be able to include sub segments.
         public uint SegmentNumber { get; private set; }
@@ -17,8 +17,8 @@ namespace HTM.Models
 
         public bool IsSubSegment { get; private set; }
 
-        internal SegmentID(Position3D neuronId, uint segNum, Position3D basePositionSegment) : base(basePositionSegment)
-        {
+        internal SegmentID(Position3D neuronId, uint segNum, Position3D basePositionSegment)
+        {            
             NeuronId = neuronId;
             SegmentNumber = segNum;
             BasePosition = basePositionSegment;
@@ -26,7 +26,7 @@ namespace HTM.Models
             LineageString = null;
         }        
 
-        internal SegmentID(Position3D neuronId, uint segNum, Position3D basePositionSegment, string LineageString) : base(basePositionSegment)
+        internal SegmentID(Position3D neuronId, uint segNum, Position3D basePositionSegment, string LineageString)
         {
             NeuronId = neuronId;
             SegmentNumber = segNum;
@@ -36,6 +36,6 @@ namespace HTM.Models
         }
 
 
-        internal string GetSegmentID() => NeuronId.StringIDWithBID + "/" + SegmentNumber.ToString() + "/" + BasePosition.StringIDWithBID;
+        internal string GetSegmentID => NeuronId.StringIDWithBID + "/" + SegmentNumber.ToString() + "/" + BasePosition.StringIDWithBID;
     }
 }

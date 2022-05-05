@@ -501,10 +501,10 @@ namespace HTM.Algorithms
             //pick all the 8 neighbhouring blocks and start getting positions
 
             List<Position3D> toReturn = new List<Position3D>();
-            Position3D axonPos = null;
+            Position3D axonPos = new Position3D();
             axonPos.cType = CType.ConnectedToAxon;
             //Dictionary<(int, int, int), char> dict = new Dictionary<(int, int, int), char>();
-            Position3D dendriticPos = null;
+            Position3D dendriticPos = new Position3D();
             dendriticPos.cType = CType.ConnectedToDendrite;
             BasisBlockType sbbType = CheckTypeOfSSB(neuronId);
             Position3D blockCenter = CPM.GetInstance.BCP.BlockCenter;

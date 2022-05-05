@@ -11,13 +11,20 @@ namespace HTM.Models
         public List<Position2D> ActiveBits { get; private set; }
         public InputPatternType IType { get; set; }        
 
-        public uint Size() => Length * Breadth;                
+        public uint Size() => Length * Breadth;
 
         public SDR(uint length, uint breadth)
+        {
+            this.Length = length;
+            this.Breadth = breadth;
+            this.ActiveBits = new List<Position2D>();
+        }
+
+        public SDR(uint length, uint breadth, List<Position2D> activeBits)
         {           
             this.Length = length;
             this.Breadth = breadth;
-            this.ActiveBits = new List<Position2D>();            
+            this.ActiveBits = activeBits;
         }       
 
         public SDR(string s, uint length, uint breadth)

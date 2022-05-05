@@ -14,7 +14,7 @@ namespace HTM.Models
     public class Neuron : IEqualityComparer<Neuron> , IEquatable<Neuron>
     {                
         internal uint Voltage { get; private set; }
-        internal Position3D NeuronID { get; private set; }
+        public Position3D NeuronID { get; private set; }
         internal NeuronState State { get; private set; }
         private List<Position3D> _proximalSegmentList { get; set; }     //list of proximal segments with higher connectivity threshold
 
@@ -71,14 +71,14 @@ namespace HTM.Models
                     //To be Done.
                 }
 
-                if(Segments.TryGetValue(newSegment.SegmentID.StringIDWithBID , out Segment segment))
+                if(Segments.TryGetValue(newSegment.SegmentID.GetSegmentID , out Segment segment))
                 {
                     //Segment exists at this position , this should not have happened unless a bug in CTable is messing up this part of the logic
 
-                    throw new Exception("You Fucked Up BITCH!!!! CTable is messed Up" + newSegment.SegmentID.StringIDWithBID);
+                    throw new Exception("You Fucked Up BITCH!!!! CTable is messed Up" + newSegment.SegmentID.GetSegmentID);
                 }
 
-                Segments.Add(newSegment.SegmentID.StringIDWithBID, newSegment);
+                Segments.Add(newSegment.SegmentID.GetSegmentID, newSegment);
 
                 i++;
             }
@@ -89,12 +89,12 @@ namespace HTM.Models
         {
             if (segment.NeuronID.Equals(NeuronID))
             {
-                if(Segments.TryGetValue(segment.SegmentID.StringIDWithBID, out Segment seg))
+                if(Segments.TryGetValue(segment.SegmentID.GetSegmentID, out Segment seg))
                 {
                     throw new Exception("ERROR : RegisterSubSegmentToNeuron : There is already a segment registered at this position");
                 }
 
-                Segments.Add(segment.SegmentID.GetSegmentID(), segment);
+                Segments.Add(segment.SegmentID.GetSegmentID, segment);
             }
             else
             {
@@ -106,7 +106,7 @@ namespace HTM.Models
         internal Segment GetSegment(SegmentID segID)
         {            
 
-            if (Segments.TryGetValue(segID.StringIDWithBID, out Segment seg))
+            if (Segments.TryGetValue(segID.GetSegmentID, out Segment seg))
                 return seg;            
 
 

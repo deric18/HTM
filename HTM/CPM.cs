@@ -63,6 +63,9 @@ namespace HTM
             instance._readySpatial = true;
             instance.cycle = 0;
             instance.nextPattern = null;
+            instance.BCP = pointsPerBlock == 0 ? new BlockConfigProvider(100000) : new BlockConfigProvider(pointsPerBlock);
+            instance.CTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
+            synapseGenerator = SynapseGenerator.GetInstance;
 
             try
             {
@@ -80,20 +83,16 @@ namespace HTM
                 Console.ReadKey();
                 return;
             }
-
-            instance.BCP = pointsPerBlock == 0 ? new BlockConfigProvider(100000) : new BlockConfigProvider(pointsPerBlock);
-            instance.CTable = ConnectionTable.Singleton(NumBlocks, instance.BCP);
-            synapseGenerator = SynapseGenerator.GetInstance;
+            
 
             //Setup all the proximal Segments of all the neurons
             //Setup and Register all the Spatial vertical Axon Lines
             //Setup all the Temproal Horizontal Axon Lines.
-
         }
         
         internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X][pos.Y].GetNeuron(pos.Z);
 
-        internal Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.X][segId.Y].GetNeuron(segId.Z);
+        public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.NeuronId.X][segId.NeuronId.Y].GetNeuron(segId.NeuronId.Z);
 
         /// <summary>
         /// All the Firing modules update the predicted list , changing the current state of the system.
@@ -199,18 +198,18 @@ namespace HTM
                 _predictedList.Add(new KeyValuePair<Segment, Neuron>(GetSegmentFromSegmentID(segmentID), GetNeuronFromSegmentID(segmentID)));
             }            
         }
-        
+
         /// <summary>
-        /// 
+        /// Get the Current PRedict SDR of the System
         /// </summary>
         /// <returns>output sdr should be 2D should only get 1 for columns that are firing and o if none of the cells in the column are firing</returns>
         public SDR Predict()
         {
             SDR toReturn = new SDR(NumX, NumY);
 
-            for (int i=0; i<NumX; i++)
+            for (int i = 0; i < NumX; i++)
             {
-                for(int j=0; j<NumY; j++)
+                for (int j = 0; j < NumY; j++)
                 {
                     if (Columns[i][j].GetFiringCellPositions().Count > 0)
                         toReturn.ActiveBits.Add(Columns[i][j].ID);
@@ -218,7 +217,7 @@ namespace HTM
             }
 
             return toReturn;
-        }        
+        }
 
 
         /// <summary>
@@ -293,7 +292,7 @@ namespace HTM
             return toRet;
         }
 
-        private IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
+        public  IEnumerable<Neuron> GetNeuronsFromPositions(List<Position3D> list)
         {
             List<Neuron> toReturn = new List<Neuron>();
 

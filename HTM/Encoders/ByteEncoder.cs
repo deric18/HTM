@@ -62,6 +62,7 @@ namespace HTM.Encoders
 
         public SDR EncodeByte(byte byteVal)
         {
+            return new SDR(10, 10);
 
         }
 

@@ -206,7 +206,7 @@ namespace HTM.Models
 
         private void PrintSegmnetID()
         {
-            Console.Write(SegmentID.StringIDWithBID);
+            Console.Write(SegmentID.GetSegmentID);
         }
 
         //private Position3D GetNewPositionFromBound(Position3D segmentBound)

@@ -14,6 +14,7 @@ namespace HTM.Models
 
         internal Column(uint x, uint y, uint size)
         {
+            Neurons = new List<Neuron>();
             Size = size;
             ID = new Position2D(x, y);
             for(uint i=0;i< Size; i++)
@@ -34,7 +35,7 @@ namespace HTM.Models
         {
             foreach (Neuron neuron in Neurons)
             {
-
+                //TODO :: finish this Sucker
             }
         }
 
@@ -65,7 +66,7 @@ namespace HTM.Models
             return toRet;
         }
 
-        internal Neuron GetNeuron(uint z) => Neurons[Convert.ToInt32(z)];
+        public Neuron GetNeuron(uint z) => Neurons[Convert.ToInt32(z)];
 
         internal List<Position3D> GetFiringCellPositions()
         {
