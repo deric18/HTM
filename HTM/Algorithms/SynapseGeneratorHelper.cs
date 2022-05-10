@@ -37,33 +37,18 @@ namespace HTM.Algorithms
 
         }
 
-        public static Position3D PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(Position3D pos, char dimension, uint blockRadius, uint? count = 0)
+        public static Position3D PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(Position3D pos, char dimension, uint blockRadius,  uint? count = 0)
         {
             if (count >= 5)
-                return null;
+            {
+                throw new Exception("PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck : \n Recursive Count Exceeded for PRedicting NEw Position");
+            }
 
             Position3D toRet = (Position3D)pos.Clone();
+            ConnectionTable cTable = ConnectionTable.Singleton();
 
             switch (dimension)
             {
-                case 'x':
-                case 'X':
-                    {
-                        toRet.X = GetRand(pos.X - blockRadius, pos.X + blockRadius);
-                        break;
-                    }
-                case 'y':
-                case 'Y':
-                    {
-                        toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius);
-                        break;
-                    }
-                case 'z':
-                case 'Z':
-                    {
-                        toRet.Z = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
-                        break;
-                    }
                 case 'A':
                 case 'a':
                     {
@@ -71,7 +56,7 @@ namespace HTM.Algorithms
                         toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius);
                         toRet.Z = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
                         toRet.BID = pos.BID;
-                        toRet.cType = Enums.CType.ConnectedToAxon;
+                        toRet.cType = Enums.CType.SuccesfullyClaimedByAxon;       //If the Position is available we should mark it as such;
                         break;
                     }
                 case 'D':
@@ -81,9 +66,10 @@ namespace HTM.Algorithms
                         toRet.Y = GetRand(pos.Y - blockRadius, pos.Y + blockRadius);
                         toRet.Z = GetRand(pos.Z - blockRadius, pos.Z + blockRadius);
                         toRet.BID = pos.BID;
-                        toRet.cType = Enums.CType.ConnectedToDendrite;
+                        toRet.cType = Enums.CType.SuccesfullyClaimedByDendrite;       //If the Position is available we should mark it as such;
                         break;
                     }
+
                 default: break;
 
             }
@@ -99,8 +85,25 @@ namespace HTM.Algorithms
             }
 
             //making sure its available or recurse again.
-            return ConnectionTable.SingleTon.IsPositionAvailable(toRet) ? toRet : PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(pos, dimension, blockRadius, ++count);
+            if (!cTable.IsPositionAvailable(toRet))
+            {
+                //If the newly guessed random position is already occupied , if its an axon and we connecting a dendrite , then isntead of reguessing a new position 
+                //Send back a connecionType to inform the method we are creating a synapse.
 
+
+                if(cTable.Position(toRet.BID, toRet.X, toRet.Y, toRet.Z).Equals('a') && dimension.Equals('D'))
+                {
+                    pos.cType = Enums.CType.DendriteConnectedToAxon;
+                }
+                else if(cTable.Position(toRet.BID, toRet.X, toRet.Y, toRet.Z).Equals('D') && dimension.Equals('A'))
+                {
+                    pos.cType = Enums.CType.AxonConnectedToDendrite;
+                }
+
+                toRet = PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(pos, dimension, blockRadius, ++count);
+            }            
+
+            return toRet;
         }
 
 

@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestConnectionTable.cs" />
+    <Compile Include="TestNeuron.cs" />
     <Compile Include="TestSegmentManipulation.cs" />
     <Compile Include="TestSynapseBlockStructure.cs" />
     <Compile Include="TestCPM.cs" />

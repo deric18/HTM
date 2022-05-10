@@ -37,6 +37,7 @@ namespace HTM.Models
             NeuronID = pos;
             State = NeuronState.RESTING;
             Segments = new Dictionary<string, Segment>();
+            ProximalSegmentList = new List<Position3D>();
             _predictedSegments = new List<SegmentID>();
             axonEndPoints = new List<Position3D>();
             dendriticEndPoints = new List<Position3D>();
@@ -49,18 +50,22 @@ namespace HTM.Models
             //Create Segments with bae positions as the the once you recieve from synapseGenerator
             List<Position3D> proximalSegList;
             proximalSegList = (CPM.GetInstance.synapseGenerator.AddProximalSegment(NeuronID));
+
+            if (proximalSegList == null)
+                proximalSegList = new List<Position3D>();
             uint i = 0;
+
             foreach(Position3D pos in proximalSegList)
             {
                 Segment newSegment = null;
                 //TODO : Need bit more reasearch about the SegmentType
 
-                if(pos.cType == CType.ConnectedToAxon)
+                if(pos.cType == CType.SuccesfullyClaimedByAxon)
                 {
                     newSegment = new Segment(pos, SegmentType.Axonal, NeuronID, i, null, false);
                     axonEndPoints.Add(pos);
                 }
-                else if(pos.cType == CType.ConnectedToDendrite)
+                else if(pos.cType == CType.SuccesfullyClaimedByDendrite)
                 {
                     newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i, null, false);
                     ProximalSegmentList.Add(pos);
@@ -100,7 +105,7 @@ namespace HTM.Models
             }
             else
             {
-                throw new Exception("Invalid Neuropn trying to be registered");
+                throw new Exception("Invalid Neuron trying to be registered");
             }
 
         }

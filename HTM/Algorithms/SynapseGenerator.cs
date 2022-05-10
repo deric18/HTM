@@ -201,7 +201,7 @@ namespace HTM.Algorithms
         /// <returns>Synpase position for the Neuron</returns>
         public List<Position3D> AddProximalSegment(Position3D neuronId)
         {
-            List<Position3D> NewProximalConnectionPoints = null;
+            List<Position3D> NewProximalConnectionPoints = new List<Position3D>();
 
             if (basisBlockType.Equals(BasisBlockType.NotApplicable))
                 InitializeChecks(neuronId);
@@ -231,44 +231,59 @@ namespace HTM.Algorithms
                     };
                 default:
                     {
-                        Console.WriteLine("No Proximal Segment Positions found for this block", neuronId.BID);
+                        Console.WriteLine("AddProximalSegment : Not Supposed To HAppen!!! SHITTY CODE!!! No Proximal Segment Positions found for this block", neuronId.BID);
                     }
                         break;
             };
 
 
-            //Register the new position.
+            //Register the new position in Ctable.
             uint axonSegCount = 0;
             uint dendriteSegCount = 0;
             foreach(var pos in NewProximalConnectionPoints)
             {
-
-                if(pos.cType == CType.ConnectedToAxon)
+                if(pos.cType == CType.DendriteConnectedToAxon || pos.cType == CType.AxonConnectedToDendrite)
+                {
+                    //Nothing TO DO everything worked out.
+                }
+                if(pos.cType == CType.DendriteConnectedToAxon)      //A Dendritic Proximal Segment connected to a nearby Axon forming a synapse
                 {
                     //Claim Axon Position
-                    SegmentID segId = new SegmentID(neuronId, axonSegCount, pos);
-                    var connectionType = CPM.GetInstance.CTable.ClaimPosition(pos, segId, EndPointType.Axon);
+                    SegmentID segId = new SegmentID(neuronId, axonSegCount, pos);       //We create a new Proximal SegID for the neuron so we can register it in CTable
+                    var connectionType = CPM.GetInstance.CTable.ClaimPosition(pos, segId, EndPointType.Dendrite);
 
-                    if(connectionType.ConType == CType.ConnectedToDendrite)
+                    if(connectionType.ConType == CType.DendriteConnectedToAxon)
                     {
-                        //Proximal Axon Segment  immediately connected to a nearby Dendrite
-                        //Now we have to get the dendrites segmentID to the calling axon
-
-
+                        //Proximal Dendrite Segment  immediately connected to a nearby Axon
+                        //Both the segments are already registered in Ctable , Nothing to do here folks.
                     }
-                    else if(connectionType.ConType == CType.SuccesfullyClaimed)
+                    else if(connectionType.ConType == CType.SuccesfullyClaimedByDendrite)
                     { 
                         //Method worked as expected log it and do nothing
-                        Console.WriteLine("New connection for Neuron \n BLOCK ID : " + neuronId.BID + "\n X:" + neuronId.X + "\n Y:" + neuronId.Y + "\n Z:" + neuronId.Z);
+                        Console.WriteLine("AddProximalSegment : \nNew connection for Neuron \n BLOCK ID : " + neuronId.BID + "\n X:" + neuronId.X + "\n Y:" + neuronId.Y + "\n Z:" + neuronId.Z);
                         Console.WriteLine(pos.StringIDWithBID);
                     }
 
-                    axonSegCount++;
+                    dendriteSegCount++;
                 }
-                else if(pos.cType == CType.ConnectedToDendrite)
+                else if(pos.cType == CType.AxonConnectedToDendrite) //An Axonal Connection Point is connecting a to nearby Proximal Dendrite
                 {
-                    
+                    //TODO
                     //Claim Dendrite
+                    SegmentID segId = new SegmentID(neuronId, axonSegCount, pos);       //We create a new Proximal SegID for the neuron so we can register it in CTable
+                    var connectionType = CPM.GetInstance.CTable.ClaimPosition(pos, segId, EndPointType.Axon);
+
+                    if(connectionType.ConType == CType.AxonConnectedToDendrite)
+                    {
+                        //Proximal Axon Segment  immediately connected to a nearby Dendrite
+                        //Both the segments are already registered in Ctable , Nothing to do here folks.
+                    }
+                    else if(connectionType.ConType == CType.SuccesfullyClaimedByAxon)
+                    { 
+                        //Method worked as expected log it and do nothing
+                        Console.WriteLine("AddProximalSegment : \nNew connection for Neuron \n BLOCK ID : " + neuronId.BID + "\n X:" + neuronId.X + "\n Y:" + neuronId.Y + "\n Z:" + neuronId.Z);
+                        Console.WriteLine(pos.StringIDWithBID);
+                    }
                 }
             }
 
@@ -388,7 +403,7 @@ namespace HTM.Algorithms
             uint blockRadius = blockCenter.X;
             axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
             
-            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
 
             toReturn.Add(axonPos);
             toReturn.Add(dendriticPos);

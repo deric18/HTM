@@ -58,7 +58,7 @@ namespace HTM.Algorithms
          * -when cpm processes a neuronal fire it gives all the positions to which the neuron fires , then cpm needs to get all thos positions and find out if there are any neurons connecting to the specific position and if so get there segment ids and tra
          *  potential to those segments
          *  CPM Constants:
-         *  A = Available , D - Occupied by Dendrite , a - Occupied by axon , N - Not Available , 
+         *  A = Available , d - Occupied by Dendrite , a - Occupied by axon , N - Not Available , 
          
              */
 
@@ -129,18 +129,19 @@ namespace HTM.Algorithms
                             AxonClaim(pos, claimerSegID);
                             cMap[pos.BID, pos.X,pos.Y, pos.Z] = 'a';
                             ++openCounter;
-                            return new ConnectionType(CType.SuccesfullyClaimed);                            
+                            return new ConnectionType(CType.SuccesfullyClaimedByAxon);                            
                         case EndPointType.Dendrite:
                             DendriteClaim(pos, claimerSegID);
                             cMap[pos.BID, pos.X,pos.Y, pos.Z] = 'D';
                             ++openCounter;
-                            return new ConnectionType(CType.SuccesfullyClaimed);
+                            return new ConnectionType(CType.SuccesfullyClaimedByAxon);
 
                         default: break;
                     }
                     ++openCounter;
                     break;
                 case 'D'://Dendrite
+                case 'd':
                     switch (eType)
                     {
                         case EndPointType.Axon://Axon claiming a dendritc position 
@@ -149,7 +150,7 @@ namespace HTM.Algorithms
                             --openCounter;
                             ++closedCounter;                            
                             if(dendriticEndPoints.TryGetValue(pos.StringIDWithBID, out segid))
-                                return new ConnectionType(CType.ConnectedToDendrite, segid);
+                                return new ConnectionType(CType.DendriteConnectedToAxon, segid);
                             break;  
                         default:
                             return new ConnectionType(CType.NotAvailable);
@@ -165,7 +166,7 @@ namespace HTM.Algorithms
                                 --openCounter;
                                 ++closedCounter;                                
                                 if (dendriticEndPoints.TryGetValue(pos.StringIDWithBID, out segid))
-                                    return new ConnectionType(CType.ConnectedToDendrite, segid);
+                                    return new ConnectionType(CType.DendriteConnectedToAxon, segid);
                                 break;
                             }
                         default:
@@ -183,7 +184,7 @@ namespace HTM.Algorithms
                                     ++temporalCounter;
                                     --openCounter;                                    
                                     if (dendriticEndPoints.TryGetValue(pos.StringIDWithBID, out segid))
-                                        return new ConnectionType(CType.ConnectedToAxon, segid);
+                                        return new ConnectionType(CType.DendriteConnectedToAxon, segid);
                                     break;
                                 }
                             default:
@@ -202,7 +203,7 @@ namespace HTM.Algorithms
                                     ++apicalCounter;
                                     --openCounter;
                                     if (dendriticEndPoints.TryGetValue(pos.StringIDWithBID, out segid))
-                                        return new ConnectionType(CType.ConnectedToAxon, segid);
+                                        return new ConnectionType(CType.DendriteConnectedToAxon, segid);
                                     break;
                                 }
                             default:
@@ -273,7 +274,7 @@ namespace HTM.Algorithms
             else
             {
                 dendriticEndPoints.Add(pos.StringIDWithBID, claimerSegID);
-                cMap[pos.BID, pos.X,pos.Y, pos.Z] = 'd';
+                cMap[pos.BID, pos.X,pos.Y, pos.Z] = 'D';
             }
         }        
     }

@@ -2,9 +2,12 @@
 {
     public enum CType
     {
+        DendriteConnectedToAxon,
+        AxonConnectedToDendrite,
+        SuccesfullyClaimedByAxon,
+        SuccesfullyClaimedByDendrite,
         ConnectedToAxon,
         ConnectedToDendrite,
-        SuccesfullyClaimed,
         NotAvailable,
         Available,
         Synapse

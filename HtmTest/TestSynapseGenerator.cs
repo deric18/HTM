@@ -8,7 +8,7 @@ namespace HtmTest
 {
 
     [TestClass]
-    internal class TestSynapseGenerator
+    public class TestSynapseGenerator
     {
         CPM instance;
         ConnectionTable cTable;
@@ -27,25 +27,36 @@ namespace HtmTest
         {
             //we have 1000 neurons in a 3 dimensional space and we are trying to make sure if we send a CBB ew get the right number of axons and dendrite synapses with the same BID sent
 
-            Position3D position3D = new Position3D(99, 99, 99, 999);
+            List<Position3D> corePositionList = new List<Position3D>()
+            {
+                new Position3D(99, 99, 99, 999),
+                new Position3D(9, 9, 0, 0),
+                new Position3D(90, 0, 9, 0),
+                new Position3D(0,0,0,0),
+                new Position3D(999, 99, 99, 99),
+
+            }
             Neuron neuron;
 
-            for (uint i = 0; i < 10; i++)
-                for (uint j = 0; j < 10; j++)
-                    for (uint k = 0; k < 10; k++)
-                    {
+            
                         neuron = instance.Columns[i, j].GetNeuron(k);
 
                         foreach (var seg in neuron.Segments.Values)
                         {
-                            Assert.Equals(seg.SegmentID.BasePosition.BID, neuron.NeuronID.BID);
-                            Assert.Equals(seg.NeuronID.X, neuron.NeuronID.X);
-                            Assert.Equals(seg.NeuronID.Y, neuron.NeuronID.Y);
-                            Assert.Equals(seg.NeuronID.Z, neuron.NeuronID.Z);
+                            Assert.AreEqual(seg.SegmentID.BasePosition.BID, neuron.NeuronID.BID);
+                            Assert.AreEqual(seg.NeuronID.X, neuron.NeuronID.X);
+                            Assert.AreEqual(seg.NeuronID.Y, neuron.NeuronID.Y);
+                            Assert.AreEqual(seg.NeuronID.Z, neuron.NeuronID.Z);
 
+                            
 
                         }
+
+
+                        Assert.AreEqual(neuron.Segments.Count, 2);
                     }                       
+
+
         }
 
         [TestMethod]

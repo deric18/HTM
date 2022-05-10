@@ -71,34 +71,9 @@ namespace HtmTest
 
         }
 
-        [TestMethod, Ignore]
-        public void TestNeuron()
-        {
-            HTM.CPM cpm = HTM.CPM.GetInstance;
-            cpm.Initialize(10, 0);
-
-            SDR testInput1 = GetNewSDR(InputPatternType.SPATIAL);
-            SDR testInput2 = GetNewSDR(InputPatternType.SPATIAL);
-
-
-            //SDR observedOutput = GetTestOutput();
-
-
-            cpm.Process(testInput1, testInput2);
-
-
-            SDR predictedOutput = cpm.Predict();
-
-
-            Assert.AreEqual(predictedOutput, predictedOutput);
-
-        }
-
-
         private SDR GetNewSDR(InputPatternType iType)
         {
             List<Position2D> activebits = GetRandomPositionList(4);
-
 
             SDR toRet = new SDR(xyz, xyz, activebits);
 

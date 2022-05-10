@@ -21,7 +21,7 @@ namespace HTM.Models
             X = x;
             Y = y;
             Z = z;
-            this.BID = default;
+            this.BID = ComputeBID(x,Y,z);
             cType = CType.Available;
         }
 
