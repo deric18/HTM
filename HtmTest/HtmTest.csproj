@@ -58,6 +58,7 @@
     <Compile Include="TestSynapseBlockStructure.cs" />
     <Compile Include="TestCPM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestSynapseGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -133,7 +133,7 @@ namespace HTM.Algorithms
             return BBcount == 1;
         }
 
-        private BasisBlockType CheckTypeOfSSB(Position3D pos)
+        private BasisBlockType CheckTypeOfSBB(Position3D pos)
         {
             BasisBlockType toReturn = BasisBlockType.NotApplicable;
 
@@ -506,7 +506,7 @@ namespace HTM.Algorithms
             //Dictionary<(int, int, int), char> dict = new Dictionary<(int, int, int), char>();
             Position3D dendriticPos = new Position3D();
             dendriticPos.cType = CType.ConnectedToDendrite;
-            BasisBlockType sbbType = CheckTypeOfSSB(neuronId);
+            BasisBlockType sbbType = CheckTypeOfSBB(neuronId);
             Position3D blockCenter = CPM.GetInstance.BCP.BlockCenter;
             blockCenter.BID = neuronId.BID;
             uint blockRadius = blockCenter.X;

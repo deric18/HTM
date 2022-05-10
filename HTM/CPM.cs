@@ -336,7 +336,7 @@ namespace HTM
 
         private Neuron GetNeuronFromPosition(uint x, uint y, uint z) => Columns[x,y].GetNeuron(z);
 
-        private Neuron GetNeuronFromPosition(Position3D pos3d) => Columns[pos3d.X,pos3d.Y].GetNeuron(pos3d.Z);
+        public Neuron GetNeuronFromPosition(Position3D pos3d) => Columns[pos3d.X,pos3d.Y].GetNeuron(pos3d.Z);
 
         private Neuron GetNeuronFromSegmentID(string SegmentID)
         {

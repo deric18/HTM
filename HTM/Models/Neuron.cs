@@ -16,11 +16,11 @@ namespace HTM.Models
         internal uint Voltage { get; private set; }
         public Position3D NeuronID { get; private set; }
         internal NeuronState State { get; private set; }
-        private List<Position3D> _proximalSegmentList { get; set; }     //list of proximal segments with higher connectivity threshold
+        public  List<Position3D> ProximalSegmentList { get; private set; }     //list of proximal segments with higher connectivity threshold
 
         //Question : Should proximal Segments be also added to the segment List
         //Answer : No , coz you can make the logic in the method to look into both lists rather than duping data , bad practice!
-        private Dictionary<string, Segment> Segments { get; set; }      // List of all segments the neuron has
+        public Dictionary<string, Segment> Segments { get; private set; }      // List of all segments the neuron has
         private uint _totalSegments;                                    // total number of segments
         private List<SegmentID> _predictedSegments;                     
         public List<Position3D> axonEndPoints { get; private set; }
@@ -63,7 +63,7 @@ namespace HTM.Models
                 else if(pos.cType == CType.ConnectedToDendrite)
                 {
                     newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i, null, false);
-                    _proximalSegmentList.Add(pos);
+                    ProximalSegmentList.Add(pos);
                 }
                 else if(pos.cType == CType.Synapse)
                 {
