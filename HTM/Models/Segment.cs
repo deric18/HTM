@@ -47,7 +47,7 @@ namespace HTM.Models
             _fullyConnected = false;
             _synapses = new Dictionary<Position3D, uint>();
             _lastAccesedCycle = 0;
-            _predictedSynapses = new List<Position3D>();            
+            _predictedSynapses = new List<Position3D>();
 
             if(isSubSegment)
             {

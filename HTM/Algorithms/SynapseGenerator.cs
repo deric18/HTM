@@ -106,7 +106,7 @@ namespace HTM.Algorithms
 
         private void InitializeChecks(Position3D pos)
         {
-            basisBlockType = (IsCoreBlock(pos) ? BasisBlockType.CoreBasisBlock : ( IsDoubleBasisBlock(pos) ? BasisBlockType.DoubleBasisBlock : ( IsSingleBasisBlock(pos) ? BasisBlockType.SingleBasisBlock  : BasisBlockType.NormalBlock)));
+            basisBlockType = (IsSingleBasisBlock(pos) ? BasisBlockType.SingleBasisBlock : ( IsDoubleBasisBlock(pos) ? BasisBlockType.DoubleBasisBlock : (IsCoreBlock(pos) ? BasisBlockType.CoreBasisBlock  : BasisBlockType.NormalBlock)));
         }
 
         private bool IsCoreBlock(Position3D pos) => ((XL_BB_Mods(pos.BID) && YD_BB_Mods(pos.BID) && ZF_BB_Mods(pos.BID)) || (XR_BB_Mods(pos.BID) && YU_BB_Mods(pos.BID) && ZB_BB_Mods(pos.BID)));
@@ -193,9 +193,9 @@ namespace HTM.Algorithms
         /// Positioning Logic : dont get the center point always get 4 point behind the center point , if something is registered already four points away , if its dendrite 
         /// put a axonal block or vice versa 
         /// core block : CREATE only 1 A & 1 D.
-        /// double basis : CREATE 1 A & 1 D
-        /// single basis block : 2 A & 2 D
-        /// normal block: Create 4 A & 4 D
+        /// double basis : CREATE 2 A & 2 D
+        /// single basis block : 4 A & 4 D
+        /// normal block: Create 8 A & 8 D
         /// </summary>
         /// <param name="neuronId"></param>
         /// <returns>Synpase position for the Neuron</returns>
@@ -205,6 +205,11 @@ namespace HTM.Algorithms
 
             if (basisBlockType.Equals(BasisBlockType.NotApplicable))
                 InitializeChecks(neuronId);
+
+            if(neuronId.X == 1 && neuronId.Y == 1 && neuronId.Z == 1)
+            {
+                Console.WriteLine("Catch this Bitch!!!!"); ; ; ;
+            }
 
             switch(basisBlockType) 
             {

@@ -46,7 +46,7 @@ namespace HTM.Models
             };
         }
 
-        private uint ComputeBID(uint x, uint y, uint z) =>              //Computes BlockID
+        private uint ComputeBID(uint x, uint y, uint z) =>              //Computes BlockID : VERIFIED
         (z * CPM.GetInstance.NumX * CPM.GetInstance.NumY + y * CPM.GetInstance.NumX + x);
 
         public  bool Equals(Position3D segId) =>         

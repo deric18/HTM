@@ -43,7 +43,7 @@ namespace HtmTest
                         Assert.AreEqual(neuron.NeuronID.Y, j);
                         Assert.AreEqual(neuron.NeuronID.Z, k);
                     }
-        }
+        }        
 
 
         [TestMethod, ExpectedException(typeof(Exception))]
