@@ -119,15 +119,15 @@ namespace HTM.Algorithms
 
             if (XL_BB_Mods(pos.BID))
                 BBcount++;
-            else if (XR_BB_Mods(pos.BID))
+            if (XR_BB_Mods(pos.BID))
                 BBcount++;
-            else if (YU_BB_Mods(pos.BID))
+            if (YU_BB_Mods(pos.BID))
                 BBcount++;
-            else if (YD_BB_Mods(pos.BID))
+            if (YD_BB_Mods(pos.BID))
                 BBcount++;
-            else if (ZF_BB_Mods(pos.BID))
+            if (ZF_BB_Mods(pos.BID))
                 BBcount++;
-            else if (ZB_BB_Mods(pos.BID))
+            if (ZB_BB_Mods(pos.BID))
                 BBcount++;
 
             return BBcount == 1;

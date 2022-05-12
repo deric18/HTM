@@ -46,7 +46,7 @@ namespace HtmTest
         }        
 
 
-        [TestMethod, ExpectedException(typeof(Exception))]
+        [TestMethod, ExpectedException(typeof(Exception)), Ignore]
         public void TestProcessCycle()
         {
             SDR dummy1 = GetNewSDR(InputPatternType.APICAL);
