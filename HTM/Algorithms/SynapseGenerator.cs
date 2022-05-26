@@ -132,7 +132,15 @@ namespace HTM.Algorithms
                 BBCount++;
             if (ZB_BB_Mods(bid) && YD_BB_Mods(bid))
                 BBCount++;
-            if()
+            if (XL_BB_Mods(bid) && ZF_BB_Mods(bid))
+                BBCount++;
+            if (XL_BB_Mods(bid) && ZB_BB_Mods(bid))
+                BBCount++;
+            if (XR_BB_Mods(bid) && ZF_BB_Mods(bid))
+                BBCount++;
+            if (XR_BB_Mods(bid) && ZB_BB_Mods(bid))
+                BBCount++;
+
 
             return BBCount == 2;
         }
