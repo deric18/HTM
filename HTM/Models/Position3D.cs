@@ -33,6 +33,7 @@ namespace HTM.Models
             this.BID = blockId;
             cType = CType.Available;
         }
+      
 
         public object Clone()
         {

@@ -111,12 +111,39 @@ namespace HTM.Algorithms
 
         private bool IsCoreBlock(Position3D pos) => ((XL_BB_Mods(pos.BID) && YD_BB_Mods(pos.BID) && ZF_BB_Mods(pos.BID)) || (XR_BB_Mods(pos.BID) && YU_BB_Mods(pos.BID) && ZB_BB_Mods(pos.BID)));
 
-        private bool IsDoubleBasisBlock(Position3D pos) => (X_BB_Mods(pos.BID) || Y_BB_Mods(pos.BID)) && (Y_BB_Mods(pos.BID) || Z_BB_Mods(pos.BID)) && (Z_BB_Mods(pos.BID) || X_BB_Mods(pos.BID));
+        private bool IsDoubleBasisBlock(Position3D pos)
+        {        
+            uint bid = pos.BID;
+            int BBCount = 0;
+
+            if (XL_BB_Mods(bid) && YU_BB_Mods(bid))
+                BBCount++;
+            if (XL_BB_Mods(bid) && YD_BB_Mods(bid))
+                BBCount++;
+            if (XR_BB_Mods(bid) && YU_BB_Mods(bid))
+                BBCount++;
+            if (XR_BB_Mods(bid) && YD_BB_Mods(bid))
+                BBCount++;
+            if (ZF_BB_Mods(bid) && YU_BB_Mods(bid))
+                BBCount++;
+            if (ZF_BB_Mods(bid) && YD_BB_Mods(bid))
+                BBCount++;
+            if (ZB_BB_Mods(bid) && YU_BB_Mods(bid))
+                BBCount++;
+            if (ZB_BB_Mods(bid) && YD_BB_Mods(bid))
+                BBCount++;
+            if()
+
+            return BBCount == 2;
+        }
 
         private bool IsSingleBasisBlock(Position3D pos)
         {
             int BBcount = 0;
-
+            if(pos.X == 0  && pos.Y == 0 && pos.Z == 1)
+            {
+                Console.WriteLine("breakpoint");
+            }
             if (XL_BB_Mods(pos.BID))
                 BBcount++;
             if (XR_BB_Mods(pos.BID))
@@ -155,25 +182,35 @@ namespace HTM.Algorithms
 
         private BasisBlockType CheckTypeOfDBB(Position3D pos)
         {
+            //TODO : BUG LEFT BOTTOM BB BLOCK IS NOT DEFINED CORRECTLY
+            //BUG Resolved!
             BasisBlockType bBT;
             uint bid = pos.BID;
 
             if (XL_BB_Mods(bid) && YU_BB_Mods(bid))
-                bBT = BasisBlockType.LUDBB;
+                bBT = BasisBlockType.LeftUpperDBB;
             else if (XL_BB_Mods(bid) && YD_BB_Mods(bid))
-                bBT = BasisBlockType.LBDBB;
+                bBT = BasisBlockType.LeftDownDBB;
             else if (XR_BB_Mods(bid) && YU_BB_Mods(bid))
-                bBT = BasisBlockType.RUDBB;
+                bBT = BasisBlockType.RightUpperDBB;
             else if (XR_BB_Mods(bid) && YD_BB_Mods(bid))
-                bBT = BasisBlockType.RBDBB;
+                bBT = BasisBlockType.RightDownDBB;
             else if (ZF_BB_Mods(bid) && YU_BB_Mods(bid))
-                bBT = BasisBlockType.FUDBB;
+                bBT = BasisBlockType.FrontUpDBB;
             else if (ZF_BB_Mods(bid) && YD_BB_Mods(bid))
-                bBT = BasisBlockType.FBDBB;
+                bBT = BasisBlockType.FrontDownDBB;
             else if (ZB_BB_Mods(bid) && YU_BB_Mods(bid))
-                bBT = BasisBlockType.BUDBB;
+                bBT = BasisBlockType.BackUpperDBB;
             else if (ZB_BB_Mods(bid) && YD_BB_Mods(bid))
-                bBT = BasisBlockType.BBDBB;
+                bBT = BasisBlockType.BackDownDBB;
+            else if (XL_BB_Mods(bid) && ZF_BB_Mods(bid))
+                bBT = BasisBlockType.LeftUpperDBB;
+            else if (XL_BB_Mods(bid) && ZB_BB_Mods(bid))
+                bBT = BasisBlockType.LeftBackDBB;
+            else if (XR_BB_Mods(bid) && ZF_BB_Mods(bid))
+                bBT = BasisBlockType.RightFrontDBB;
+            else if (XR_BB_Mods(bid) && ZB_BB_Mods(bid))
+                bBT = BasisBlockType.RightBackDBB;
             else
             {
                 Console.WriteLine("ERROR: Invalid Double Basis Block Type");
@@ -202,14 +239,14 @@ namespace HTM.Algorithms
         public List<Position3D> AddProximalSegment(Position3D neuronId)
         {
             List<Position3D> NewProximalConnectionPoints = new List<Position3D>();
-
-            if (basisBlockType.Equals(BasisBlockType.NotApplicable))
-                InitializeChecks(neuronId);
-
+            
             if(neuronId.X == 1 && neuronId.Y == 1 && neuronId.Z == 1)
             {
-                Console.WriteLine("Catch this Bitch!!!!"); ; ; ;
-            }
+                Console.WriteLine("Catch This Exception");                
+            }            
+            InitializeChecks(neuronId);
+
+           
 
             switch(basisBlockType) 
             {
@@ -462,6 +499,8 @@ namespace HTM.Algorithms
             toReturn.Add(axonPos);
             toReturn.Add(dendriticPos);
 
+
+            //BUG : Below Offset does not make sense
             // -z,& -x
             blockCenter.BID = neuronId.BID - ZOFFSET - XOFFSET;
             axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);

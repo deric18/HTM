@@ -44,6 +44,11 @@ namespace HTM.Algorithms
                 throw new Exception("PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck : \n Recursive Count Exceeded for PRedicting NEw Position");
             }
 
+            if(pos.BID < 0 || pos.BID >= uint.MaxValue)
+            {
+                throw new Exception("PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck: you messed up block ID Calculation!!!");
+            }
+
             Position3D toRet = (Position3D)pos.Clone();
             ConnectionTable cTable = ConnectionTable.Singleton();
 
