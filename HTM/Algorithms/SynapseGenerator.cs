@@ -834,7 +834,7 @@ namespace HTM.Algorithms
             //Hint : Upon generating a dendrite / axon in DBB , Always extend towards normal blocks. that way neurons will not remain unused.
             switch (bbt)
             {
-                case BasisBlockType.FUDBB:      //Means Front Facing Block which intersects with Upper Facing Block. So we can only apply -YZX  & -Z OFFSETS to it.
+                case BasisBlockType.FrontUpDBB:      //Means Front Facing Block which intersects with Upper Facing Block. So we can only apply -YZX  & -Z OFFSETS to it.
                     {
                         //Figure out which offsets are to be applied to every DBB type , apply it , compute it.
                         //-z offset
@@ -852,7 +852,7 @@ namespace HTM.Algorithms
 
                         break;
                     }
-                case BasisBlockType.FBDBB:  // Front Facing Block With Bottom Intersection DBB , Need to Add Z & Y OFFSETS to it.
+                case BasisBlockType.FrontDownDBB:  // Front Facing Block With Bottom Intersection DBB , Need to Add Z & Y OFFSETS to it.
                     {
                         blockCenter.BID = neuronPos.BID + ZOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -867,7 +867,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.LUDBB:  // Left Face Uppser Side Intersection Block , -Y & +X OFFSETS
+                case BasisBlockType.LeftUpperDBB:  // Left Face Uppser Side Intersection Block , -Y & +X OFFSETS
                     {
                         blockCenter.BID = neuronPos.BID + XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -882,7 +882,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.LBDBB:  // Left Face Back Side Intersection Block , +Y & +X OFFSETS
+                case BasisBlockType.LeftBackDBB:  // Left Face Back Side Intersection Block , +Y & +X OFFSETS
                     {
                         blockCenter.BID = neuronPos.BID + XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -897,7 +897,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.BUDBB:  // Back Face Upper Side Intersection Block , -XY & -Y OFFSETS 
+                case BasisBlockType.BackUpperDBB:  // Back Face Upper Side Intersection Block , -XY & -Y OFFSETS 
                     {
                         blockCenter.BID = neuronPos.BID + XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -912,7 +912,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.BBDBB:  //-Z+2Y , -Z+2Y
+                case BasisBlockType.BackDownDBB:  //-Z+2Y , -Z+2Y
                     {
                         blockCenter.BID = neuronPos.BID -ZOFFSET + 2*YOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -927,7 +927,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.RUDBB:  //Y-2X, -Y-2X
+                case BasisBlockType.RightUpperDBB:  //Y-2X, -Y-2X
                     {
                         blockCenter.BID = neuronPos.BID + YOFFSET -2*XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -942,7 +942,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.RBDBB:  // -X+Y, -2X+Y
+                case BasisBlockType.RightBackDBB:  // -X+Y, -2X+Y
                     {
                         blockCenter.BID = neuronPos.BID + YOFFSET -XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -955,6 +955,26 @@ namespace HTM.Algorithms
                         dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
                         toReturn.Add(axonPos);
                         toReturn.Add(dendriticPos);
+                        break;
+                    }//TODO: Need to code it up
+                case BasisBlockType.LeftDownDBB:
+                    {
+
+                        break;
+
+                    }
+                case BasisBlockType.LeftFrontDBB:
+                    {
+                        break;
+
+                    }
+                case BasisBlockType.RightDownDBB:
+                    {
+                        break;
+
+                    }
+                case BasisBlockType.RightFrontDBB:
+                    {
                         break;
                     }
                 default:
