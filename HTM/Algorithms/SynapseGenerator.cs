@@ -91,6 +91,44 @@ namespace HTM.Algorithms
 
         private bool Z_BB_Mods(uint bId) => (ZF_BB_Mods(bId) && ZB_BB_Mods(bId));
 
+        //TODO : Need New Checks for just DBB's
+
+        private bool XL_DBB_Mods(uint bId) => (bId % (num_cols_reg * num_rows_reg) == 0);           //0 , 100 , 200 , 300
+
+
+        //TRICKY :
+        private bool XR_DBB_Mods(uint bId)
+        {
+
+            // X = 10  Not 9 but 109,209,309,409,509
+            // X = 15  Not 15 but 239,464,...
+            if (bId <= ZOFFSET) return false;
+            else if (bId % (ZOFFSET + XOFFSET - 1) == 0) return true;
+
+
+            uint rem = bId;
+
+
+            while(rem > ZOFFSET)
+            {
+                
+                if(rem == (ZOFFSET + XOFFSET -1))
+                {
+                    return true;
+                }
+                else if(rem > ZOFFSET + XOFFSET - 1)
+                {
+                    rem -= ZOFFSET;
+                }
+            }
+
+            return false;
+
+        }                                                                                                     
+        private bool YU_DBB_Mods(uint bId) =>  (((ZOFFSET - YOFFSET + 1) <= bId && bId > (ZOFFSET)) ? true : false);  // 91,92,93,...,99
+        private bool YD_DBB_Mods(uint bId) => (0 <= bId ? bId < num_cols_reg ? true : false : false);   
+        private bool ZF_DBB_Mods(uint bId) => (0 <= bId ? 0 < num_rows_reg * num_cols_reg ? true : false : false);
+        private bool ZB_DBB_Mods(uint bId) => ((num_cols_reg * num_rows_reg * num_files_reg) - (num_rows_reg * num_cols_reg) <= bId ? bId < (num_rows_reg * num_cols_reg * num_files_reg) ? true : false : false);
 
         /// <summary>
         /// Checks if the RSB for the pos falls out of the existing block or not
@@ -114,32 +152,32 @@ namespace HTM.Algorithms
         private bool IsDoubleBasisBlock(Position3D pos)
         {        
             uint bid = pos.BID;
-            int BBCount = 0;
+            int DBBCount = 0;
 
-            if (XL_BB_Mods(bid) && YU_BB_Mods(bid))
-                BBCount++;
-            if (XL_BB_Mods(bid) && YD_BB_Mods(bid))
-                BBCount++;
-            if (XR_BB_Mods(bid) && YU_BB_Mods(bid))
-                BBCount++;
-            if (XR_BB_Mods(bid) && YD_BB_Mods(bid))
-                BBCount++;
-            if (ZF_BB_Mods(bid) && YU_BB_Mods(bid))
-                BBCount++;
-            if (ZF_BB_Mods(bid) && YD_BB_Mods(bid))
-                BBCount++;
-            if (ZB_BB_Mods(bid) && YU_BB_Mods(bid))
-                BBCount++;
-            if (ZB_BB_Mods(bid) && YD_BB_Mods(bid))
-                BBCount++;
-            if (XL_BB_Mods(bid) && ZF_BB_Mods(bid))
-                BBCount++;
-            if (XL_BB_Mods(bid) && ZB_BB_Mods(bid))
-                BBCount++;
-            if (XR_BB_Mods(bid) && ZF_BB_Mods(bid))
-                BBCount++;
-            if (XR_BB_Mods(bid) && ZB_BB_Mods(bid))
-                BBCount++;
+            if (XL_DBB_Mods(bid) && YU_DBB_Mods(bid))
+                DBBCount++;
+            if (XL_DBB_Mods(bid) && YD_DBB_Mods(bid))
+                DBBCount++;
+            if (XR_DBB_Mods(bid) && YU_DBB_Mods(bid))
+                DBBCount++;
+            if (XR_DBB_Mods(bid) && YD_DBB_Mods(bid))
+                DBBCount++;
+            if (ZF_DBB_Mods(bid) && YU_DBB_Mods(bid))
+                DBBCount++;
+            if (ZF_DBB_Mods(bid) && YD_DBB_Mods(bid))
+                DBBCount++;
+            if (ZB_DBB_Mods(bid) && YU_DBB_Mods(bid))
+                DBBCount++;
+            if (ZB_DBB_Mods(bid) && YD_DBB_Mods(bid))
+                DBBCount++;
+            if (XL_DBB_Mods(bid) && ZF_DBB_Mods(bid))
+                DBBCount++;
+            if (XL_DBB_Mods(bid) && ZB_DBB_Mods(bid))
+                DBBCount++;
+            if (XR_DBB_Mods(bid) && ZF_DBB_Mods(bid))
+                DBBCount++;
+            if (XR_DBB_Mods(bid) && ZB_DBB_Mods(bid))
+                DBBCount++;
 
 
             return BBCount == 2;
@@ -812,8 +850,8 @@ namespace HTM.Algorithms
         /// <returns></returns>
         //NOTE : The reason why DBB's get only 2 axons and dendrites is becuase there are no more neurons on two sides of there block so we can reduce the A&D's by exactly half.
         //Points to Ponder :
-        //1. Can achieve Better NEural Connectivity with 2 Axons & Dendrites to DBB.
-        //2. Its always better to have Connection with one Normal Block That way Signal Loss is Minimal.
+        //1. Can achieve Better Neural Connectivity with 2 Axons & Dendrites to DBB.
+        //2. Its always better to have Connection with one Normal Block That way Signal Loss is Minimal. 
         private List<Position3D> ComputeProximalCoordinatesForDoubleBB(Position3D neuronPos)            // 2 AXONS & 2 DENDRITES PER BLOCK
         {
             //figure out which face of the block is the block on ? then figure out which offsets should be applied.
