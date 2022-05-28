@@ -89,18 +89,36 @@ namespace HTM.Algorithms
 
         private bool Y_BB_Mods(uint bId) => (YU_BB_Mods(bId) && YD_BB_Mods(bId));
 
-        private bool Z_BB_Mods(uint bId) => (ZF_BB_Mods(bId) && ZB_BB_Mods(bId));
+        private bool Z_BB_Mods(uint bId) => (ZF_BB_Mods(bId) && ZB_BB_Mods(bId));        
 
-        //TODO : Need New Checks for just DBB's
+        private bool XLF_DBB_Mods(uint bId) => (bId % (num_rows_reg) == 0);           //0 , 10 , 20 , 30, .. 90
 
-        private bool XL_DBB_Mods(uint bId) => (bId % (num_cols_reg * num_rows_reg) == 0);           //0 , 100 , 200 , 300
-
+        private bool XLB_DBB_Mods(int bid) => ( ( ( ( ( YOFFSET- XOFFSET ) * ZOFFSET ) + YOFFSET ) >= bid && bid < ( (  ( YOFFSET - XOFFSET) * ZOFFSET) + ( ( YOFFSET - ( 2 * XOFFSET ) ) * YOFFSET) ) && ( bid % YOFFSET == 0 ) ) ? true : false);               //910,920,930, ... 980
 
         //TRICKY :
-        private bool XR_DBB_Mods(uint bId)
-        {
+        private bool XRB_DBB_Mods(uint bId) => (((909 < bId && bId < 990 && ( (bId % 9) == 0))) ? true : false);
 
-            // X = 10  Not 9 but 109,209,309,409,509
+            // X = 10 NOT 909 BUT 919, 929, 939, ... 989
+            // X = 15 NOT ? will dot his later
+
+
+
+        private bool XRF_DBB_Mods(uint bid)
+        {
+            // NOT 9 BUT 19, 29, 39, ... 89
+
+            return ( ( ( 18 < bid ) && ( bid < 90 ) && ( bid % 9 ) == 0 ) ? true : false);
+
+        }
+
+
+
+        //TODO-----------------------------------------------------------------------------------------------------------
+        private bool YUL_DBB_Mods(uint bId) =>  (((ZOFFSET - YOFFSET + 1) <= bId && bId > (ZOFFSET)) ? true : false);  // 91,92,93,...,99
+        private bool YDL_DBB_Mods(uint bId) => (0 <= bId ? bId < num_cols_reg ? true : false : false);   
+        private bool YDR_DBB_Mods(uint bid)
+        {
+            // X = 10  Not 9 but 109,209,309,409,509lllll
             // X = 15  Not 15 but 239,464,...
             if (bId <= ZOFFSET) return false;
             else if (bId % (ZOFFSET + XOFFSET - 1) == 0) return true;
@@ -109,26 +127,35 @@ namespace HTM.Algorithms
             uint rem = bId;
 
 
-            while(rem > ZOFFSET)
+            while (rem > ZOFFSET)
             {
-                
-                if(rem == (ZOFFSET + XOFFSET -1))
+
+                if (rem == (ZOFFSET + XOFFSET - 1))
                 {
                     return true;
                 }
-                else if(rem > ZOFFSET + XOFFSET - 1)
+                else if (rem > ZOFFSET + XOFFSET - 1)
                 {
                     rem -= ZOFFSET;
                 }
             }
 
             return false;
+        }
 
-        }                                                                                                     
-        private bool YU_DBB_Mods(uint bId) =>  (((ZOFFSET - YOFFSET + 1) <= bId && bId > (ZOFFSET)) ? true : false);  // 91,92,93,...,99
-        private bool YD_DBB_Mods(uint bId) => (0 <= bId ? bId < num_cols_reg ? true : false : false);   
-        private bool ZF_DBB_Mods(uint bId) => (0 <= bId ? 0 < num_rows_reg * num_cols_reg ? true : false : false);
-        private bool ZB_DBB_Mods(uint bId) => ((num_cols_reg * num_rows_reg * num_files_reg) - (num_rows_reg * num_cols_reg) <= bId ? bId < (num_rows_reg * num_cols_reg * num_files_reg) ? true : false : false);
+        private bool YUR_DBB_Mods(uint bid)
+        {
+            bool toRet = false;
+
+
+            return toRet;
+        }
+        private bool ZFU_DBB_Mods(uint bId) => (0 <= bId ? 0 < num_rows_reg * num_cols_reg ? true : false : false);
+        private bool ZFL_DBB_Mods(uint bid) => (true);
+        private bool ZBL_DBB_Mods(uint bid, bool b) => (false);
+        private bool ZBU_DBB_Mods(uint bId) => ((num_cols_reg * num_rows_reg * num_files_reg) - (num_rows_reg * num_cols_reg) <= bId ? bId < (num_rows_reg * num_cols_reg * num_files_reg) ? true : false : false);
+        
+
 
         /// <summary>
         /// Checks if the RSB for the pos falls out of the existing block or not
@@ -154,7 +181,7 @@ namespace HTM.Algorithms
             uint bid = pos.BID;
             int DBBCount = 0;
 
-            if (XL_DBB_Mods(bid) && YU_DBB_Mods(bid))
+            if (XLF_DBB_Mods(bid) && YU_DBB_Mods(bid))
                 DBBCount++;
             if (XL_DBB_Mods(bid) && YD_DBB_Mods(bid))
                 DBBCount++;
@@ -227,9 +254,7 @@ namespace HTM.Algorithms
         }
 
         private BasisBlockType CheckTypeOfDBB(Position3D pos)
-        {
-            //TODO : BUG LEFT BOTTOM BB BLOCK IS NOT DEFINED CORRECTLY
-            //BUG Resolved!
+        {                     
             BasisBlockType bBT;
             uint bid = pos.BID;
 
@@ -328,6 +353,7 @@ namespace HTM.Algorithms
             //Register the new position in Ctable.
             uint axonSegCount = 0;
             uint dendriteSegCount = 0;
+
             foreach(var pos in NewProximalConnectionPoints)
             {
                 if(pos.cType == CType.DendriteConnectedToAxon || pos.cType == CType.AxonConnectedToDendrite)
