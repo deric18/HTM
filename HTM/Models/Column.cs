@@ -29,15 +29,7 @@ namespace HTM.Models
         {
             //proximal segments always need to have higher initial synaptic connection potential.
             n.CreateProximalSegments();
-        }
-
-        private void SetupProximalSegments()
-        {
-            foreach (Neuron neuron in Neurons)
-            {
-                //TODO :: finish this Sucker
-            }
-        }
+        }       
 
         internal void Fire()
         {

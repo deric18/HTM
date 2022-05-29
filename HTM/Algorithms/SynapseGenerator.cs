@@ -111,14 +111,12 @@ namespace HTM.Algorithms
 
         }
 
-
-
-        //TODO-----------------------------------------------------------------------------------------------------------
-        private bool YUL_DBB_Mods(uint bId) =>  (((ZOFFSET - YOFFSET + 1) <= bId && bId > (ZOFFSET)) ? true : false);  // 91,92,93,...,99
-        private bool YDL_DBB_Mods(uint bId) => (0 <= bId ? bId < num_cols_reg ? true : false : false);   
-        private bool YDR_DBB_Mods(uint bid)
+        
+        private bool YUL_DBB_Mods(uint bId) =>  (((190) <= bId && bId > (890) && ((bId % ZOFFSET) == 90) ? true : false));  // NOT 90 BUT 190,290,...890
+        private bool YDL_DBB_Mods(uint bId) => (99 < bId && (bId % 100) == 0 && (bId < 900) ? true : false);              //NOT 0 BUT 100,200,300,...800
+        private bool YDR_DBB_Mods(uint bid)     
         {
-            // X = 10  Not 9 but 109,209,309,409,509lllll
+            // X = 10  Not 9 but 109,209,309,409,509 , .. 809
             // X = 15  Not 15 but 239,464,...
             if (bId <= ZOFFSET) return false;
             else if (bId % (ZOFFSET + XOFFSET - 1) == 0) return true;
@@ -145,15 +143,17 @@ namespace HTM.Algorithms
 
         private bool YUR_DBB_Mods(uint bid)
         {
+            // NOT 99 BUT 199,299,..,899
             bool toRet = false;
 
+            toRet = ((bid > 198) && (bid % ZOFFSET) == 99 && (bid < 900));
 
             return toRet;
         }
-        private bool ZFU_DBB_Mods(uint bId) => (0 <= bId ? 0 < num_rows_reg * num_cols_reg ? true : false : false);
-        private bool ZFL_DBB_Mods(uint bid) => (true);
-        private bool ZBL_DBB_Mods(uint bid, bool b) => (false);
-        private bool ZBU_DBB_Mods(uint bId) => ((num_cols_reg * num_rows_reg * num_files_reg) - (num_rows_reg * num_cols_reg) <= bId ? bId < (num_rows_reg * num_cols_reg * num_files_reg) ? true : false : false);
+        private bool ZFU_DBB_Mods(uint bId) => (bId > 90 && bId <99 ? true : false); //NOT 90 BUT 91,92,93,....,98
+        private bool ZFL_DBB_Mods(uint bid) => (bid > 0 && bid < 9);  //NOT 0 BUT 1,2,3,...,8
+        private bool ZBL_DBB_Mods(uint bid, bool b) => (bid > 900 && bid <909); //NOT 900 BUT 901,902,....,908
+        private bool ZBU_DBB_Mods(uint bId) => (bId > 990 && bId < 999);     //NOT 990 BUT 991,992,....,998
         
 
 
