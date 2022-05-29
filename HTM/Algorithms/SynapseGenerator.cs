@@ -40,7 +40,7 @@ namespace HTM.Algorithms
         private uint num_files_reg;
         private uint numXPerBlock;
         private uint numYPerBlock;
-        private bool isBlockChanges;
+        private bool isBlockChanged;
         private uint newBlockId;
         private uint numZPerBlock;
         private readonly uint YOFFSET;
@@ -68,11 +68,11 @@ namespace HTM.Algorithms
             numYPerBlock = CPM.GetInstance.BCP.NumYperBlock;
             numZPerBlock = CPM.GetInstance.BCP.NumZperBlock;
             crossOver_X_Left = crossOver_X_Right = crossOver_Y_Up = crossOver_Y_Down = crossOver_Z_Front = crossOver_Z_Back = false;
-            isBlockChanges = false;
+            isBlockChanged = false;
             newBlockId = 0;
             XOFFSET = 1;
-            YOFFSET = num_cols_reg;
-            ZOFFSET = (num_rows_reg * num_cols_reg);
+            YOFFSET = 10;
+            ZOFFSET = (100);
             //based on above values , initialize and populate all the basic block modulos.
             basisBlockType = BasisBlockType.NotApplicable;
             //XL_BB_Mods = XR_BB_Mods = YU_BB_Mod = YD_BB_Mod = ZF_BB_Mod = ZB_BB_Mod = 0;
@@ -91,12 +91,12 @@ namespace HTM.Algorithms
 
         private bool Z_BB_Mods(uint bId) => (ZF_BB_Mods(bId) && ZB_BB_Mods(bId));        
 
-        private bool XLF_DBB_Mods(uint bId) => (bId % (num_rows_reg) == 0);           //0 , 10 , 20 , 30, .. 90
+        private bool XLF_DBB_Mods(uint bId) => (bId > 9 && bId < 91 && ((bId % 10 )== 0));           //NOT 0/9 BUT 10 , 20 , 30, .. 90
 
-        private bool XLB_DBB_Mods(int bid) => ( ( ( ( ( YOFFSET- XOFFSET ) * ZOFFSET ) + YOFFSET ) >= bid && bid < ( (  ( YOFFSET - XOFFSET) * ZOFFSET) + ( ( YOFFSET - ( 2 * XOFFSET ) ) * YOFFSET) ) && ( bid % YOFFSET == 0 ) ) ? true : false);               //910,920,930, ... 980
+        private bool XLB_DBB_Mods(uint bid) => ( ( ( ( ( YOFFSET- XOFFSET ) * ZOFFSET ) + YOFFSET ) >= bid && bid < ( (  ( YOFFSET - XOFFSET) * ZOFFSET) + ( ( YOFFSET - ( 2 * XOFFSET ) ) * YOFFSET) ) && ( bid % YOFFSET == 0 ) ) ? true : false);               //NOT 900/990 BUT  910,920,930, ... 980
 
         //TRICKY :
-        private bool XRB_DBB_Mods(uint bId) => (((909 < bId && bId < 990 && ( (bId % 9) == 0))) ? true : false);
+        private bool XRB_DBB_Mods(uint bId) => (((909 < bId && bId < 990 && ( (bId % 9) == 0))) ? true : false);            //NOT 909 BUT 919,929,...,989
 
             // X = 10 NOT 909 BUT 919, 929, 939, ... 989
             // X = 15 NOT ? will dot his later
@@ -118,11 +118,11 @@ namespace HTM.Algorithms
         {
             // X = 10  Not 9 but 109,209,309,409,509 , .. 809
             // X = 15  Not 15 but 239,464,...
-            if (bId <= ZOFFSET) return false;
-            else if (bId % (ZOFFSET + XOFFSET - 1) == 0) return true;
+            if (bid <= ZOFFSET) return false;
+            else if (bid % (ZOFFSET + XOFFSET - 1) == 0) return true;
 
 
-            uint rem = bId;
+            uint rem = bid;
 
 
             while (rem > ZOFFSET)
@@ -152,7 +152,7 @@ namespace HTM.Algorithms
         }
         private bool ZFU_DBB_Mods(uint bId) => (bId > 90 && bId <99 ? true : false); //NOT 90 BUT 91,92,93,....,98
         private bool ZFL_DBB_Mods(uint bid) => (bid > 0 && bid < 9);  //NOT 0 BUT 1,2,3,...,8
-        private bool ZBL_DBB_Mods(uint bid, bool b) => (bid > 900 && bid <909); //NOT 900 BUT 901,902,....,908
+        private bool ZBL_DBB_Mods(uint bid) => (bid > 900 && bid <909); //NOT 900 BUT 901,902,....,908
         private bool ZBU_DBB_Mods(uint bId) => (bId > 990 && bId < 999);     //NOT 990 BUT 991,992,....,998
         
 
@@ -181,33 +181,33 @@ namespace HTM.Algorithms
             uint bid = pos.BID;
             int DBBCount = 0;
 
-            if (XLF_DBB_Mods(bid) && YU_DBB_Mods(bid))
+            if (XLF_DBB_Mods(bid))
                 DBBCount++;
-            if (XL_DBB_Mods(bid) && YD_DBB_Mods(bid))
+            if (XLB_DBB_Mods(bid))
                 DBBCount++;
-            if (XR_DBB_Mods(bid) && YU_DBB_Mods(bid))
+            if (XRF_DBB_Mods(bid))
                 DBBCount++;
-            if (XR_DBB_Mods(bid) && YD_DBB_Mods(bid))
+            if (XRB_DBB_Mods(bid))
                 DBBCount++;
-            if (ZF_DBB_Mods(bid) && YU_DBB_Mods(bid))
+            if (YUL_DBB_Mods(bid))
                 DBBCount++;
-            if (ZF_DBB_Mods(bid) && YD_DBB_Mods(bid))
+            if (YDL_DBB_Mods(bid))
                 DBBCount++;
-            if (ZB_DBB_Mods(bid) && YU_DBB_Mods(bid))
+            if (YDR_DBB_Mods(bid))
                 DBBCount++;
-            if (ZB_DBB_Mods(bid) && YD_DBB_Mods(bid))
+            if (YUR_DBB_Mods(bid))
                 DBBCount++;
-            if (XL_DBB_Mods(bid) && ZF_DBB_Mods(bid))
+            if (ZFU_DBB_Mods(bid))
                 DBBCount++;
-            if (XL_DBB_Mods(bid) && ZB_DBB_Mods(bid))
+            if (ZFL_DBB_Mods(bid))
                 DBBCount++;
-            if (XR_DBB_Mods(bid) && ZF_DBB_Mods(bid))
+            if (ZBU_DBB_Mods(bid))
                 DBBCount++;
-            if (XR_DBB_Mods(bid) && ZB_DBB_Mods(bid))
+            if (ZBL_DBB_Mods(bid))
                 DBBCount++;
 
 
-            return BBCount == 2;
+            return DBBCount == 2;
         }
 
         private bool IsSingleBasisBlock(Position3D pos)
@@ -258,29 +258,27 @@ namespace HTM.Algorithms
             BasisBlockType bBT;
             uint bid = pos.BID;
 
-            if (XL_BB_Mods(bid) && YU_BB_Mods(bid))
+            if (YUL_DBB_Mods(bid))
                 bBT = BasisBlockType.LeftUpperDBB;
-            else if (XL_BB_Mods(bid) && YD_BB_Mods(bid))
+            else if (YDL_DBB_Mods(bid))
                 bBT = BasisBlockType.LeftDownDBB;
-            else if (XR_BB_Mods(bid) && YU_BB_Mods(bid))
+            else if (YUR_DBB_Mods(bid))
                 bBT = BasisBlockType.RightUpperDBB;
-            else if (XR_BB_Mods(bid) && YD_BB_Mods(bid))
+            else if (YDR_DBB_Mods(bid))
                 bBT = BasisBlockType.RightDownDBB;
-            else if (ZF_BB_Mods(bid) && YU_BB_Mods(bid))
+            else if (ZFU_DBB_Mods(bid))
                 bBT = BasisBlockType.FrontUpDBB;
-            else if (ZF_BB_Mods(bid) && YD_BB_Mods(bid))
+            else if (ZFL_DBB_Mods(bid))
                 bBT = BasisBlockType.FrontDownDBB;
-            else if (ZB_BB_Mods(bid) && YU_BB_Mods(bid))
+            else if (ZBU_DBB_Mods(bid))
                 bBT = BasisBlockType.BackUpperDBB;
-            else if (ZB_BB_Mods(bid) && YD_BB_Mods(bid))
-                bBT = BasisBlockType.BackDownDBB;
-            else if (XL_BB_Mods(bid) && ZF_BB_Mods(bid))
-                bBT = BasisBlockType.LeftUpperDBB;
-            else if (XL_BB_Mods(bid) && ZB_BB_Mods(bid))
-                bBT = BasisBlockType.LeftBackDBB;
-            else if (XR_BB_Mods(bid) && ZF_BB_Mods(bid))
+            else if (ZBL_DBB_Mods(bid))
+                bBT = BasisBlockType.BackDownDBB;            
+            else if (XLF_DBB_Mods(bid))
+                bBT = BasisBlockType.LeftFrontDBB;
+            else if (XRF_DBB_Mods(bid))
                 bBT = BasisBlockType.RightFrontDBB;
-            else if (XR_BB_Mods(bid) && ZB_BB_Mods(bid))
+            else if (XRB_DBB_Mods(bid))
                 bBT = BasisBlockType.RightBackDBB;
             else
             {
@@ -1093,7 +1091,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId -= 1;
                     }
 
@@ -1112,7 +1110,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId += 1;
                     }
                 }                
@@ -1127,13 +1125,13 @@ namespace HTM.Algorithms
                 // if isBasisBlock , need to figure out which side of the edge is the basis block is in ? if its on the left edge and the cross over is X then needs adjustments , same for other faces y ,z
 
                 uint x = SynapseGeneratorHelper.GetRand(0, basePosition.X + blockRadius);
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(x);
             }
             else if(XR_BB_Mods(basePosition.BID) && crossOver_Right)
             {
                 uint x = SynapseGeneratorHelper.GetRand(basePosition.X - blockRadius , numXPerBlock);
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(x);
             }
             else if(XR_BB_Mods(basePosition.BID) && crossOver_Left)
@@ -1150,7 +1148,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId -= 1;
                 }
             }
@@ -1168,7 +1166,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId += 1;
                 }
             }
@@ -1201,7 +1199,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId += (YOFFSET);
                     }
 
@@ -1221,7 +1219,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId -= YOFFSET;
                     }
                 }
@@ -1235,13 +1233,13 @@ namespace HTM.Algorithms
                 // if isBasisBlock , need to figure out which side of the edge is the basis block is in ? if its on the left edge and the cross over is X then needs adjustments , same for other faces y ,z
 
                 uint y = SynapseGeneratorHelper.GetRand(basePosition.Y - blockRadius, numYPerBlock);
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(y);
             }
             else if (YD_BB_Mods(basePosition.BID) && crossOver_Down)
             {
                 uint y = SynapseGeneratorHelper.GetRand(0, basePosition.Y + blockRadius);
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(y);
             }
             else if(YU_BB_Mods(basePosition.BID) && crossOver_Down)     //Not a problem basis block on upper face but crossing over on below block
@@ -1259,7 +1257,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId -= YOFFSET;
                 }
             }
@@ -1277,7 +1275,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId += (YOFFSET);
                 }
             }
@@ -1310,7 +1308,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId += ZOFFSET;
                     }
                 }
@@ -1328,7 +1326,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId -= ZOFFSET;
                     }
                 }
@@ -1343,13 +1341,13 @@ namespace HTM.Algorithms
                 // if isBasisBlock , need to figure out which side of the edge is the basis block is in ? if its on the left edge and the cross over is X then needs adjustments , same for other faces y ,z
 
                 uint z = SynapseGeneratorHelper.GetRand(0, basePosition.Z + numZPerBlock);  
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(z);
             }
             else if (ZB_BB_Mods(basePosition.BID) && crossOver_Back)
             {
                 uint x = SynapseGeneratorHelper.GetRand(basePosition.Z - blockRadius, numZPerBlock);
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(x);
             }
             else if(ZF_BB_Mods(basePosition.BID) && crossOver_Back)
@@ -1366,7 +1364,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId -= ZOFFSET;
                 }
             }
@@ -1384,7 +1382,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId += ZOFFSET;
                 }
             }
