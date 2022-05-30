@@ -127,7 +127,7 @@ namespace HTM.Algorithms
 
 
         //DOUBLE BASIS BLOCKS
-        private bool XLF_DBB_Mods(uint bId) => (bId > 9 && bId < 91 && ((bId % 10 )== 0));           //NOT 0/9 BUT 10 , 20 , 30, .. 90
+        private bool XLF_DBB_Mods(uint bId) => (bId > 9 && bId < 90 && ((bId % 10 )== 0));           //NOT 0/9 BUT 10 , 20 , 30, .. 80
 
         private bool XLB_DBB_Mods(uint bid) => ( ( ( ( ( YOFFSET- XOFFSET ) * ZOFFSET ) + YOFFSET ) <= bid && bid <= ( (  ( YOFFSET - XOFFSET) * ZOFFSET) + ( ( YOFFSET - ( 2 * XOFFSET ) ) * YOFFSET) ) && ( bid % YOFFSET == 0 ) ) ? true : false);               //NOT 900/990 BUT  910,920,930, ... 980
 
@@ -148,33 +148,14 @@ namespace HTM.Algorithms
         }
 
         
-        private bool YUL_DBB_Mods(uint bId) =>  (((190) <= bId && bId > (890) && ((bId % ZOFFSET) == 90) ? true : false));  // NOT 90 BUT 190,290,...890
+        private bool YUL_DBB_Mods(uint bId) =>  (((190) <= bId && bId < (890) && ((bId % ZOFFSET) == 90) ? true : false));  // NOT 90 BUT 190,290,...890
         private bool YDL_DBB_Mods(uint bId) => (99 < bId && (bId % 100) == 0 && (bId < 900) ? true : false);              //NOT 0 BUT 100,200,300,...800
         private bool YDR_DBB_Mods(uint bid)     
         {
             // X = 10  Not 9 but 109,209,309,409,509 , .. 809
             // X = 15  Not 15 but 239,464,...
-            if (bid <= ZOFFSET) return false;
-            else if (bid % (ZOFFSET + XOFFSET - 1) == 0) return true;
+            return bid > 108 && bid < 810 && (bid % ZOFFSET) == 9;
 
-
-            uint rem = bid;
-
-
-            while (rem > ZOFFSET)
-            {
-
-                if (rem == (ZOFFSET + XOFFSET - 1))
-                {
-                    return true;
-                }
-                else if (rem > ZOFFSET + XOFFSET - 1)
-                {
-                    rem -= ZOFFSET;
-                }
-            }
-
-            return false;
         }
 
         private bool YUR_DBB_Mods(uint bid)
@@ -217,7 +198,7 @@ namespace HTM.Algorithms
             uint bid = pos.BID;
             bool flag = false;
 
-            if (pos.BID == 910)
+            if (pos.BID == 990)
             {
                 Console.WriteLine("breakpoint");
             }
@@ -318,7 +299,7 @@ namespace HTM.Algorithms
 
             if (pos.BID == 910)
             {
-                Console.WriteLine("Catch This Exception");
+               // Console.WriteLine("Catch This Exception");
             }
 
             if (YUL_DBB_Mods(bid))
@@ -373,12 +354,10 @@ namespace HTM.Algorithms
         public List<Position3D> AddProximalSegment(Position3D neuronId)
         {
             List<Position3D> NewProximalConnectionPoints = new List<Position3D>();
-            
-            if(neuronId.X == 9 && neuronId.Y == 1 && neuronId.Z == 0)
-            {
-                Console.WriteLine("Catch This Exception");                
-            }            
+                        
 
+            if (neuronId.X == 0 && neuronId.Y == 9 && neuronId.Z == 9)
+                Console.WriteLine("Catch an exception");
 
 
             InitializeChecks(neuronId);
@@ -575,6 +554,10 @@ namespace HTM.Algorithms
             List<Position3D> toReturn = new List<Position3D>();
             Position3D axonPos = null;
             Position3D dendriticPos = null;
+
+            if (neuronPos.X == 0 && neuronPos.Y == 9 && neuronPos.Z == 0)
+                Console.WriteLine("Catch an exception");
+
 
             //pick the center of the block and then create a random square block the size of the block and call create new random position , just in case perform check
             //if we are creating a position for axon and it falls over the central axon point then pick a different position. this is not needed because it wont happen CTable wont let that happen as the point is already registered

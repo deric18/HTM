@@ -75,7 +75,7 @@ namespace HtmTest
 
             foreach (var neuron in instance.GetNeuronsFromPositions(doubleBBPositionList))
             {
-                Assert.AreEqual(neuron.ProximalSegmentList.Count + neuron.axonEndPoints.Count, 2);
+                Assert.AreEqual(neuron.ProximalSegmentList.Count + neuron.axonEndPoints.Count, 4);
 
                 foreach (var seg in neuron.Segments.Values)
                 {
@@ -102,7 +102,7 @@ namespace HtmTest
 
             foreach (var neuron in instance.GetNeuronsFromPositions(sinlgeBBPositionList))
             {
-                Assert.AreEqual(neuron.ProximalSegmentList.Count + neuron.axonEndPoints.Count, 4);
+                Assert.AreEqual(neuron.ProximalSegmentList.Count + neuron.axonEndPoints.Count, 8);
 
                 foreach (var seg in neuron.Segments.Values)
                 {
@@ -128,7 +128,7 @@ namespace HtmTest
 
             foreach (var neuron in instance.GetNeuronsFromPositions(normalBBPositionList))
             {
-                Assert.AreEqual(neuron.ProximalSegmentList.Count + neuron.axonEndPoints.Count, 8); 
+                Assert.AreEqual(neuron.ProximalSegmentList.Count + neuron.axonEndPoints.Count, 16); 
 
                 foreach (var seg in neuron.Segments.Values)
                 {
