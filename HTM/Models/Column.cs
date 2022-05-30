@@ -28,6 +28,10 @@ namespace HTM.Models
         private void Initialize(Neuron n)
         {
             //proximal segments always need to have higher initial synaptic connection potential.
+            if(n.NeuronID.BID == 910)
+            {
+                Console.WriteLine("Cath it!!!");
+            }
             n.CreateProximalSegments();
         }       
 

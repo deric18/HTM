@@ -78,7 +78,9 @@ namespace HTM.Algorithms
             //XL_BB_Mods = XR_BB_Mods = YU_BB_Mod = YD_BB_Mod = ZF_BB_Mod = ZB_BB_Mod = 0;
         }
 
-        private bool XL_BB_Mods(uint bId) => (bId % num_cols_reg == 0);           //returns true if basis block else false
+
+        //CORE BASIS BLOCKS CHECKS
+        private bool XL_BB_Mods(uint bId) => (bId % num_cols_reg == 0);           //NOT 
         private bool XR_BB_Mods(uint bId) => (bId % (num_cols_reg - 1)) == 0;
         private bool YU_BB_Mods(uint bId) => (((num_cols_reg * num_rows_reg) - num_cols_reg) <= bId) ? bId < (num_cols_reg * num_rows_reg) ? true : false : false;
         private bool YD_BB_Mods(uint bId) => (0 <= bId ? bId < num_cols_reg ? true : false : false);
@@ -91,9 +93,43 @@ namespace HTM.Algorithms
 
         private bool Z_BB_Mods(uint bId) => (ZF_BB_Mods(bId) && ZB_BB_Mods(bId));        
 
+        //SINGLE BASIS BLOCK
+
+        private bool X_SBB_Mods(uint bid)
+        {
+
+            if (!XLF_DBB_Mods(bid) && !XLB_DBB_Mods(bid) && !XRB_DBB_Mods(bid) && !XRF_DBB_Mods(bid))
+                return true;
+
+            return false;
+        }
+
+        private bool Y_SBB_Mods(uint bid)
+        {
+            bool b1 = !ZFL_DBB_Mods(bid), b2 = !ZBL_DBB_Mods(bid), b3 = !YDL_DBB_Mods(bid), b4 = !YUL_DBB_Mods(bid), b5 = !ZFU_DBB_Mods(bid), b6 = !YUR_DBB_Mods(bid), b7 = !ZBU_DBB_Mods(bid), b8 = !YDR_DBB_Mods(bid);
+            if (b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8)
+                if (!XLF_DBB_Mods(bid) && !XLB_DBB_Mods(bid) && !XRF_DBB_Mods(bid) && !XRB_DBB_Mods(bid))
+                    return true;
+
+            return false;
+            //Make sure the block doesnt rest on 
+        }
+
+        private bool Z_SBB_Mods(uint bid)
+        {
+            bool b1 = !ZFL_DBB_Mods(bid), b2 = !ZBL_DBB_Mods(bid), b3 = !YDL_DBB_Mods(bid), b4 = !YUL_DBB_Mods(bid), b5 = !ZFU_DBB_Mods(bid), b6 = !YUR_DBB_Mods(bid), b7 = !ZBU_DBB_Mods(bid), b8 = !YDR_DBB_Mods(bid);
+            if( b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8)
+                return true;
+
+            return false;
+        }
+
+
+
+        //DOUBLE BASIS BLOCKS
         private bool XLF_DBB_Mods(uint bId) => (bId > 9 && bId < 91 && ((bId % 10 )== 0));           //NOT 0/9 BUT 10 , 20 , 30, .. 90
 
-        private bool XLB_DBB_Mods(uint bid) => ( ( ( ( ( YOFFSET- XOFFSET ) * ZOFFSET ) + YOFFSET ) >= bid && bid < ( (  ( YOFFSET - XOFFSET) * ZOFFSET) + ( ( YOFFSET - ( 2 * XOFFSET ) ) * YOFFSET) ) && ( bid % YOFFSET == 0 ) ) ? true : false);               //NOT 900/990 BUT  910,920,930, ... 980
+        private bool XLB_DBB_Mods(uint bid) => ( ( ( ( ( YOFFSET- XOFFSET ) * ZOFFSET ) + YOFFSET ) <= bid && bid <= ( (  ( YOFFSET - XOFFSET) * ZOFFSET) + ( ( YOFFSET - ( 2 * XOFFSET ) ) * YOFFSET) ) && ( bid % YOFFSET == 0 ) ) ? true : false);               //NOT 900/990 BUT  910,920,930, ... 980
 
         //TRICKY :
         private bool XRB_DBB_Mods(uint bId) => (((909 < bId && bId < 990 && ( (bId % 9) == 0))) ? true : false);            //NOT 909 BUT 919,929,...,989
@@ -174,80 +210,102 @@ namespace HTM.Algorithms
             basisBlockType = (IsSingleBasisBlock(pos) ? BasisBlockType.SingleBasisBlock : ( IsDoubleBasisBlock(pos) ? BasisBlockType.DoubleBasisBlock : (IsCoreBlock(pos) ? BasisBlockType.CoreBasisBlock  : BasisBlockType.NormalBlock)));
         }
 
-        private bool IsCoreBlock(Position3D pos) => ((XL_BB_Mods(pos.BID) && YD_BB_Mods(pos.BID) && ZF_BB_Mods(pos.BID)) || (XR_BB_Mods(pos.BID) && YU_BB_Mods(pos.BID) && ZB_BB_Mods(pos.BID)));
+        private bool IsCoreBlock(Position3D pos) => (new List<uint> { 0,9,900,909,90,990,99,999}.Contains(pos.BID));
 
         private bool IsDoubleBasisBlock(Position3D pos)
         {        
             uint bid = pos.BID;
-            int DBBCount = 0;
+            bool flag = false;
+
+            if (pos.BID == 910)
+            {
+                Console.WriteLine("breakpoint");
+            }
+
 
             if (XLF_DBB_Mods(bid))
-                DBBCount++;
-            if (XLB_DBB_Mods(bid))
-                DBBCount++;
-            if (XRF_DBB_Mods(bid))
-                DBBCount++;
-            if (XRB_DBB_Mods(bid))
-                DBBCount++;
-            if (YUL_DBB_Mods(bid))
-                DBBCount++;
-            if (YDL_DBB_Mods(bid))
-                DBBCount++;
-            if (YDR_DBB_Mods(bid))
-                DBBCount++;
-            if (YUR_DBB_Mods(bid))
-                DBBCount++;
-            if (ZFU_DBB_Mods(bid))
-                DBBCount++;
-            if (ZFL_DBB_Mods(bid))
-                DBBCount++;
-            if (ZBU_DBB_Mods(bid))
-                DBBCount++;
-            if (ZBL_DBB_Mods(bid))
-                DBBCount++;
+                flag = true;
+            else if (XLB_DBB_Mods(bid))
+                flag = true;
+            else if (XRF_DBB_Mods(bid))
+                flag = true;
+            else if (XRB_DBB_Mods(bid))
+                flag = true;
+            else if (YUL_DBB_Mods(bid))
+                flag = true;
+            else if (YDL_DBB_Mods(bid))
+                flag = true;
+            else if (YDR_DBB_Mods(bid))
+                flag = true;
+            else if (YUR_DBB_Mods(bid))
+                flag = true;
+            else if (ZFU_DBB_Mods(bid))
+                flag = true;
+            else if (ZFL_DBB_Mods(bid))
+                flag = true;
+            else if (ZBU_DBB_Mods(bid))
+                flag = true;
+            else if (ZBL_DBB_Mods(bid))
+                flag = true;
 
 
-            return DBBCount == 2;
+            return flag;
         }
 
         private bool IsSingleBasisBlock(Position3D pos)
         {
-            int BBcount = 0;
-            if(pos.X == 0  && pos.Y == 0 && pos.Z == 1)
+            bool flag = false;
+
+            if(pos.X == 9  && pos.Y == 1 && pos.Z == 0)
             {
                 Console.WriteLine("breakpoint");
             }
-            if (XL_BB_Mods(pos.BID))
-                BBcount++;
-            if (XR_BB_Mods(pos.BID))
-                BBcount++;
-            if (YU_BB_Mods(pos.BID))
-                BBcount++;
-            if (YD_BB_Mods(pos.BID))
-                BBcount++;
-            if (ZF_BB_Mods(pos.BID))
-                BBcount++;
-            if (ZB_BB_Mods(pos.BID))
-                BBcount++;
 
-            return BBcount == 1;
+            if (IsCoreBlock(pos))
+                return false;
+
+            if(pos.BID % 10 == 0 || pos.BID % 10 == 9)      //if block id is on the x-axis , ends with either a zero or 9
+            {
+                if (X_SBB_Mods(pos.BID))
+                    flag = true;                
+            }
+            else if( ( pos.BID > 100 && pos.BID % 100 > 0 && pos.BID % 100 < 9 ) || ( pos.BID % 100 > 90 && pos.BID % 100 < 99 && pos.BID < 988 )  )         // block exists on either side of Y - Axis // this bitch does nothing , do better!!!
+            {
+                // check for all the vertical bars 
+
+                //101,102,.. 108,201,202,203,...208,301,302,...308,...801,802,...808
+                //191,192,.. 198,291,292,293,...298,391,392,...398,...891,892,...898
+
+
+
+                if (Y_SBB_Mods(pos.BID))
+                    flag = true;
+            }
+            else if((pos.BID > 0 && pos.BID < 99) || (pos.BID % 100 >= 90 && pos.BID % 100 <= 99))       // block exists on either side of the Z-Axis 
+            {
+                // check fro vertical and horizaontal bars
+                if (Z_SBB_Mods(pos.BID))
+                    flag = true;
+            }
+
+            return flag;
         }
 
         private BasisBlockType CheckTypeOfSBB(Position3D pos)
         {
             BasisBlockType toReturn = BasisBlockType.NotApplicable;
 
-            if (XL_BB_Mods(pos.BID))
+            if (pos.BID % 10 == 0)
                 toReturn = BasisBlockType.LeftSBB;
-            else if (XR_BB_Mods(pos.BID))
+            else if (pos.BID % 10 == 9)
                 toReturn = BasisBlockType.RightSBB;
-            else if (YU_BB_Mods(pos.BID))
-                toReturn = BasisBlockType.UpSBB;
-            else if (YD_BB_Mods(pos.BID))
+            else if ((pos.BID > 100 && pos.BID % 100 > 0 && pos.BID % 100 < 9))
                 toReturn = BasisBlockType.BottomSBB;
-            else if (ZF_BB_Mods(pos.BID))
+            else if ((pos.BID % 100 > 90 && pos.BID % 100 < 99 && pos.BID < 988))
+                toReturn = BasisBlockType.UpSBB;
+            else if ((pos.BID > 0 && pos.BID < 99))
                 toReturn = BasisBlockType.FrontSBB;
-            else if (ZB_BB_Mods(pos.BID))
+            else if ((pos.BID > 910 && pos.BID % 100 >= 90 && pos.BID % 100 <= 99))
                 toReturn = BasisBlockType.BackSBB;
 
             return toReturn;
@@ -257,6 +315,11 @@ namespace HTM.Algorithms
         {                     
             BasisBlockType bBT;
             uint bid = pos.BID;
+
+            if (pos.BID == 910)
+            {
+                Console.WriteLine("Catch This Exception");
+            }
 
             if (YUL_DBB_Mods(bid))
                 bBT = BasisBlockType.LeftUpperDBB;
@@ -273,13 +336,15 @@ namespace HTM.Algorithms
             else if (ZBU_DBB_Mods(bid))
                 bBT = BasisBlockType.BackUpperDBB;
             else if (ZBL_DBB_Mods(bid))
-                bBT = BasisBlockType.BackDownDBB;            
+                bBT = BasisBlockType.BackDownDBB;
             else if (XLF_DBB_Mods(bid))
                 bBT = BasisBlockType.LeftFrontDBB;
             else if (XRF_DBB_Mods(bid))
                 bBT = BasisBlockType.RightFrontDBB;
             else if (XRB_DBB_Mods(bid))
                 bBT = BasisBlockType.RightBackDBB;
+            else if (XLB_DBB_Mods(bid))
+                bBT = BasisBlockType.LeftBackDBB;
             else
             {
                 Console.WriteLine("ERROR: Invalid Double Basis Block Type");
@@ -309,10 +374,13 @@ namespace HTM.Algorithms
         {
             List<Position3D> NewProximalConnectionPoints = new List<Position3D>();
             
-            if(neuronId.X == 1 && neuronId.Y == 1 && neuronId.Z == 1)
+            if(neuronId.X == 9 && neuronId.Y == 1 && neuronId.Z == 0)
             {
                 Console.WriteLine("Catch This Exception");                
             }            
+
+
+
             InitializeChecks(neuronId);
 
            
