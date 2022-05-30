@@ -39,7 +39,7 @@ namespace HTM.Algorithms
 
         public static Position3D PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(Position3D pos, char dimension, uint blockRadius,  uint? count = 0)
         {
-            if(pos.BID == 112)
+            if(pos.BID == 673)
             {
                 Console.WriteLine("Catch this raand!!!");
             }
@@ -47,12 +47,12 @@ namespace HTM.Algorithms
             {
                 if (count >= 5)
                 {
-                    throw new Exception("PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck : \n Recursive Count Exceeded for PRedicting NEw Position");
+                    throw new Exception("PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck : \n Recursive Count Exceeded for PRedicting NEw Position");                    
                 }
 
                 if (pos.BID < 0 || pos.BID >= uint.MaxValue)
                 {
-                    throw new Exception("PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck: you messed up block ID Calculation!!!");
+                    throw new Exception("PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck: you messed up block ID Calculation!!!");                    
                 }
             }
             catch(Exception ex)

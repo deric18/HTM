@@ -47,6 +47,7 @@ namespace HTM.Models
             };
         }
 
+        //TODO : Fix the computation of the BID Bug
         private uint ComputeBID(uint x, uint y, uint z) =>              //Computes BlockID : VERIFIED
         (z * CPM.GetInstance.NumX * CPM.GetInstance.NumY + y * CPM.GetInstance.NumX + x);
 

@@ -256,7 +256,7 @@ namespace HTM.Algorithms
         {
             bool flag = false;
 
-            if(pos.X == 9 && pos.Y == 1 && pos.Z == 0)
+            if(pos.BID == 673)
             {
                 Console.WriteLine("breakpoint");
             }
