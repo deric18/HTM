@@ -97,8 +97,8 @@ namespace HTM.Algorithms
 
         private bool X_SBB_Mods(uint bid)
         {
-
-            if (!XLF_DBB_Mods(bid) && !XLB_DBB_Mods(bid) && !XRB_DBB_Mods(bid) && !XRF_DBB_Mods(bid))
+            bool b1 = !XLF_DBB_Mods(bid), b2 = !XLB_DBB_Mods(bid), b3 = !XRB_DBB_Mods(bid), b4 = !XRF_DBB_Mods(bid), b5 = !YUL_DBB_Mods(bid), b6 = !YUR_DBB_Mods(bid), b7 = !YDL_DBB_Mods(bid), b8 = !YDR_DBB_Mods(bid);
+            if (b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8)
                 return true;
 
             return false;
@@ -132,7 +132,7 @@ namespace HTM.Algorithms
         private bool XLB_DBB_Mods(uint bid) => ( ( ( ( ( YOFFSET- XOFFSET ) * ZOFFSET ) + YOFFSET ) <= bid && bid <= ( (  ( YOFFSET - XOFFSET) * ZOFFSET) + ( ( YOFFSET - ( 2 * XOFFSET ) ) * YOFFSET) ) && ( bid % YOFFSET == 0 ) ) ? true : false);               //NOT 900/990 BUT  910,920,930, ... 980
 
         //TRICKY :
-        private bool XRB_DBB_Mods(uint bId) => (((909 < bId && bId < 990 && ( (bId % 9) == 0))) ? true : false);            //NOT 909 BUT 919,929,...,989
+        private bool XRB_DBB_Mods(uint bId) => (((909 < bId && bId < 990 && ( (bId % 10) == 9))) ? true : false);            //NOT 909 BUT 919,929,...,989
 
             // X = 10 NOT 909 BUT 919, 929, 939, ... 989
             // X = 15 NOT ? will dot his later
@@ -143,7 +143,7 @@ namespace HTM.Algorithms
         {
             // NOT 9 BUT 19, 29, 39, ... 89
 
-            return ( ( ( 18 < bid ) && ( bid < 90 ) && ( bid % 9 ) == 0 ) ? true : false);
+            return ( ( ( 18 < bid ) && ( bid < 90 ) && ( bid % 10 ) == 9 ) ? true : false);
 
         }
 
@@ -256,7 +256,7 @@ namespace HTM.Algorithms
         {
             bool flag = false;
 
-            if(pos.X == 9  && pos.Y == 1 && pos.Z == 0)
+            if(pos.X == 9 && pos.Y == 1 && pos.Z == 0)
             {
                 Console.WriteLine("breakpoint");
             }
