@@ -198,7 +198,7 @@ namespace HTM.Algorithms
             uint bid = pos.BID;
             bool flag = false;
 
-            if (pos.BID == 990)
+            if (pos.BID == 10)
             {
                 Console.WriteLine("breakpoint");
             }
@@ -691,8 +691,8 @@ namespace HTM.Algorithms
             blockCenter.BID = neuronId.BID;
             uint blockRadius = blockCenter.X;
 
-            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
-            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+            //axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            //dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
 
 
             toReturn.Add(axonPos);
@@ -948,8 +948,8 @@ namespace HTM.Algorithms
             uint blockRadius = blockCenter.X;
 
 
-            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
-            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+            //axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            //dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
 
 
             //Hint : Upon generating a dendrite / axon in DBB , Always extend towards normal blocks. that way neurons will not remain unused.
