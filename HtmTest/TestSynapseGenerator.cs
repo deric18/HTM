@@ -17,7 +17,7 @@ namespace HtmTest
         public void Initialze()
         {
             instance = CPM.GetInstance;
-            instance.Initialize(10, 100000);
+            instance.Initialize(10, 1000000);
             cTable = instance.CTable;
         }
 
@@ -46,7 +46,7 @@ namespace HtmTest
 
                 foreach (var seg in neuron.Segments.Values)
                 {
-                    Assert.AreEqual(seg.SegmentID.BasePosition.BID, neuron.NeuronID.BID);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.BID, neuron.NeuronID.BID);
                     Assert.AreEqual(seg.SegmentID.NeuronId.X, neuron.NeuronID.X);
                     Assert.AreEqual(seg.SegmentID.NeuronId.Y, neuron.NeuronID.Y);
                     Assert.AreEqual(seg.SegmentID.NeuronId.Z, neuron.NeuronID.Z);
@@ -79,7 +79,7 @@ namespace HtmTest
 
                 foreach (var seg in neuron.Segments.Values)
                 {
-                    Assert.AreEqual(seg.SegmentID.BasePosition.BID, neuron.NeuronID.BID);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.BID, neuron.NeuronID.BID);
                     Assert.AreEqual(seg.SegmentID.NeuronId.X, neuron.NeuronID.X);
                     Assert.AreEqual(seg.SegmentID.NeuronId.Y, neuron.NeuronID.Y);
                     Assert.AreEqual(seg.SegmentID.NeuronId.Z, neuron.NeuronID.Z);
@@ -97,7 +97,7 @@ namespace HtmTest
                 new Position3D(5,5,0, 55),
                 new Position3D(0,5,5, 550),
                 new Position3D(9,5,5, 559),
-                new Position3D(5,5,5, 555)
+                new Position3D(5,5,9, 955)
             };
 
             foreach (var neuron in instance.GetNeuronsFromPositions(sinlgeBBPositionList))
@@ -124,7 +124,7 @@ namespace HtmTest
                 new Position3D(1,1,1, 111),
                 new Position3D(8,8,8, 888),
                 new Position3D(8,1,1, 118),
-                new Position3D(8,8,9, 988)
+                new Position3D(8,7,8, 878)
             };
 
             foreach (var neuron in instance.GetNeuronsFromPositions(normalBBPositionList))

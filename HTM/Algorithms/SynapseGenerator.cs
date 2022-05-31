@@ -237,7 +237,7 @@ namespace HTM.Algorithms
         {
             bool flag = false;
 
-            if(pos.BID == 673)
+            if(pos.BID == 111)
             {
                 Console.WriteLine("breakpoint");
             }
@@ -262,7 +262,7 @@ namespace HTM.Algorithms
                 if (Y_SBB_Mods(pos.BID))
                     flag = true;
             }
-            else if((pos.BID > 0 && pos.BID < 99) || (pos.BID % 100 >= 90 && pos.BID % 100 <= 99))       // block exists on either side of the Z-Axis 
+            else if((pos.BID > 0 && pos.BID < 99) || (pos.BID > 910 && pos.BID < 989))       // block exists on either side of the Z-Axis 
             {
                 // check fro vertical and horizaontal bars
                 if (Z_SBB_Mods(pos.BID))
@@ -286,7 +286,7 @@ namespace HTM.Algorithms
                 toReturn = BasisBlockType.UpSBB;
             else if ((pos.BID > 0 && pos.BID < 99))
                 toReturn = BasisBlockType.FrontSBB;
-            else if ((pos.BID > 910 && pos.BID % 100 >= 90 && pos.BID % 100 <= 99))
+            else if ((pos.BID > 910 && pos.BID < 988))
                 toReturn = BasisBlockType.BackSBB;
 
             return toReturn;
@@ -902,7 +902,7 @@ namespace HTM.Algorithms
                         toReturn.Add(axonPos);
                         toReturn.Add(dendriticPos);
 
-                        blockCenter.BID = neuronId.BID + ZOFFSET;
+                        blockCenter.BID = neuronId.BID - ZOFFSET - XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
                         dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
 

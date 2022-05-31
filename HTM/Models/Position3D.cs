@@ -30,7 +30,10 @@ namespace HTM.Models
             X = x;
             Y = y;
             Z = z;
-            this.BID = blockId;
+            if(blockId == ComputeBID(x,Y,Z))
+                this.BID = blockId;
+            else
+                this.BID = ComputeBID(x,Y,Z);
             cType = CType.Available;
         }
       

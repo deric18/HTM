@@ -23,7 +23,7 @@ namespace HtmTest
         {
             xyz = 10;
             instance = CPM.GetInstance;
-            instance.Initialize(xyz, 100000);            
+            instance.Initialize(xyz, 1000000);            
             //cTable = ConnectionTable.Singleton();
         }
 

@@ -1,5 +1,6 @@
 ﻿using HTM.Models;
 using System;
+using System.Security.Cryptography;
 
 namespace HTM.Algorithms
 {
@@ -61,7 +62,7 @@ namespace HTM.Algorithms
             }
 
             Position3D toRet = (Position3D)pos.Clone();
-            ConnectionTable cTable = ConnectionTable.Singleton();
+            ConnectionTable cTable = ConnectionTable.Singleton();            
 
             switch (dimension)
             {
@@ -171,9 +172,19 @@ namespace HTM.Algorithms
         public static uint GetRand(uint min, uint max)
         {
             Random r = new Random();
+            
+
             int I1 = Convert.ToInt32(min);
             int I2 = Convert.ToInt32(max);
-            return (uint)r.Next(I1, I2);
+
+            uint val = (uint)r.Next(I1, I2);
+
+            if(val == (min + max) / 2)
+            {
+                return GetRand(min, max);
+            }
+
+            return val;
         }
 
         public static uint GetRand(int seed, uint min, uint max)
@@ -183,5 +194,5 @@ namespace HTM.Algorithms
             int I2 = Convert.ToInt32(max);
             return (uint)r.Next(I1, I2);
         }
-    }
+    }    
 }
