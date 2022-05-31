@@ -71,9 +71,7 @@ namespace HTM.Models
                         axonEndPoints.Add(pos);
                     }
                     else if (pos.cType == CType.SuccesfullyClaimedByDendrite)
-                    {
-                        if (pos.BID != 111)
-                            break;
+                    {                        
                         newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i, null, false);
                         ProximalSegmentList.Add(pos);
                     }
@@ -89,8 +87,7 @@ namespace HTM.Models
                         //Get the connecting Segment
                         // form a synapse 
                         // register both connections 
-
-                        //To be Done.
+                        
                     }
                     else if(pos.cType == CType.DendriteConnectedToAxon)
                     {

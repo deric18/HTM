@@ -559,7 +559,7 @@ namespace HTM.Algorithms
             Position3D axonPos = null;
             Position3D dendriticPos = null;
 
-            if (neuronPos.X == 0 && neuronPos.Y == 9 && neuronPos.Z == 0)
+            if (neuronPos.X == 0 && neuronPos.Y == 0 && neuronPos.Z == 0)
                 Console.WriteLine("Catch an exception");
 
 
