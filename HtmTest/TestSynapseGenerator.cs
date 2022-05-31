@@ -47,9 +47,9 @@ namespace HtmTest
                 foreach (var seg in neuron.Segments.Values)
                 {
                     Assert.AreEqual(seg.SegmentID.BasePosition.BID, neuron.NeuronID.BID);
-                    Assert.AreEqual(seg.NeuronID.X, neuron.NeuronID.X);
-                    Assert.AreEqual(seg.NeuronID.Y, neuron.NeuronID.Y);
-                    Assert.AreEqual(seg.NeuronID.Z, neuron.NeuronID.Z);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.X, neuron.NeuronID.X);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.Y, neuron.NeuronID.Y);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.Z, neuron.NeuronID.Z);
 
                 }
             }
@@ -80,9 +80,9 @@ namespace HtmTest
                 foreach (var seg in neuron.Segments.Values)
                 {
                     Assert.AreEqual(seg.SegmentID.BasePosition.BID, neuron.NeuronID.BID);
-                    Assert.AreEqual(seg.NeuronID.X, neuron.NeuronID.X);
-                    Assert.AreEqual(seg.NeuronID.Y, neuron.NeuronID.Y);
-                    Assert.AreEqual(seg.NeuronID.Z, neuron.NeuronID.Z);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.X, neuron.NeuronID.X);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.Y, neuron.NeuronID.Y);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.Z, neuron.NeuronID.Z);
 
                 }
             }
@@ -106,14 +106,15 @@ namespace HtmTest
 
                 foreach (var seg in neuron.Segments.Values)
                 {
-                    Assert.AreEqual(seg.SegmentID.BasePosition.BID, neuron.NeuronID.BID);
-                    Assert.AreEqual(seg.NeuronID.X, neuron.NeuronID.X);
-                    Assert.AreEqual(seg.NeuronID.Y, neuron.NeuronID.Y);
-                    Assert.AreEqual(seg.NeuronID.Z, neuron.NeuronID.Z);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.BID, neuron.NeuronID.BID);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.X, neuron.NeuronID.X);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.Y, neuron.NeuronID.Y);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.Z, neuron.NeuronID.Z);
 
                 }
             }
         }
+
 
         [TestMethod]
         public void CreateProximalSegmentForNormalBB()
@@ -132,10 +133,10 @@ namespace HtmTest
 
                 foreach (var seg in neuron.Segments.Values)
                 {
-                    Assert.AreEqual(seg.SegmentID.BasePosition.BID, neuron.NeuronID.BID);
-                    Assert.AreEqual(seg.NeuronID.X, neuron.NeuronID.X);
-                    Assert.AreEqual(seg.NeuronID.Y, neuron.NeuronID.Y);
-                    Assert.AreEqual(seg.NeuronID.Z, neuron.NeuronID.Z);
+                    //Assert.AreEqual(seg.SegmentID.BasePosition.BID, neuron.NeuronID.BID);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.X, neuron.NeuronID.X);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.Y, neuron.NeuronID.Y);
+                    Assert.AreEqual(seg.SegmentID.NeuronId.Z, neuron.NeuronID.Z);
 
                 }
             }

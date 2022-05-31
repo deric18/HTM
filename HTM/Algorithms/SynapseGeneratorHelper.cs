@@ -93,12 +93,23 @@ namespace HTM.Algorithms
             //TODO : Need to account for some logic where dendrites need to connect to an existing axonal endpoint , in that case it need be registered as synapse and return appropriate enum.
 
             //just making sure we dont accidentlly pick the same position back to the caller)
-            toRet = (toRet.X == pos.X && toRet.Y == pos.Y && toRet.Z == pos.Z ) ? PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(toRet, dimension, blockRadius, ++count) : toRet ;
+            if (toRet.X == pos.X && toRet.Y == pos.Y && toRet.Z == pos.Z)
+            {
 
+                toRet = PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(toRet, dimension, blockRadius, ++count);
+
+
+            }
+
+
+            //catching an exception!!!
             if(toRet.BID>= CPM.GetInstance.NumBlocks || toRet == null || ( toRet.X >= CPM.GetInstance.BCP.NumXperBlock || toRet.Y >= CPM.GetInstance.BCP.NumYperBlock || toRet.Z >= CPM.GetInstance.BCP.NumZperBlock))
             {
                 Console.WriteLine("Catch this exception");
             }
+
+
+
 
             //making sure its available or recurse again.
             if (!cTable.IsPositionAvailable(toRet))
@@ -110,10 +121,12 @@ namespace HTM.Algorithms
                 if(cTable.Position(toRet.BID, toRet.X, toRet.Y, toRet.Z).Equals('a') && dimension.Equals('D'))
                 {
                     pos.cType = Enums.CType.DendriteConnectedToAxon;
+                    return toRet;
                 }
                 else if(cTable.Position(toRet.BID, toRet.X, toRet.Y, toRet.Z).Equals('D') && dimension.Equals('A'))
                 {
                     pos.cType = Enums.CType.AxonConnectedToDendrite;
+                    return toRet;
                 }
 
                 toRet = PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(pos, dimension, blockRadius, ++count);

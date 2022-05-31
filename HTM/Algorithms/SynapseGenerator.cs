@@ -356,14 +356,14 @@ namespace HTM.Algorithms
             List<Position3D> NewProximalConnectionPoints = new List<Position3D>();
                         
 
-            if (neuronId.X == 0 && neuronId.Y == 9 && neuronId.Z == 9)
+            if (neuronId.BID == 111)
                 Console.WriteLine("Catch an exception");
 
 
             InitializeChecks(neuronId);
 
+             
            
-
             switch(basisBlockType) 
             {
                 case BasisBlockType.SingleBasisBlock:
@@ -401,11 +401,13 @@ namespace HTM.Algorithms
 
             foreach(var pos in NewProximalConnectionPoints)
             {
-                if(pos.cType == CType.DendriteConnectedToAxon || pos.cType == CType.AxonConnectedToDendrite)
+                if(pos.cType == CType.SuccesfullyClaimedByDendrite || pos.cType == CType.SuccesfullyClaimedByAxon)
                 {
-                    //Nothing TO DO everything worked out.
+                    //Positions intended where succesfully claimed , now create segments at these positions
+                    //SegmentID segID = new SegmentID(neuronId, axonSegCount, )
+
                 }
-                if(pos.cType == CType.DendriteConnectedToAxon)      //A Dendritic Proximal Segment connected to a nearby Axon forming a synapse
+                else if(pos.cType == CType.DendriteConnectedToAxon)      //A Dendritic Proximal Segment connected to a nearby Axon forming a synapse
                 {
                     //Claim Axon Position
                     SegmentID segId = new SegmentID(neuronId, axonSegCount, pos);       //We create a new Proximal SegID for the neuron so we can register it in CTable
@@ -443,6 +445,8 @@ namespace HTM.Algorithms
                         Console.WriteLine("AddProximalSegment : \nNew connection for Neuron \n BLOCK ID : " + neuronId.BID + "\n X:" + neuronId.X + "\n Y:" + neuronId.Y + "\n Z:" + neuronId.Z);
                         Console.WriteLine(pos.StringIDWithBID);
                     }
+
+                    axonSegCount++;
                 }
             }
 
@@ -581,6 +585,10 @@ namespace HTM.Algorithms
             Dictionary<(int, int, int), char> dict = new Dictionary<(int, int, int), char>();
             Position3D dendriticPos = null;
 
+
+            if (neuronId.BID == 111)
+                Console.WriteLine("Stuff");
+
             //pick the center of the block and then create a random square block the size of the block and call create new random position , just in case perform check
             //if we are creating a position for axon and it falls over the central axon point then pick a different position. this is not needed because it wont happen CTable wont let that happen as the point is already registered
             Position3D blockCenter = CPM.GetInstance.BCP.BlockCenter;
@@ -693,10 +701,7 @@ namespace HTM.Algorithms
 
             //axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
             //dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
-
-
-            toReturn.Add(axonPos);
-            toReturn.Add(dendriticPos);
+           
 
 
             switch (sbbType)
@@ -947,7 +952,10 @@ namespace HTM.Algorithms
             blockCenter.BID = neuronPos.BID;
             uint blockRadius = blockCenter.X;
 
-
+            if (neuronPos.BID == 111)
+            {
+                uint i = 10;
+            }
             //axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
             //dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
 
@@ -1077,25 +1085,72 @@ namespace HTM.Algorithms
                         toReturn.Add(axonPos);
                         toReturn.Add(dendriticPos);
                         break;
-                    }//TODO: Need to code it up
-                case BasisBlockType.LeftDownDBB:
-                    {
-
-                        break;
 
                     }
-                case BasisBlockType.LeftFrontDBB:
+                case BasisBlockType.LeftDownDBB:    //+X+Y, +Z+X+Y
                     {
-                        break;
+                        
+                        blockCenter.BID = neuronPos.BID + XOFFSET + YOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        blockCenter.BID = neuronPos.BID + ZOFFSET + YOFFSET + XOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+                        break;                        
 
                     }
-                case BasisBlockType.RightDownDBB:
+                case BasisBlockType.LeftFrontDBB:   //+Z+X+Y, +X+Y
                     {
-                        break;
+                        
+                        blockCenter.BID = neuronPos.BID + ZOFFSET + YOFFSET + XOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        blockCenter.BID = neuronPos.BID + XOFFSET + YOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+                        break;                        
 
                     }
-                case BasisBlockType.RightFrontDBB:
+                case BasisBlockType.RightDownDBB:    //+Y-X , +Z+Y-X
                     {
+                        
+                        blockCenter.BID = neuronPos.BID + YOFFSET - XOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        blockCenter.BID = neuronPos.BID + ZOFFSET - XOFFSET + YOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+                        break;                       
+
+                    }
+                case BasisBlockType.RightFrontDBB:  //+Z-X, +Z-X-Y
+                    {
+                        blockCenter.BID = neuronPos.BID + ZOFFSET - XOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        blockCenter.BID = neuronPos.BID + ZOFFSET - XOFFSET - YOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
                         break;
                     }
                 default:

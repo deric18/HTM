@@ -55,25 +55,57 @@ namespace HTM.Models
                 proximalSegList = new List<Position3D>();
             uint i = 0;
 
+            if (NeuronID.BID == 111)
+                Console.WriteLine("Stuff");
+
             foreach(Position3D pos in proximalSegList)
             {
                 Segment newSegment = null;
                 //TODO : Need bit more reasearch about the SegmentType
 
-                if(pos.cType == CType.SuccesfullyClaimedByAxon)
+                try
                 {
-                    newSegment = new Segment(pos, SegmentType.Axonal, NeuronID, i, null, false);
-                    axonEndPoints.Add(pos);
+                    if (pos.cType == CType.SuccesfullyClaimedByAxon)
+                    {
+                        newSegment = new Segment(pos, SegmentType.Axonal, NeuronID, i, null, false);
+                        axonEndPoints.Add(pos);
+                    }
+                    else if (pos.cType == CType.SuccesfullyClaimedByDendrite)
+                    {
+                        if (pos.BID != 111)
+                            break;
+                        newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i, null, false);
+                        ProximalSegmentList.Add(pos);
+                    }
+                    else if (pos.cType == CType.AxonConnectedToDendrite)
+                    {
+                        DoubleSegment douSeg = _cpm.CTable.InterfaceFire(pos.StringIDWithBID);
+
+                        axonEndPoints.Add(douSeg.axonalSegmentID.BasePosition);
+                        var segId = douSeg.axonalSegmentID;
+                        newSegment = new Segment(segId.BasePosition, SegmentType.Axonal, segId.NeuronId, i, segId.GetSegmentID);
+                        newSegment.AddNewConnection(pos);
+                        _cpm.GetSegmentFromSegmentID(douSeg.dendriteISegmentD).AddNewConnection(pos);   //This is Very important as it adds the synapse to the dendrite as well
+                        //Get the connecting Segment
+                        // form a synapse 
+                        // register both connections 
+
+                        //To be Done.
+                    }
+                    else if(pos.cType == CType.DendriteConnectedToAxon)
+                    {
+                        DoubleSegment douSeg = _cpm.CTable.InterfaceFire(pos.StringIDWithBID);
+
+                        dendriticEndPoints.Add(douSeg.dendriteISegmentD.BasePosition);
+                        var segId = douSeg.dendriteISegmentD;
+                        newSegment = new Segment(segId.BasePosition, SegmentType.Proximal, segId.NeuronId, i, segId.GetSegmentID);
+                        newSegment.AddNewConnection(pos);
+                        _cpm.GetSegmentFromSegmentID(douSeg.axonalSegmentID).AddNewConnection(pos);
+                    }
                 }
-                else if(pos.cType == CType.SuccesfullyClaimedByDendrite)
+                catch (Exception e)
                 {
-                    newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i, null, false);
-                    ProximalSegmentList.Add(pos);
-                }
-                else if(pos.cType == CType.Synapse)
-                {
-                    throw new Exception();
-                    //To be Done.
+                    Console.WriteLine("New Connection Synapse return type is incorrect");
                 }
 
                 if(Segments.TryGetValue(newSegment.SegmentID.GetSegmentID , out Segment segment))
