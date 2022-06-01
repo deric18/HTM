@@ -46,15 +46,37 @@ namespace HtmTest
         }        
 
 
-        [TestMethod, ExpectedException(typeof(Exception)), Ignore]
-        public void TestProcessCycle()
+        [TestMethod]
+        public void TestEmptyProcessCycle()
         {
-            SDR dummy1 = GetNewSDR(InputPatternType.APICAL);
-            SDR dummy2 = GetNewSDR(InputPatternType.SPATIAL);
+            SDR temporalPattern = GetNewSDR(InputPatternType.TEMPORAL, new List<Position2D>() { });
+            SDR spatialPattern = GetNewSDR(InputPatternType.SPATIAL, new List<Position2D>() { });
+            SDR expected = new SDR(10, 10);            
 
-            instance.Process(dummy1, dummy2);
-        }        
-               
+
+            instance.Process(temporalPattern, spatialPattern);
+
+            SDR actual = instance.Predict();
+
+            Assert.AreEqual(true, actual.Equals(expected));
+        }
+
+        [TestMethod]
+        public void TestFireProcessCycle()
+        {
+            SDR temporalPattern = GetNewSDR(InputPatternType.TEMPORAL, new List<Position2D>() { new Position2D(3, 3), new Position2D(6, 6), new Position2D(4, 4) });
+            SDR spatialPattern = GetNewSDR(InputPatternType.SPATIAL, new List<Position2D>() { new Position2D(2, 2), new Position2D(3, 3), new Position2D(7, 7) });
+
+            SDR expected = new SDR(10, 10);
+
+
+
+            instance.Process(temporalPattern, spatialPattern);
+
+            SDR actual = instance.Predict();
+
+            Assert.AreEqual(expected, actual);
+        }
 
         [TestMethod, Ignore]
         public void TestBlockConfigProvider()
@@ -69,6 +91,12 @@ namespace HtmTest
 
 
 
+        }
+
+
+        private SDR GetNewSDR(InputPatternType iType, List<Position2D> activeBits)
+        {
+            return new SDR(10, 10, activeBits);
         }
 
         private SDR GetNewSDR(InputPatternType iType)

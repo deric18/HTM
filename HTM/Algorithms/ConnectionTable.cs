@@ -225,7 +225,14 @@ namespace HTM.Algorithms
         /// <returns></returns>
         internal DoubleSegment InterfaceFire(string position)
         {
-            return synapses[position];
+            if(synapses.TryGetValue(position, out var doubleSegment))
+            {
+                return doubleSegment;
+            }
+
+            Console.WriteLine("Invalid Synapse ID : Synapse does nto exist at this position");
+
+            return null;
         }
 
 

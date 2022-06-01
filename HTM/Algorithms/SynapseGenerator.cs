@@ -127,7 +127,7 @@ namespace HTM.Algorithms
 
 
         //DOUBLE BASIS BLOCKS
-        private bool XLF_DBB_Mods(uint bId) => (bId > 9 && bId < 90 && ((bId % 10 )== 0));           //NOT 0/9 BUT 10 , 20 , 30, .. 80
+        private bool XLF_DBB_Mods(uint bId) => (bId > 9 && bId < 90 && ((bId % 10 ) == 0));           //NOT 0/9 BUT 10 , 20 , 30, .. 80
 
         private bool XLB_DBB_Mods(uint bid) => ( ( ( ( ( YOFFSET- XOFFSET ) * ZOFFSET ) + YOFFSET ) <= bid && bid <= ( (  ( YOFFSET - XOFFSET) * ZOFFSET) + ( ( YOFFSET - ( 2 * XOFFSET ) ) * YOFFSET) ) && ( bid % YOFFSET == 0 ) ) ? true : false);               //NOT 900/990 BUT  910,920,930, ... 980
 
@@ -237,7 +237,7 @@ namespace HTM.Algorithms
         {
             bool flag = false;
 
-            if(pos.BID == 111)
+            if(pos.BID == 50)
             {
                 Console.WriteLine("breakpoint");
             }
@@ -256,7 +256,6 @@ namespace HTM.Algorithms
 
                 //101,102,.. 108,201,202,203,...208,301,302,...308,...801,802,...808
                 //191,192,.. 198,291,292,293,...298,391,392,...398,...891,892,...898
-
 
 
                 if (Y_SBB_Mods(pos.BID))

@@ -194,7 +194,8 @@ namespace HTM.Models
                 //_cpm.CTable.RecordFire(point);
 
                 //Get the doublesegment asociated with this position and directly send a grow signal to the denditic neuron.
-                _cpm.GetNeuronFromPositionID(dSegment.dendriteISegmentD.NeuronId).Grow( _cpm.GetSegmentFromSegmentID(dSegment.dendriteISegmentD), dSegment.synapsePosition);
+                if(dSegment != null)
+                    _cpm.GetNeuronFromPositionID(dSegment.dendriteISegmentD.NeuronId).Grow( _cpm.GetSegmentFromSegmentID(dSegment.dendriteISegmentD), dSegment.synapsePosition);
             }
         }
 

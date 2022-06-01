@@ -1,10 +1,11 @@
 ﻿using HTM.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace HTM.Models
 {
-    public class SDR
+    public class SDR : IEquatable<SDR>
     {
         public uint Length { get; private set; }
         public uint Breadth { get; private set; }
@@ -64,5 +65,19 @@ namespace HTM.Models
 
             return true;
         }        
+
+        public bool Equals(SDR y)
+        {
+            if (this.Length == y.Length && this.Breadth == y.Breadth && this.ActiveBits.Count == y.ActiveBits.Count)
+            {
+                for (int i = 0; i < this.ActiveBits.Count; i++)
+                {
+                    if (this.ActiveBits[i] != y.ActiveBits[i])
+                        return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

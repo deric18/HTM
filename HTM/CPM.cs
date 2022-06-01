@@ -109,8 +109,8 @@ namespace HTM
                     {
                         //Fetch the columns to fire and decide if to burst the whole column or fire specific neurons
                         //Fire the neurons and update predicted list
-                        if (!_readySpatial)
-                            throw new Exception("Invalid Input Pattern Type");
+                        //if (!_readySpatial)
+                        //    throw new Exception("Invalid Input Pattern Type");
 
                         List<Position2D> firingPositions = firstPattern.ActiveBits;
 
@@ -125,8 +125,8 @@ namespace HTM
                 case InputPatternType.TEMPORAL:
                     {
                         //Fetch , Fire , Update
-                        if (!_readyTemporal)
-                            throw new Exception("Invalid Input Pattern Type");
+                        //if (!_readyTemporal)
+                        //    throw new Exception("Invalid Input Pattern Type");
 
                         List<Position2D> firingPositions = firstPattern.ActiveBits;
 
@@ -142,8 +142,8 @@ namespace HTM
                     {
                         //Fetch , Fire , Update
 
-                        if (!_readyApical)
-                            throw new Exception("Invalid Input Pattern Type");
+                        //if (!_readyApical)
+                        //    throw new Exception("Invalid Input Pattern Type");
 
                         List<Position2D> firingPositions = firstPattern.ActiveBits;
 
