@@ -87,6 +87,8 @@ namespace HTM.Algorithms
         //    }
         //}
 
+        public int GetTotalSynapsesCount => synapses.Count;
+
         public Dictionary<string, KeyValuePair<uint, DoubleSegment>>.ValueCollection GetAllPredictedSegments()
         {
             return PredictedSegments.Values;

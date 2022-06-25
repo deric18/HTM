@@ -74,8 +74,9 @@ namespace HtmTest
             instance.Process(temporalPattern, spatialPattern);
 
             SDR actual = instance.Predict();
+            int total = instance.CTable.GetTotalSynapsesCount;
 
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(true, actual.Equals(expected));
         }
 
         [TestMethod, Ignore]

@@ -26,7 +26,7 @@ namespace HTM.Models
             this.Length = length;
             this.Breadth = breadth;
             this.ActiveBits = activeBits;
-        }       
+        }
 
         public SDR(string s, uint length, uint breadth)
         {
