@@ -225,30 +225,39 @@ namespace HTM
         /// 1.Neurons that are predicted in this cycle , all the neurons that contributed to the last cycle for these neurons to be predicted should be incremented.
         /// 2.System should be advanced enough to recognise any neurons that usually dont fire and are firing in this iteration , should be analysed.
         /// </summary>
-        //private void Grow()
-        //{
-        //    //ToDo
-        //    //Once the Firing Cycle has finished
-        //    //Call Connection Tables & Get aLl the DoubleSegment Objects
-        //    //Strengthen all the connections using the DoubleSegments.
-        //    //var predictedSegments = instance.CTable.GetAllPredictedSegments();
+        private void Grow()
+        {
+            //ToDo
+            //Once the Firing Cycle has finished
+            //Call Connection Tables & Get aLl the DoubleSegment Objects
+            //Strengthen all the connections using the DoubleSegments.
+            var predictedSegments = instance.CTable.GetAllPredictedSegments();
+            instance.CTable.FlushPredictedSegments();
 
-        //    //for each item in predictedsegments contains a double segment and number of hits the segment has received
-        //    //first order of business , get only the segments which belong to neurons which are going to fire this cycle and strengthen only those segments that have conrtibited
-        //    //to the neuronal segments
-        //    //Also if there too high of a count on one of the segments detect
-
-        //    foreach (var item in GetIntersectionSet())
-        //    {
-        //        item.Key.Grow(item.Value, instance.CTable.InterfaceFire()
-
-        //    }
+            foreach(var item in predictedSegments)
+            {
+                uint hits = item.Key;
+                DoubleSegment ds = item.Value;
 
 
-        //    //Flush the predicted segment
-        //    CPM.GetInstance.CTable.FlushPredictedSegments();
 
-        //}
+            }
+
+            //for each item in predictedsegments contains a double segment and number of hits the segment has received
+            //first order of business , get only the segments which belong to neurons which are going to fire this cycle and strengthen only those segments that have conrtibited
+            //to the neuronal segments
+            //Also if there too high of a count on one of the segments detect
+
+            foreach (var item in GetIntersectionSet())
+            {
+                item.Key.Grow(item.Value, instance.CTable.InterfaceFire());
+            }
+
+
+            //Flush the predicted segment
+            CPM.GetInstance.CTable.FlushPredictedSegments();
+
+        }
 
 
         /// <summary>

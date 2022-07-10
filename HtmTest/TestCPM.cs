@@ -23,7 +23,7 @@ namespace HtmTest
         {
             xyz = 10;
             instance = CPM.GetInstance;
-            instance.Initialize(xyz, 1000000);            
+            instance.Initialize(xyz, 100000);            
             //cTable = ConnectionTable.Singleton();
         }
 
@@ -69,14 +69,19 @@ namespace HtmTest
 
             SDR expected = new SDR(10, 10);
 
+            int total = 0;
 
+            while (total != 1)
+            {
+                temporalPattern = GetNewRandomSDR(InputPatternType.TEMPORAL);
+                spatialPattern = GetNewRandomSDR(InputPatternType.SPATIAL);
 
-            instance.Process(temporalPattern, spatialPattern);
+                instance.Process(temporalPattern, spatialPattern);
 
-            SDR actual = instance.Predict();
-            int total = instance.CTable.GetTotalSynapsesCount;
+                total = instance.CTable.GetTotalSynapsesCount;                
+            }
 
-            Assert.AreEqual(true, actual.Equals(expected));
+            Assert.IsTrue(total > 0);
         }
 
         [TestMethod, Ignore]
@@ -100,9 +105,9 @@ namespace HtmTest
             return new SDR(10, 10, activeBits);
         }
 
-        private SDR GetNewSDR(InputPatternType iType)
+        private SDR GetNewRandomSDR(InputPatternType iType)
         {
-            List<Position2D> activebits = GetRandomPositionList(4);
+            List<Position2D> activebits = GetRandomPositionList(GetRand());
 
             SDR toRet = new SDR(xyz, xyz, activebits);
 
@@ -110,8 +115,6 @@ namespace HtmTest
 
             return toRet;
         }        
-
-
 
         private List<Position2D> GetRandomPositionList(int count)
         {

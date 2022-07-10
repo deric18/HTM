@@ -196,6 +196,10 @@ namespace HTM.Models
                 //Get the doublesegment asociated with this position and directly send a grow signal to the denditic neuron.
                 if(dSegment != null)
                     _cpm.GetNeuronFromPositionID(dSegment.dendriteISegmentD.NeuronId).Grow( _cpm.GetSegmentFromSegmentID(dSegment.dendriteISegmentD), dSegment.synapsePosition);
+                else
+                {
+                    //Neurons axons doesnt have any active connection to any dendrites near by.
+                }
             }
         }
 
