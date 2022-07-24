@@ -120,6 +120,8 @@ namespace HTM
                         }
                         _readySpatial = false;
                         _readyApical = true;
+                        Grow();
+
                         break;
                     }
                 case InputPatternType.TEMPORAL:
@@ -190,6 +192,11 @@ namespace HTM
 
         }
 
+        private void ColumnFlush(uint X, uint Y)
+        {
+            instance.ColumnFlush(X, Y);
+        }
+
         internal void AddtoPredictedList(Position3D position, SegmentID segmentID, uint potential)
         {
             bool willFire = GetNeuronFromPosition(segmentID.NeuronId).Process(segmentID.BasePosition, segmentID, potential);
@@ -227,21 +234,14 @@ namespace HTM
         /// </summary>
         private void Grow()
         {
-            //ToDo
+            //TODO
             //Once the Firing Cycle has finished
             //Call Connection Tables & Get aLl the DoubleSegment Objects
             //Strengthen all the connections using the DoubleSegments.
             var predictedSegments = instance.CTable.GetAllPredictedSegments();
-            instance.CTable.FlushPredictedSegments();
+            
 
-            foreach(var item in predictedSegments)
-            {
-                uint hits = item.Key;
-                DoubleSegment ds = item.Value;
-
-
-
-            }
+            
 
             //for each item in predictedsegments contains a double segment and number of hits the segment has received
             //first order of business , get only the segments which belong to neurons which are going to fire this cycle and strengthen only those segments that have conrtibited
@@ -266,7 +266,7 @@ namespace HTM
         /// <returns></returns>
         private List<KeyValuePair<Neuron, Segment>> GetIntersectionSet()
         {
-            List<Neuron> list1 = GetPredictedNeuronsFromSDR(nextPattern);
+            List<Neuron> firingneuronsForNextPattern = GetPredictedNeuronsFromSDR(nextPattern);
 
             List<KeyValuePair<Neuron, Segment>> toRet = new List<KeyValuePair<Neuron, Segment>>();
 
@@ -276,9 +276,9 @@ namespace HTM
                 throw new Exception("There are no predicted Neurons nor segments !! , THis is never supposed to happen!!!");
             }
 
-            foreach(var kvp in _predictedList)
+            foreach(var kvp in _predictedList)                  //Compute if any of the predicted neuron from the last cycle is going to fire this cycle.
             {
-                foreach(var neuron in list1)
+                foreach(var neuron in firingneuronsForNextPattern)
                 {
                     if(kvp.Value.Equals(neuron))
                     {
@@ -286,6 +286,10 @@ namespace HTM
                     }
                 }
             }
+
+            //What if there are no neurons intersecting previous cycle ?
+            //TODO :Create a hardwired distal connection between these.
+
 
             return toRet;
         }

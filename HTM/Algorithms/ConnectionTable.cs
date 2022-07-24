@@ -21,7 +21,7 @@ namespace HTM.Algorithms
 
         private Dictionary<string, DoubleSegment> synapses;
 
-        public Dictionary<string,KeyValuePair<uint, DoubleSegment>> PredictedSegments { get; private set; }    //Needed by CPM to match up and grow synapses between firing and predicted neurons.
+        public Dictionary<string,DoubleSegment> PredictedSegments { get; private set; }    //Needed by CPM to match up and grow synapses between firing and predicted neurons.
         public static ConnectionTable SingleTon;
 
 
@@ -39,7 +39,7 @@ namespace HTM.Algorithms
             dendriticEndPoints = new Dictionary<string, SegmentID>();       //<position3d , corresponding segment id of the dendrite>.
             synapses = new Dictionary<string, DoubleSegment>();             //Holds all the synapses with respective synapses ID's.
             cMap = new char[numBlocks, bcp.NumXperBlock,bcp.NumYperBlock, bcp.NumZperBlock];
-            PredictedSegments = new Dictionary<string, KeyValuePair<uint, DoubleSegment>>();
+            PredictedSegments = new Dictionary<string, DoubleSegment>();
 
 
             for (uint block = 0; block < numBlocks; block++)
@@ -88,7 +88,7 @@ namespace HTM.Algorithms
 
         public int GetTotalSynapsesCount => synapses.Count;
 
-        public Dictionary<string, KeyValuePair<uint, DoubleSegment>>.ValueCollection GetAllPredictedSegments()
+        public Dictionary<string, DoubleSegment>.ValueCollection GetAllPredictedSegments()
         {
             return PredictedSegments.Values;
         }
@@ -261,8 +261,18 @@ namespace HTM.Algorithms
         /// <returns></returns>
         internal DoubleSegment InterfaceFire(string position)
         {
+            //Called by axonal endpoints to extract if any dendrites are connected to it it ll fire them
             if(synapses.TryGetValue(position, out var doubleSegment))
             {
+                if(PredictedSegments.TryGetValue(position, out var ds))
+                {                                        
+                    PredictedSegments[position].IncrementHitcount();
+                }
+                else
+                {
+                    PredictedSegments.Add(position, doubleSegment);
+                }
+
                 return doubleSegment;
             }
 

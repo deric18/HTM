@@ -10,11 +10,17 @@
         public Position3D synapsePosition { get; private set; }
         public SegmentID dendriteISegmentD { get; private set; }
 
+        public uint hitcount { get; private set; }
+
         public DoubleSegment(Position3D synapsePosition, SegmentID axonalSegmentID, SegmentID dendriticSegmentID)
         {
             this.synapsePosition = synapsePosition;
             this.axonalSegmentID = axonalSegmentID;
             this.dendriteISegmentD = dendriticSegmentID;
+            hitcount = 0;
         }        
+
+        public void IncrementHitcount() =>
+            hitcount++;
     }
 }
