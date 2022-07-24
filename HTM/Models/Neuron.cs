@@ -20,9 +20,9 @@ namespace HTM.Models
 
         //Question : Should proximal Segments be also added to the segment List
         //Answer : No , coz you can make the logic in the method to look into both lists rather than duping data , bad practice!
-        public Dictionary<string, Segment> Segments { get; private set; }      // List of all segments the neuron has
-        private uint _totalSegments;                                    // total number of segments
-        private List<SegmentID> _predictedSegments;                     
+        public Dictionary<string, Segment> Segments { get; private set; }      // List of all segments the neuron has        
+        private List<SegmentID> _NMDApredictedSegments;
+        private List<SegmentID> _FailedToFirePredictedSegments;
         public List<Position3D> axonEndPoints { get; private set; }
         public List<Position3D> dendriticEndPoints { get; private set; }
 
@@ -32,17 +32,45 @@ namespace HTM.Models
 
         public Neuron(Position3D pos)
         {
-            Voltage = 0;
-            _totalSegments = 0;
+            Voltage = 0;            
             NeuronID = pos;
             State = NeuronState.RESTING;
             Segments = new Dictionary<string, Segment>();
             ProximalSegmentList = new List<Position3D>();
-            _predictedSegments = new List<SegmentID>();
+            _NMDApredictedSegments = new List<SegmentID>();
+            _FailedToFirePredictedSegments = new List<SegmentID>();
             axonEndPoints = new List<Position3D>();
             dendriticEndPoints = new List<Position3D>();
             _cpm = CPM.GetInstance;
-        }        
+        }
+
+        /// <summary>
+        /// Process Potential to segment and decide if you are gonna fire or not so CPM can add you to the prediction list.
+        /// </summary>
+        /// 
+        /// <param name="position"></param>
+        /// <param name="segmentID"></param>
+        /// <param name="potential"></param>
+        /// <returns></returns>
+        internal bool Process(Position3D position, SegmentID segmentID, uint potential)
+        {
+            //Get the segment , supply the potential and see if it decides to fire (NMDA) or depolarise.
+            //if NMDA add segment to predicted list and return response based on firing limits also after firing remember to flush the voltage.
+            //if deplorised good , keep the potential.
+            Segment seg = GetSegment(segmentID);
+            if (seg.Process(potential, position, InputPatternType.INTERNAL))     //if NMDA
+            {
+                Voltage += seg._sumVoltage;
+                seg.FlushVoltage();
+                _NMDApredictedSegments.Add(segmentID);
+                this.State = NeuronState.PREDICTED;
+                return true;
+            }
+
+            _FailedToFirePredictedSegments.Add(segmentID);
+
+            return false;
+        }
 
         public void CreateProximalSegments()
         {
@@ -55,25 +83,54 @@ namespace HTM.Models
                 proximalSegList = new List<Position3D>();
             uint i = 0;
 
+            if (NeuronID.BID == 111)
+                Console.WriteLine("Stuff");
+
             foreach(Position3D pos in proximalSegList)
             {
                 Segment newSegment = null;
                 //TODO : Need bit more reasearch about the SegmentType
 
-                if(pos.cType == CType.SuccesfullyClaimedByAxon)
+                try
                 {
-                    newSegment = new Segment(pos, SegmentType.Axonal, NeuronID, i, null, false);
-                    axonEndPoints.Add(pos);
+                    if (pos.cType == CType.SuccesfullyClaimedByAxon)
+                    {
+                        newSegment = new Segment(pos, SegmentType.Axonal, NeuronID, i, null, false);
+                        axonEndPoints.Add(pos);
+                    }
+                    else if (pos.cType == CType.SuccesfullyClaimedByDendrite)
+                    {                        
+                        newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i, null, false);
+                        ProximalSegmentList.Add(pos);
+                    }
+                    else if (pos.cType == CType.AxonConnectedToDendrite)
+                    {
+                        DoubleSegment douSeg = _cpm.CTable.InterfaceFire(pos.StringIDWithBID);
+
+                        axonEndPoints.Add(douSeg.axonalSegmentID.BasePosition);
+                        var segId = douSeg.axonalSegmentID;
+                        newSegment = new Segment(segId.BasePosition, SegmentType.Axonal, segId.NeuronId, i, segId.GetSegmentID);
+                        newSegment.AddNewConnection(pos);
+                        _cpm.GetSegmentFromSegmentID(douSeg.dendriteISegmentD).AddNewConnection(pos);   //This is Very important as it adds the synapse to the dendrite as well
+                        //Get the connecting Segment
+                        // form a synapse 
+                        // register both connections 
+                        
+                    }
+                    else if(pos.cType == CType.DendriteConnectedToAxon)
+                    {
+                        DoubleSegment douSeg = _cpm.CTable.InterfaceFire(pos.StringIDWithBID);
+
+                        dendriticEndPoints.Add(douSeg.dendriteISegmentD.BasePosition);
+                        var segId = douSeg.dendriteISegmentD;
+                        newSegment = new Segment(segId.BasePosition, SegmentType.Proximal, segId.NeuronId, i, segId.GetSegmentID);
+                        newSegment.AddNewConnection(pos);
+                        _cpm.GetSegmentFromSegmentID(douSeg.axonalSegmentID).AddNewConnection(pos);
+                    }
                 }
-                else if(pos.cType == CType.SuccesfullyClaimedByDendrite)
+                catch (Exception e)
                 {
-                    newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i, null, false);
-                    ProximalSegmentList.Add(pos);
-                }
-                else if(pos.cType == CType.Synapse)
-                {
-                    throw new Exception();
-                    //To be Done.
+                    Console.WriteLine("New Connection Synapse return type is incorrect");
                 }
 
                 if(Segments.TryGetValue(newSegment.SegmentID.GetSegmentID , out Segment segment))
@@ -120,33 +177,7 @@ namespace HTM.Models
 
 
             throw new InvalidOperationException("Invalid Segment ID Access");
-        }        
-
-
-
-        /// <summary>
-        /// Process Potential to segment and decide if you are gonna fire or not so CPM can add you to the prediction list.
-        /// </summary>
-        /// 
-        /// <param name="position"></param>
-        /// <param name="segmentID"></param>
-        /// <param name="potential"></param>
-        /// <returns></returns>
-        internal bool Process(Position3D position, SegmentID segmentID, uint potential)
-        {
-            //Get the segment , supply the potential and see if it decides to fire (NMDA) or depolarise.
-            //if NMDA add segment to predicted list and return response based on firing limits also after firing remember to flush the voltage.
-            //if deplorised good , keep the potential.
-            Segment seg = GetSegment(segmentID);
-            if(seg.Process(potential, position, InputPatternType.INTERNAL))     //if NMDA
-            {
-                Voltage += seg._sumVoltage;
-                seg.FlushVoltage();
-                _predictedSegments.Add(segmentID);
-                return true;
-            }
-            return false;
-        }
+        }                
 
         /// <summary>
         /// Handles Firing of a Neuron
@@ -165,8 +196,20 @@ namespace HTM.Models
                 //_cpm.CTable.RecordFire(point);
 
                 //Get the doublesegment asociated with this position and directly send a grow signal to the denditic neuron.
-                _cpm.GetNeuronFromPositionID(dSegment.dendriteISegmentD.NeuronId).Grow( _cpm.GetSegmentFromSegmentID(dSegment.dendriteISegmentD), dSegment.synapsePosition);
+                if(dSegment != null)
+                    _cpm.GetNeuronFromPositionID(dSegment.dendriteISegmentD.NeuronId).Grow( _cpm.GetSegmentFromSegmentID(dSegment.dendriteISegmentD), dSegment.synapsePosition);
+                else
+                {
+                    //Neurons axons doesnt have any active connection to any dendrites near by.
+                }
             }
+        }
+
+        internal void FinishCycle()
+        {
+            FlushVoltage();
+            _FailedToFirePredictedSegments.Clear();
+            _NMDApredictedSegments.Clear();
         }
 
         public string GetString() => NeuronID.StringIDWithBID;

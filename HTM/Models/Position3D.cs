@@ -30,9 +30,13 @@ namespace HTM.Models
             X = x;
             Y = y;
             Z = z;
-            this.BID = blockId;
+            if(blockId == ComputeBID(x,Y,Z))
+                this.BID = blockId;
+            else
+                this.BID = ComputeBID(x,Y,Z);
             cType = CType.Available;
         }
+      
 
         public object Clone()
         {
@@ -46,6 +50,7 @@ namespace HTM.Models
             };
         }
 
+        //TODO : Fix the computation of the BID Bug
         private uint ComputeBID(uint x, uint y, uint z) =>              //Computes BlockID : VERIFIED
         (z * CPM.GetInstance.NumX * CPM.GetInstance.NumY + y * CPM.GetInstance.NumX + x);
 

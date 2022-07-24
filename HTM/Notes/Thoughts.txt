@@ -17,3 +17,9 @@ How does Temporal Pooling Happen where Columns vote with each other to predict w
 - The best feature that is available to figure out key distinctions , eliminating features that we dont have proper sense over atm to figuring out the key required sensed feature needed to
 effictively distinguish between the object under question. A Very efficient and informed intelligent way to do pooling between different columns and come to a conclusion with the entire network
 to reach a concensus.
+
+
+
+
+BlockConfigProvider
+-You can only design how a block can be configured but how the toal number of such block get configured cannot be changed , the design stays the same

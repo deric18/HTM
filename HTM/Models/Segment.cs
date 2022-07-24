@@ -159,6 +159,11 @@ namespace HTM.Models
 
                 ConnectionType cPos = CPM.GetInstance.CTable.ClaimPosition(newPosition, SegmentID, EndPointType.Dendrite);
 
+                if(cPos.ConType.Equals(CType.NotAvailable))
+                {
+                    throw new Exception("Your Code Sucks !!!! This should never Happen , You Moron !!! ITs time to consider other careers !!! May be watch more BReaking Bad and start Selling Meth !!!!");
+                }
+
                 AddConnection(newPosition);
             } 
             else if(SubSegments.Value.Count < int.Parse(ConfigurationManager.AppSettings["MAX_SEGMENTS_PER_NEURON"]))
@@ -167,6 +172,11 @@ namespace HTM.Models
                 newPosition = sg.PredictNewRandomPosition(this.BasePosition);
 
                 ConnectionType cPos = CPM.GetInstance.CTable.ClaimPosition(newPosition, SegmentID, EndPointType.Dendrite);
+
+                if (cPos.ConType.Equals(CType.NotAvailable))
+                {
+                    throw new Exception("Your Code Sucks !!!! This should never Happen , You Moron !!! ITs time to consider other careers !!! May be watch more BReaking Bad and start Selling Meth !!!!");
+                }
 
                 CreateSubSegment(newPosition);
             }

@@ -109,8 +109,8 @@ namespace HTM
                     {
                         //Fetch the columns to fire and decide if to burst the whole column or fire specific neurons
                         //Fire the neurons and update predicted list
-                        if (!_readySpatial)
-                            throw new Exception("Invalid Input Pattern Type");
+                        //if (!_readySpatial)
+                        //    throw new Exception("Invalid Input Pattern Type");
 
                         List<Position2D> firingPositions = firstPattern.ActiveBits;
 
@@ -120,13 +120,15 @@ namespace HTM
                         }
                         _readySpatial = false;
                         _readyApical = true;
+                        Grow();
+
                         break;
                     }
                 case InputPatternType.TEMPORAL:
                     {
                         //Fetch , Fire , Update
-                        if (!_readyTemporal)
-                            throw new Exception("Invalid Input Pattern Type");
+                        //if (!_readyTemporal)
+                        //    throw new Exception("Invalid Input Pattern Type");
 
                         List<Position2D> firingPositions = firstPattern.ActiveBits;
 
@@ -142,8 +144,8 @@ namespace HTM
                     {
                         //Fetch , Fire , Update
 
-                        if (!_readyApical)
-                            throw new Exception("Invalid Input Pattern Type");
+                        //if (!_readyApical)
+                        //    throw new Exception("Invalid Input Pattern Type");
 
                         List<Position2D> firingPositions = firstPattern.ActiveBits;
 
@@ -190,6 +192,11 @@ namespace HTM
 
         }
 
+        private void ColumnFlush(uint X, uint Y)
+        {
+            instance.ColumnFlush(X, Y);
+        }
+
         internal void AddtoPredictedList(Position3D position, SegmentID segmentID, uint potential)
         {
             bool willFire = GetNeuronFromPosition(segmentID.NeuronId).Process(segmentID.BasePosition, segmentID, potential);
@@ -225,30 +232,32 @@ namespace HTM
         /// 1.Neurons that are predicted in this cycle , all the neurons that contributed to the last cycle for these neurons to be predicted should be incremented.
         /// 2.System should be advanced enough to recognise any neurons that usually dont fire and are firing in this iteration , should be analysed.
         /// </summary>
-        //private void Grow()
-        //{
-        //    //ToDo
-        //    //Once the Firing Cycle has finished
-        //    //Call Connection Tables & Get aLl the DoubleSegment Objects
-        //    //Strengthen all the connections using the DoubleSegments.
-        //    //var predictedSegments = instance.CTable.GetAllPredictedSegments();
+        private void Grow()
+        {
+            //TODO
+            //Once the Firing Cycle has finished
+            //Call Connection Tables & Get aLl the DoubleSegment Objects
+            //Strengthen all the connections using the DoubleSegments.
+            var predictedSegments = instance.CTable.GetAllPredictedSegments();
+            
 
-        //    //for each item in predictedsegments contains a double segment and number of hits the segment has received
-        //    //first order of business , get only the segments which belong to neurons which are going to fire this cycle and strengthen only those segments that have conrtibited
-        //    //to the neuronal segments
-        //    //Also if there too high of a count on one of the segments detect
+            
 
-        //    foreach (var item in GetIntersectionSet())
-        //    {
-        //        item.Key.Grow(item.Value, instance.CTable.InterfaceFire()
+            //for each item in predictedsegments contains a double segment and number of hits the segment has received
+            //first order of business , get only the segments which belong to neurons which are going to fire this cycle and strengthen only those segments that have conrtibited
+            //to the neuronal segments
+            //Also if there too high of a count on one of the segments detect
 
-        //    }
+            foreach (var item in GetIntersectionSet())
+            {
+                item.Key.Grow(item.Value, instance.CTable.InterfaceFire());
+            }
 
 
-        //    //Flush the predicted segment
-        //    CPM.GetInstance.CTable.FlushPredictedSegments();
+            //Flush the predicted segment
+            CPM.GetInstance.CTable.FlushPredictedSegments();
 
-        //}
+        }
 
 
         /// <summary>
@@ -257,7 +266,7 @@ namespace HTM
         /// <returns></returns>
         private List<KeyValuePair<Neuron, Segment>> GetIntersectionSet()
         {
-            List<Neuron> list1 = GetPredictedNeuronsFromSDR(nextPattern);
+            List<Neuron> firingneuronsForNextPattern = GetPredictedNeuronsFromSDR(nextPattern);
 
             List<KeyValuePair<Neuron, Segment>> toRet = new List<KeyValuePair<Neuron, Segment>>();
 
@@ -267,9 +276,9 @@ namespace HTM
                 throw new Exception("There are no predicted Neurons nor segments !! , THis is never supposed to happen!!!");
             }
 
-            foreach(var kvp in _predictedList)
+            foreach(var kvp in _predictedList)                  //Compute if any of the predicted neuron from the last cycle is going to fire this cycle.
             {
-                foreach(var neuron in list1)
+                foreach(var neuron in firingneuronsForNextPattern)
                 {
                     if(kvp.Value.Equals(neuron))
                     {
@@ -277,6 +286,10 @@ namespace HTM
                     }
                 }
             }
+
+            //What if there are no neurons intersecting previous cycle ?
+            //TODO :Create a hardwired distal connection between these.
+
 
             return toRet;
         }

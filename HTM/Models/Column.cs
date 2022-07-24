@@ -10,6 +10,7 @@ namespace HTM.Models
         internal List<Neuron> Neurons { get; private set; }
         internal Position2D ID { get; private set; }
         internal uint Size { get; private set; }
+        internal bool BurstLastCycle;
         
 
         internal Column(uint x, uint y, uint size)
@@ -17,9 +18,10 @@ namespace HTM.Models
             Neurons = new List<Neuron>();
             Size = size;
             ID = new Position2D(x, y);
+            BurstLastCycle = false;
             for(uint i=0;i< Size; i++)
             {
-                Neuron n = new Neuron(new Position3D(x, y, i, (x + (y * 10) + (i * 100))));         //Potential Bug Reolved. Incorrect Block Id Allocation can cause potential fuck up's hard to track! Lesson : give 100% focus to modules you are working on !!!!!
+                Neuron n = new Neuron(new Position3D(x, y, i));         //Potential Bug Reolved. Incorrect Block Id Allocation can cause potential fuck up's hard to track! Lesson : give 100% focus to modules you are working on !!!!!
                 Neurons.Add(n);
                 Initialize(n);
             }
@@ -28,16 +30,12 @@ namespace HTM.Models
         private void Initialize(Neuron n)
         {
             //proximal segments always need to have higher initial synaptic connection potential.
-            n.CreateProximalSegments();
-        }
-
-        private void SetupProximalSegments()
-        {
-            foreach (Neuron neuron in Neurons)
+            if(n.NeuronID.BID == 910)
             {
-                //TODO :: finish this Sucker
+                Console.WriteLine("Catch it!!!");
             }
-        }
+            n.CreateProximalSegments();
+        }       
 
         internal void Fire()
         {
@@ -64,6 +62,13 @@ namespace HTM.Models
             toRet.Add(n);
 
             return toRet;
+        }
+
+        //CycleFlush
+        internal void ColumnFlush(uint x, uint y)
+        {
+            Neurons.ForEach(neuron => neuron.FinishCycle());
+            
         }
 
         public Neuron GetNeuron(uint z) => Neurons[Convert.ToInt32(z)];

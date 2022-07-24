@@ -3,7 +3,7 @@
     public enum BasisBlockType
     {
         NotApplicable,
-        SingleBasisBlock,
+        SingleBasisBlock,           //Single Basis Blocks
         FrontSBB,
         BackSBB,
         LeftSBB,
@@ -11,17 +11,21 @@
         UpSBB,
         BottomSBB,
         DoubleBasisBlock,
-        FUDBB,      //Double Basis Blocks
-        FBDBB,
-        LUDBB,
-        LBDBB,
-        BUDBB,
-        BBDBB,
-        RUDBB,
-        RBDBB,
-        NormalBlock,
-        CoreBasisBlock,
-        FrontLeftBottomCBB,
+        LeftDownDBB,
+        LeftUpperDBB,
+        LeftFrontDBB,
+        LeftBackDBB,
+        RightDownDBB,
+        RightUpperDBB,
+        RightFrontDBB,
+        RightBackDBB,
+        FrontUpDBB,
+        FrontDownDBB,        
+        BackUpperDBB,
+        BackDownDBB,
+        NormalBlock,                //Normal Basis Block
+        CoreBasisBlock,             //Core Basis Block
+        FrontLeftBottomCBB,         
         FrontRightBottomCBB,
         FrontLeftUpperCBB,
         FrontRightUpperCBB,

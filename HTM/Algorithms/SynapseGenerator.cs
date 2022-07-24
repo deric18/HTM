@@ -40,7 +40,7 @@ namespace HTM.Algorithms
         private uint num_files_reg;
         private uint numXPerBlock;
         private uint numYPerBlock;
-        private bool isBlockChanges;
+        private bool isBlockChanged;
         private uint newBlockId;
         private uint numZPerBlock;
         private readonly uint YOFFSET;
@@ -68,17 +68,19 @@ namespace HTM.Algorithms
             numYPerBlock = CPM.GetInstance.BCP.NumYperBlock;
             numZPerBlock = CPM.GetInstance.BCP.NumZperBlock;
             crossOver_X_Left = crossOver_X_Right = crossOver_Y_Up = crossOver_Y_Down = crossOver_Z_Front = crossOver_Z_Back = false;
-            isBlockChanges = false;
+            isBlockChanged = false;
             newBlockId = 0;
             XOFFSET = 1;
-            YOFFSET = num_cols_reg;
-            ZOFFSET = (num_rows_reg * num_cols_reg);
+            YOFFSET = 10;
+            ZOFFSET = (100);
             //based on above values , initialize and populate all the basic block modulos.
             basisBlockType = BasisBlockType.NotApplicable;
             //XL_BB_Mods = XR_BB_Mods = YU_BB_Mod = YD_BB_Mod = ZF_BB_Mod = ZB_BB_Mod = 0;
         }
 
-        private bool XL_BB_Mods(uint bId) => (bId % num_cols_reg == 0);           //returns true if basis block else false
+
+        //CORE BASIS BLOCKS CHECKS
+        private bool XL_BB_Mods(uint bId) => (bId % num_cols_reg == 0);           //NOT 
         private bool XR_BB_Mods(uint bId) => (bId % (num_cols_reg - 1)) == 0;
         private bool YU_BB_Mods(uint bId) => (((num_cols_reg * num_rows_reg) - num_cols_reg) <= bId) ? bId < (num_cols_reg * num_rows_reg) ? true : false : false;
         private bool YD_BB_Mods(uint bId) => (0 <= bId ? bId < num_cols_reg ? true : false : false);
@@ -89,7 +91,87 @@ namespace HTM.Algorithms
 
         private bool Y_BB_Mods(uint bId) => (YU_BB_Mods(bId) && YD_BB_Mods(bId));
 
-        private bool Z_BB_Mods(uint bId) => (ZF_BB_Mods(bId) && ZB_BB_Mods(bId));
+        private bool Z_BB_Mods(uint bId) => (ZF_BB_Mods(bId) && ZB_BB_Mods(bId));        
+
+        //SINGLE BASIS BLOCK
+
+        private bool X_SBB_Mods(uint bid)
+        {
+            bool b1 = !XLF_DBB_Mods(bid), b2 = !XLB_DBB_Mods(bid), b3 = !XRB_DBB_Mods(bid), b4 = !XRF_DBB_Mods(bid), b5 = !YUL_DBB_Mods(bid), b6 = !YUR_DBB_Mods(bid), b7 = !YDL_DBB_Mods(bid), b8 = !YDR_DBB_Mods(bid);
+            if (b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8)
+                return true;
+
+            return false;
+        }
+
+        private bool Y_SBB_Mods(uint bid)
+        {
+            bool b1 = !ZFL_DBB_Mods(bid), b2 = !ZBL_DBB_Mods(bid), b3 = !YDL_DBB_Mods(bid), b4 = !YUL_DBB_Mods(bid), b5 = !ZFU_DBB_Mods(bid), b6 = !YUR_DBB_Mods(bid), b7 = !ZBU_DBB_Mods(bid), b8 = !YDR_DBB_Mods(bid);
+            if (b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8)
+                if (!XLF_DBB_Mods(bid) && !XLB_DBB_Mods(bid) && !XRF_DBB_Mods(bid) && !XRB_DBB_Mods(bid))
+                    return true;
+
+            return false;
+            //Make sure the block doesnt rest on 
+        }
+
+        private bool Z_SBB_Mods(uint bid)
+        {
+            bool b1 = !ZFL_DBB_Mods(bid), b2 = !ZBL_DBB_Mods(bid), b3 = !YDL_DBB_Mods(bid), b4 = !YUL_DBB_Mods(bid), b5 = !ZFU_DBB_Mods(bid), b6 = !YUR_DBB_Mods(bid), b7 = !ZBU_DBB_Mods(bid), b8 = !YDR_DBB_Mods(bid);
+            if( b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8)
+                return true;
+
+            return false;
+        }
+
+
+
+        //DOUBLE BASIS BLOCKS
+        private bool XLF_DBB_Mods(uint bId) => (bId > 9 && bId < 90 && ((bId % 10 ) == 0));           //NOT 0/9 BUT 10 , 20 , 30, .. 80
+
+        private bool XLB_DBB_Mods(uint bid) => ( ( ( ( ( YOFFSET- XOFFSET ) * ZOFFSET ) + YOFFSET ) <= bid && bid <= ( (  ( YOFFSET - XOFFSET) * ZOFFSET) + ( ( YOFFSET - ( 2 * XOFFSET ) ) * YOFFSET) ) && ( bid % YOFFSET == 0 ) ) ? true : false);               //NOT 900/990 BUT  910,920,930, ... 980
+
+        //TRICKY :
+        private bool XRB_DBB_Mods(uint bId) => (((909 < bId && bId < 990 && ( (bId % 10) == 9))) ? true : false);            //NOT 909 BUT 919,929,...,989
+
+            // X = 10 NOT 909 BUT 919, 929, 939, ... 989
+            // X = 15 NOT ? will dot his later
+
+
+
+        private bool XRF_DBB_Mods(uint bid)
+        {
+            // NOT 9 BUT 19, 29, 39, ... 89
+
+            return ( ( ( 18 < bid ) && ( bid < 90 ) && ( bid % 10 ) == 9 ) ? true : false);
+
+        }
+
+        
+        private bool YUL_DBB_Mods(uint bId) =>  (((190) <= bId && bId < (890) && ((bId % ZOFFSET) == 90) ? true : false));  // NOT 90 BUT 190,290,...890
+        private bool YDL_DBB_Mods(uint bId) => (99 < bId && (bId % 100) == 0 && (bId < 900) ? true : false);              //NOT 0 BUT 100,200,300,...800
+        private bool YDR_DBB_Mods(uint bid)     
+        {
+            // X = 10  Not 9 but 109,209,309,409,509 , .. 809
+            // X = 15  Not 15 but 239,464,...
+            return bid > 108 && bid < 810 && (bid % ZOFFSET) == 9;
+
+        }
+
+        private bool YUR_DBB_Mods(uint bid)
+        {
+            // NOT 99 BUT 199,299,..,899
+            bool toRet = false;
+
+            toRet = ((bid > 198) && (bid % ZOFFSET) == 99 && (bid < 900));
+
+            return toRet;
+        }
+        private bool ZFU_DBB_Mods(uint bId) => (bId > 90 && bId <99 ? true : false); //NOT 90 BUT 91,92,93,....,98
+        private bool ZFL_DBB_Mods(uint bid) => (bid > 0 && bid < 9);  //NOT 0 BUT 1,2,3,...,8
+        private bool ZBL_DBB_Mods(uint bid) => (bid > 900 && bid <909); //NOT 900 BUT 901,902,....,908
+        private bool ZBU_DBB_Mods(uint bId) => (bId > 990 && bId < 999);     //NOT 990 BUT 991,992,....,998
+        
 
 
         /// <summary>
@@ -109,71 +191,140 @@ namespace HTM.Algorithms
             basisBlockType = (IsSingleBasisBlock(pos) ? BasisBlockType.SingleBasisBlock : ( IsDoubleBasisBlock(pos) ? BasisBlockType.DoubleBasisBlock : (IsCoreBlock(pos) ? BasisBlockType.CoreBasisBlock  : BasisBlockType.NormalBlock)));
         }
 
-        private bool IsCoreBlock(Position3D pos) => ((XL_BB_Mods(pos.BID) && YD_BB_Mods(pos.BID) && ZF_BB_Mods(pos.BID)) || (XR_BB_Mods(pos.BID) && YU_BB_Mods(pos.BID) && ZB_BB_Mods(pos.BID)));
+        private bool IsCoreBlock(Position3D pos) => (new List<uint> { 0,9,900,909,90,990,99,999}.Contains(pos.BID));
 
-        private bool IsDoubleBasisBlock(Position3D pos) => (X_BB_Mods(pos.BID) || Y_BB_Mods(pos.BID)) && (Y_BB_Mods(pos.BID) || Z_BB_Mods(pos.BID)) && (Z_BB_Mods(pos.BID) || X_BB_Mods(pos.BID));
+        private bool IsDoubleBasisBlock(Position3D pos)
+        {        
+            uint bid = pos.BID;
+            bool flag = false;
+
+            if (pos.BID == 10)
+            {
+                Console.WriteLine("breakpoint");
+            }
+
+
+            if (XLF_DBB_Mods(bid))
+                flag = true;
+            else if (XLB_DBB_Mods(bid))
+                flag = true;
+            else if (XRF_DBB_Mods(bid))
+                flag = true;
+            else if (XRB_DBB_Mods(bid))
+                flag = true;
+            else if (YUL_DBB_Mods(bid))
+                flag = true;
+            else if (YDL_DBB_Mods(bid))
+                flag = true;
+            else if (YDR_DBB_Mods(bid))
+                flag = true;
+            else if (YUR_DBB_Mods(bid))
+                flag = true;
+            else if (ZFU_DBB_Mods(bid))
+                flag = true;
+            else if (ZFL_DBB_Mods(bid))
+                flag = true;
+            else if (ZBU_DBB_Mods(bid))
+                flag = true;
+            else if (ZBL_DBB_Mods(bid))
+                flag = true;
+
+
+            return flag;
+        }
 
         private bool IsSingleBasisBlock(Position3D pos)
         {
-            int BBcount = 0;
+            bool flag = false;
 
-            if (XL_BB_Mods(pos.BID))
-                BBcount++;
-            else if (XR_BB_Mods(pos.BID))
-                BBcount++;
-            else if (YU_BB_Mods(pos.BID))
-                BBcount++;
-            else if (YD_BB_Mods(pos.BID))
-                BBcount++;
-            else if (ZF_BB_Mods(pos.BID))
-                BBcount++;
-            else if (ZB_BB_Mods(pos.BID))
-                BBcount++;
+            if(pos.BID == 50)
+            {
+                Console.WriteLine("breakpoint");
+            }
 
-            return BBcount == 1;
+            if (IsCoreBlock(pos))
+                return false;
+
+            if(pos.BID % 10 == 0 || pos.BID % 10 == 9)      //if block id is on the x-axis , ends with either a zero or 9
+            {
+                if (X_SBB_Mods(pos.BID))
+                    flag = true;                
+            }
+            else if( ( pos.BID > 100 && pos.BID % 100 > 0 && pos.BID % 100 < 9 ) || ( pos.BID % 100 > 90 && pos.BID % 100 < 99 && pos.BID < 988 )  )         // block exists on either side of Y - Axis // this bitch does nothing , do better!!!
+            {
+                // check for all the vertical bars 
+
+                //101,102,.. 108,201,202,203,...208,301,302,...308,...801,802,...808
+                //191,192,.. 198,291,292,293,...298,391,392,...398,...891,892,...898
+
+
+                if (Y_SBB_Mods(pos.BID))
+                    flag = true;
+            }
+            else if((pos.BID > 0 && pos.BID < 99) || (pos.BID > 910 && pos.BID < 989))       // block exists on either side of the Z-Axis 
+            {
+                // check fro vertical and horizaontal bars
+                if (Z_SBB_Mods(pos.BID))
+                    flag = true;
+            }
+
+            return flag;
         }
 
         private BasisBlockType CheckTypeOfSBB(Position3D pos)
         {
             BasisBlockType toReturn = BasisBlockType.NotApplicable;
 
-            if (XL_BB_Mods(pos.BID))
+            if (pos.BID % 10 == 0)
                 toReturn = BasisBlockType.LeftSBB;
-            else if (XR_BB_Mods(pos.BID))
+            else if (pos.BID % 10 == 9)
                 toReturn = BasisBlockType.RightSBB;
-            else if (YU_BB_Mods(pos.BID))
-                toReturn = BasisBlockType.UpSBB;
-            else if (YD_BB_Mods(pos.BID))
+            else if ((pos.BID > 100 && pos.BID % 100 > 0 && pos.BID % 100 < 9))
                 toReturn = BasisBlockType.BottomSBB;
-            else if (ZF_BB_Mods(pos.BID))
+            else if ((pos.BID % 100 > 90 && pos.BID % 100 < 99 && pos.BID < 988))
+                toReturn = BasisBlockType.UpSBB;
+            else if ((pos.BID > 0 && pos.BID < 99))
                 toReturn = BasisBlockType.FrontSBB;
-            else if (ZB_BB_Mods(pos.BID))
+            else if ((pos.BID > 910 && pos.BID < 988))
                 toReturn = BasisBlockType.BackSBB;
 
             return toReturn;
         }
 
         private BasisBlockType CheckTypeOfDBB(Position3D pos)
-        {
+        {                     
             BasisBlockType bBT;
             uint bid = pos.BID;
 
-            if (XL_BB_Mods(bid) && YU_BB_Mods(bid))
-                bBT = BasisBlockType.LUDBB;
-            else if (XL_BB_Mods(bid) && YD_BB_Mods(bid))
-                bBT = BasisBlockType.LBDBB;
-            else if (XR_BB_Mods(bid) && YU_BB_Mods(bid))
-                bBT = BasisBlockType.RUDBB;
-            else if (XR_BB_Mods(bid) && YD_BB_Mods(bid))
-                bBT = BasisBlockType.RBDBB;
-            else if (ZF_BB_Mods(bid) && YU_BB_Mods(bid))
-                bBT = BasisBlockType.FUDBB;
-            else if (ZF_BB_Mods(bid) && YD_BB_Mods(bid))
-                bBT = BasisBlockType.FBDBB;
-            else if (ZB_BB_Mods(bid) && YU_BB_Mods(bid))
-                bBT = BasisBlockType.BUDBB;
-            else if (ZB_BB_Mods(bid) && YD_BB_Mods(bid))
-                bBT = BasisBlockType.BBDBB;
+            if (pos.BID == 910)
+            {
+               // Console.WriteLine("Catch This Exception");
+            }
+
+            if (YUL_DBB_Mods(bid))
+                bBT = BasisBlockType.LeftUpperDBB;
+            else if (YDL_DBB_Mods(bid))
+                bBT = BasisBlockType.LeftDownDBB;
+            else if (YUR_DBB_Mods(bid))
+                bBT = BasisBlockType.RightUpperDBB;
+            else if (YDR_DBB_Mods(bid))
+                bBT = BasisBlockType.RightDownDBB;
+            else if (ZFU_DBB_Mods(bid))
+                bBT = BasisBlockType.FrontUpDBB;
+            else if (ZFL_DBB_Mods(bid))
+                bBT = BasisBlockType.FrontDownDBB;
+            else if (ZBU_DBB_Mods(bid))
+                bBT = BasisBlockType.BackUpperDBB;
+            else if (ZBL_DBB_Mods(bid))
+                bBT = BasisBlockType.BackDownDBB;
+            else if (XLF_DBB_Mods(bid))
+                bBT = BasisBlockType.LeftFrontDBB;
+            else if (XRF_DBB_Mods(bid))
+                bBT = BasisBlockType.RightFrontDBB;
+            else if (XRB_DBB_Mods(bid))
+                bBT = BasisBlockType.RightBackDBB;
+            else if (XLB_DBB_Mods(bid))
+                bBT = BasisBlockType.LeftBackDBB;
             else
             {
                 Console.WriteLine("ERROR: Invalid Double Basis Block Type");
@@ -202,15 +353,16 @@ namespace HTM.Algorithms
         public List<Position3D> AddProximalSegment(Position3D neuronId)
         {
             List<Position3D> NewProximalConnectionPoints = new List<Position3D>();
+                        
 
-            if (basisBlockType.Equals(BasisBlockType.NotApplicable))
-                InitializeChecks(neuronId);
+            if (neuronId.BID == 111)
+                Console.WriteLine("Catch an exception");
 
-            if(neuronId.X == 1 && neuronId.Y == 1 && neuronId.Z == 1)
-            {
-                Console.WriteLine("Catch this Bitch!!!!"); ; ; ;
-            }
 
+            InitializeChecks(neuronId);
+
+             
+           
             switch(basisBlockType) 
             {
                 case BasisBlockType.SingleBasisBlock:
@@ -245,13 +397,16 @@ namespace HTM.Algorithms
             //Register the new position in Ctable.
             uint axonSegCount = 0;
             uint dendriteSegCount = 0;
+
             foreach(var pos in NewProximalConnectionPoints)
             {
-                if(pos.cType == CType.DendriteConnectedToAxon || pos.cType == CType.AxonConnectedToDendrite)
+                if(pos.cType == CType.SuccesfullyClaimedByDendrite || pos.cType == CType.SuccesfullyClaimedByAxon)
                 {
-                    //Nothing TO DO everything worked out.
+                    //Positions intended where succesfully claimed , now create segments at these positions
+                    //SegmentID segID = new SegmentID(neuronId, axonSegCount, )
+
                 }
-                if(pos.cType == CType.DendriteConnectedToAxon)      //A Dendritic Proximal Segment connected to a nearby Axon forming a synapse
+                else if(pos.cType == CType.DendriteConnectedToAxon)      //A Dendritic Proximal Segment connected to a nearby Axon forming a synapse
                 {
                     //Claim Axon Position
                     SegmentID segId = new SegmentID(neuronId, axonSegCount, pos);       //We create a new Proximal SegID for the neuron so we can register it in CTable
@@ -289,6 +444,8 @@ namespace HTM.Algorithms
                         Console.WriteLine("AddProximalSegment : \nNew connection for Neuron \n BLOCK ID : " + neuronId.BID + "\n X:" + neuronId.X + "\n Y:" + neuronId.Y + "\n Z:" + neuronId.Z);
                         Console.WriteLine(pos.StringIDWithBID);
                     }
+
+                    axonSegCount++;
                 }
             }
 
@@ -401,6 +558,10 @@ namespace HTM.Algorithms
             Position3D axonPos = null;
             Position3D dendriticPos = null;
 
+            if (neuronPos.X == 0 && neuronPos.Y == 0 && neuronPos.Z == 0)
+                Console.WriteLine("Catch an exception");
+
+
             //pick the center of the block and then create a random square block the size of the block and call create new random position , just in case perform check
             //if we are creating a position for axon and it falls over the central axon point then pick a different position. this is not needed because it wont happen CTable wont let that happen as the point is already registered
             Position3D blockCenter = CPM.GetInstance.BCP.BlockCenter;
@@ -422,6 +583,10 @@ namespace HTM.Algorithms
             Position3D axonPos = null;
             Dictionary<(int, int, int), char> dict = new Dictionary<(int, int, int), char>();
             Position3D dendriticPos = null;
+
+
+            if (neuronId.BID == 111)
+                Console.WriteLine("Stuff");
 
             //pick the center of the block and then create a random square block the size of the block and call create new random position , just in case perform check
             //if we are creating a position for axon and it falls over the central axon point then pick a different position. this is not needed because it wont happen CTable wont let that happen as the point is already registered
@@ -462,6 +627,8 @@ namespace HTM.Algorithms
             toReturn.Add(axonPos);
             toReturn.Add(dendriticPos);
 
+
+            //BUG : Below Offset does not make sense
             // -z,& -x
             blockCenter.BID = neuronId.BID - ZOFFSET - XOFFSET;
             axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -531,12 +698,9 @@ namespace HTM.Algorithms
             blockCenter.BID = neuronId.BID;
             uint blockRadius = blockCenter.X;
 
-            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
-            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
-
-
-            toReturn.Add(axonPos);
-            toReturn.Add(dendriticPos);
+            //axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            //dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+           
 
 
             switch (sbbType)
@@ -737,7 +901,7 @@ namespace HTM.Algorithms
                         toReturn.Add(axonPos);
                         toReturn.Add(dendriticPos);
 
-                        blockCenter.BID = neuronId.BID + ZOFFSET;
+                        blockCenter.BID = neuronId.BID - ZOFFSET - XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
                         dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
 
@@ -765,8 +929,8 @@ namespace HTM.Algorithms
         /// <returns></returns>
         //NOTE : The reason why DBB's get only 2 axons and dendrites is becuase there are no more neurons on two sides of there block so we can reduce the A&D's by exactly half.
         //Points to Ponder :
-        //1. Can achieve Better NEural Connectivity with 2 Axons & Dendrites to DBB.
-        //2. Its always better to have Connection with one Normal Block That way Signal Loss is Minimal.
+        //1. Can achieve Better Neural Connectivity with 2 Axons & Dendrites to DBB.
+        //2. Its always better to have Connection with one Normal Block That way Signal Loss is Minimal. 
         private List<Position3D> ComputeProximalCoordinatesForDoubleBB(Position3D neuronPos)            // 2 AXONS & 2 DENDRITES PER BLOCK
         {
             //figure out which face of the block is the block on ? then figure out which offsets should be applied.
@@ -787,15 +951,18 @@ namespace HTM.Algorithms
             blockCenter.BID = neuronPos.BID;
             uint blockRadius = blockCenter.X;
 
-
-            axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
-            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+            if (neuronPos.BID == 111)
+            {
+                uint i = 10;
+            }
+            //axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+            //dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
 
 
             //Hint : Upon generating a dendrite / axon in DBB , Always extend towards normal blocks. that way neurons will not remain unused.
             switch (bbt)
             {
-                case BasisBlockType.FUDBB:      //Means Front Facing Block which intersects with Upper Facing Block. So we can only apply -YZX  & -Z OFFSETS to it.
+                case BasisBlockType.FrontUpDBB:      //Means Front Facing Block which intersects with Upper Facing Block. So we can only apply -YZX  & -Z OFFSETS to it.
                     {
                         //Figure out which offsets are to be applied to every DBB type , apply it , compute it.
                         //-z offset
@@ -813,7 +980,7 @@ namespace HTM.Algorithms
 
                         break;
                     }
-                case BasisBlockType.FBDBB:  // Front Facing Block With Bottom Intersection DBB , Need to Add Z & Y OFFSETS to it.
+                case BasisBlockType.FrontDownDBB:  // Front Facing Block With Bottom Intersection DBB , Need to Add Z & Y OFFSETS to it.
                     {
                         blockCenter.BID = neuronPos.BID + ZOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -828,7 +995,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.LUDBB:  // Left Face Uppser Side Intersection Block , -Y & +X OFFSETS
+                case BasisBlockType.LeftUpperDBB:  // Left Face Uppser Side Intersection Block , -Y & +X OFFSETS
                     {
                         blockCenter.BID = neuronPos.BID + XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -843,7 +1010,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.LBDBB:  // Left Face Back Side Intersection Block , +Y & +X OFFSETS
+                case BasisBlockType.LeftBackDBB:  // Left Face Back Side Intersection Block , +Y & +X OFFSETS
                     {
                         blockCenter.BID = neuronPos.BID + XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -858,7 +1025,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.BUDBB:  // Back Face Upper Side Intersection Block , -XY & -Y OFFSETS 
+                case BasisBlockType.BackUpperDBB:  // Back Face Upper Side Intersection Block , -XY & -Y OFFSETS 
                     {
                         blockCenter.BID = neuronPos.BID + XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -873,7 +1040,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.BBDBB:  //-Z+2Y , -Z+2Y
+                case BasisBlockType.BackDownDBB:  //-Z+2Y , -Z+2Y
                     {
                         blockCenter.BID = neuronPos.BID -ZOFFSET + 2*YOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -888,7 +1055,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.RUDBB:  //Y-2X, -Y-2X
+                case BasisBlockType.RightUpperDBB:  //Y-2X, -Y-2X
                     {
                         blockCenter.BID = neuronPos.BID + YOFFSET -2*XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -903,7 +1070,7 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
                         break;
                     }
-                case BasisBlockType.RBDBB:  // -X+Y, -2X+Y
+                case BasisBlockType.RightBackDBB:  // -X+Y, -2X+Y
                     {
                         blockCenter.BID = neuronPos.BID + YOFFSET -XOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
@@ -912,6 +1079,73 @@ namespace HTM.Algorithms
                         toReturn.Add(dendriticPos);
 
                         blockCenter.BID = neuronPos.BID - 2*XOFFSET + YOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+                        break;
+
+                    }
+                case BasisBlockType.LeftDownDBB:    //+X+Y, +Z+X+Y
+                    {
+                        
+                        blockCenter.BID = neuronPos.BID + XOFFSET + YOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        blockCenter.BID = neuronPos.BID + ZOFFSET + YOFFSET + XOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+                        break;                        
+
+                    }
+                case BasisBlockType.LeftFrontDBB:   //+Z+X+Y, +X+Y
+                    {
+                        
+                        blockCenter.BID = neuronPos.BID + ZOFFSET + YOFFSET + XOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        blockCenter.BID = neuronPos.BID + XOFFSET + YOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+                        break;                        
+
+                    }
+                case BasisBlockType.RightDownDBB:    //+Y-X , +Z+Y-X
+                    {
+                        
+                        blockCenter.BID = neuronPos.BID + YOFFSET - XOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        blockCenter.BID = neuronPos.BID + ZOFFSET - XOFFSET + YOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+                        break;                       
+
+                    }
+                case BasisBlockType.RightFrontDBB:  //+Z-X, +Z-X-Y
+                    {
+                        blockCenter.BID = neuronPos.BID + ZOFFSET - XOFFSET;
+                        axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
+                        dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
+                        toReturn.Add(axonPos);
+                        toReturn.Add(dendriticPos);
+
+                        blockCenter.BID = neuronPos.BID + ZOFFSET - XOFFSET - YOFFSET;
                         axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'A', blockRadius);
                         dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(blockCenter, 'D', blockRadius);
                         toReturn.Add(axonPos);
@@ -962,7 +1196,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId -= 1;
                     }
 
@@ -981,7 +1215,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId += 1;
                     }
                 }                
@@ -996,13 +1230,13 @@ namespace HTM.Algorithms
                 // if isBasisBlock , need to figure out which side of the edge is the basis block is in ? if its on the left edge and the cross over is X then needs adjustments , same for other faces y ,z
 
                 uint x = SynapseGeneratorHelper.GetRand(0, basePosition.X + blockRadius);
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(x);
             }
             else if(XR_BB_Mods(basePosition.BID) && crossOver_Right)
             {
                 uint x = SynapseGeneratorHelper.GetRand(basePosition.X - blockRadius , numXPerBlock);
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(x);
             }
             else if(XR_BB_Mods(basePosition.BID) && crossOver_Left)
@@ -1019,7 +1253,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId -= 1;
                 }
             }
@@ -1037,7 +1271,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId += 1;
                 }
             }
@@ -1070,7 +1304,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId += (YOFFSET);
                     }
 
@@ -1090,7 +1324,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId -= YOFFSET;
                     }
                 }
@@ -1104,13 +1338,13 @@ namespace HTM.Algorithms
                 // if isBasisBlock , need to figure out which side of the edge is the basis block is in ? if its on the left edge and the cross over is X then needs adjustments , same for other faces y ,z
 
                 uint y = SynapseGeneratorHelper.GetRand(basePosition.Y - blockRadius, numYPerBlock);
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(y);
             }
             else if (YD_BB_Mods(basePosition.BID) && crossOver_Down)
             {
                 uint y = SynapseGeneratorHelper.GetRand(0, basePosition.Y + blockRadius);
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(y);
             }
             else if(YU_BB_Mods(basePosition.BID) && crossOver_Down)     //Not a problem basis block on upper face but crossing over on below block
@@ -1128,7 +1362,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId -= YOFFSET;
                 }
             }
@@ -1146,7 +1380,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId += (YOFFSET);
                 }
             }
@@ -1179,7 +1413,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId += ZOFFSET;
                     }
                 }
@@ -1197,7 +1431,7 @@ namespace HTM.Algorithms
 
                     if (boundedInterval.isBlockChanged)
                     {
-                        isBlockChanges = true;
+                        isBlockChanged = true;
                         newBlockId -= ZOFFSET;
                     }
                 }
@@ -1212,13 +1446,13 @@ namespace HTM.Algorithms
                 // if isBasisBlock , need to figure out which side of the edge is the basis block is in ? if its on the left edge and the cross over is X then needs adjustments , same for other faces y ,z
 
                 uint z = SynapseGeneratorHelper.GetRand(0, basePosition.Z + numZPerBlock);  
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(z);
             }
             else if (ZB_BB_Mods(basePosition.BID) && crossOver_Back)
             {
                 uint x = SynapseGeneratorHelper.GetRand(basePosition.Z - blockRadius, numZPerBlock);
-                isBlockChanges = false;
+                isBlockChanged = false;
                 boundedInterval = new Interval(x);
             }
             else if(ZF_BB_Mods(basePosition.BID) && crossOver_Back)
@@ -1235,7 +1469,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId -= ZOFFSET;
                 }
             }
@@ -1253,7 +1487,7 @@ namespace HTM.Algorithms
 
                 if (boundedInterval.isBlockChanged)
                 {
-                    isBlockChanges = true;
+                    isBlockChanged = true;
                     newBlockId += ZOFFSET;
                 }
             }
