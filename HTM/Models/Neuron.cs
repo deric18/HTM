@@ -4,6 +4,7 @@ using HTM.Enums;
 using System.Collections.Generic;
 using System;
 using HTM.Algorithms;
+using System.Configuration;
 
 namespace HTM.Models
 {
@@ -11,37 +12,42 @@ namespace HTM.Models
     /// 1.Account for both excitatory and inhibitory neurons . Need to rethink about this, one argument is that this is not neccessary because HTM Model already accounts for this by 
     /// picking single neurons from one column with highest values using selective firing techniques.
     /// </summary>
-    public class Neuron : IEqualityComparer<Neuron> , IEquatable<Neuron>
-    {                
+    public class Neuron : IEqualityComparer<Neuron>, IEquatable<Neuron>
+    {
         internal uint Voltage { get; private set; }
         public Position3D NeuronID { get; private set; }
         internal NeuronState State { get; private set; }
-        public  List<Position3D> ProximalSegmentList { get; private set; }     //list of proximal segments with higher connectivity threshold
+        public List<Position3D> ProximalSegmentList { get; private set; }     //list of proximal segments with higher connectivity threshold
 
         //Question : Should proximal Segments be also added to the segment List
         //Answer : No , coz you can make the logic in the method to look into both lists rather than duping data , bad practice!
         public Dictionary<string, Segment> Segments { get; private set; }      // List of all segments the neuron has        
-        private List<SegmentID> _NMDApredictedSegments;
-        private List<SegmentID> _FailedToFirePredictedSegments;
+        private Dictionary<Position3D, Segment> _NMDApredictedSegments;
+        private List<Segment> _FailedToFirePredictedSegments;
         public List<Position3D> axonEndPoints { get; private set; }
         public List<Position3D> dendriticEndPoints { get; private set; }
 
-        private const uint NEURONAL_FIRE_VOLTAGE = 10;
+        private readonly uint NEURONAL_FIRE_VOLTAGE;
+        private readonly uint AVERAGE_GROWTH_SIGNAL_STRENGTH;
+        private readonly uint NMDA_SPIKE_POTENTIAL;
 
         private CPM _cpm;
 
         public Neuron(Position3D pos)
         {
-            Voltage = 0;            
+            Voltage = 0;
             NeuronID = pos;
             State = NeuronState.RESTING;
             Segments = new Dictionary<string, Segment>();
             ProximalSegmentList = new List<Position3D>();
-            _NMDApredictedSegments = new List<SegmentID>();
-            _FailedToFirePredictedSegments = new List<SegmentID>();
+            _NMDApredictedSegments = new Dictionary<Position3D, Segment>();
+            _FailedToFirePredictedSegments = new List<Segment>();
             axonEndPoints = new List<Position3D>();
             dendriticEndPoints = new List<Position3D>();
             _cpm = CPM.GetInstance;
+            NEURONAL_FIRE_VOLTAGE = Convert.ToUInt32(ConfigurationManager.AppSettings["NEURONAL_FIRE_VOLTAGE"]);
+            AVERAGE_GROWTH_SIGNAL_STRENGTH = Convert.ToUInt32(ConfigurationManager.AppSettings["AVERAGE_GROWTH_SIGNAL_STRENGTH"]);
+            NMDA_SPIKE_POTENTIAL = Convert.ToUInt32(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]);
         }
 
         /// <summary>
@@ -61,16 +67,72 @@ namespace HTM.Models
             if (seg.Process(potential, position, InputPatternType.INTERNAL))     //if NMDA
             {
                 Voltage += seg._sumVoltage;
-                seg.FlushVoltage();
-                _NMDApredictedSegments.Add(segmentID);
+                _NMDApredictedSegments.Add(position, seg);
                 this.State = NeuronState.PREDICTED;
                 return true;
             }
 
-            _FailedToFirePredictedSegments.Add(segmentID);
+            _FailedToFirePredictedSegments.Add(seg);
 
             return false;
         }
+
+        /// <summary>
+        /// check if any of the neruons axons are connected to any dendrite at all ?
+        /// if so fire them , add the recipient neuron to the predicted list
+        ///     if the predicted neuron fires next send a grow signal to that neuron ,also prune to those which havent fired in the last 45 cycles
+        ///     else increase cycle count on each of these empty synapses
+        /// else
+        ///  send multiple grow singals to the neuron so it makes some connections.
+        /// </summary>
+        internal void Fire()
+        {
+            foreach (var point in axonEndPoints)
+            {
+
+                DoubleSegment dSegment = _cpm.CTable.InterfaceFire(point.StringIDWithBID);
+
+                if (dSegment != null)
+                {
+                    var neuron = _cpm.GetNeuronFromSegmentID(dSegment.dendriteISegmentD);
+                    neuron.Process(point, dSegment.dendriteISegmentD, NEURONAL_FIRE_VOLTAGE);
+                }
+                else
+                {
+                    Console.WriteLine("FIRE : NULL FIRE , Neuron does not have any valid Connections to fire");
+                    //Neurons axons doesnt have any active connection to any dendrites near by.
+                }
+            }
+        }
+
+
+        internal void Grow(Segment seg, Position3D synapse)
+        {
+            //TODO:
+            //growth signal comes from CPM when neuron exceeds fire index in the fire cycle , we add new positions to both axonal endpoints and dendritic segments.
+            // Will need some details on which dendrites or axons are exactly firing.
+
+            seg.Grow(synapse);
+            
+        }
+
+        /// <summary>
+        /// increment synaptic strength on nmda & non nmda predicted segments
+        /// send out a grow and prune signal to all the segments , to cut out unneccesary connection and grow more promissing ones.
+        /// </summary>
+        internal void Grow()
+        {
+
+
+
+        }
+
+
+        internal void Audit()
+        {
+            //Go through all the segments and there respective connections and audit there hitcounters , if 0 for 50 cycles then prune them 
+        }
+
 
         public void CreateProximalSegments()
         {
@@ -80,7 +142,9 @@ namespace HTM.Models
             proximalSegList = (CPM.GetInstance.synapseGenerator.AddProximalSegment(NeuronID));
 
             if (proximalSegList == null)
-                proximalSegList = new List<Position3D>();
+                proximalSegList = new List<Position3D>();   //Avoiding Exceptions
+
+
             uint i = 0;
 
             if (NeuronID.BID == 111)
@@ -88,8 +152,7 @@ namespace HTM.Models
 
             foreach(Position3D pos in proximalSegList)
             {
-                Segment newSegment = null;
-                //TODO : Need bit more reasearch about the SegmentType
+                Segment newSegment = null;                
 
                 try
                 {
@@ -110,8 +173,8 @@ namespace HTM.Models
                         axonEndPoints.Add(douSeg.axonalSegmentID.BasePosition);
                         var segId = douSeg.axonalSegmentID;
                         newSegment = new Segment(segId.BasePosition, SegmentType.Axonal, segId.NeuronId, i, segId.GetSegmentID);
-                        newSegment.AddNewConnection(pos);
-                        _cpm.GetSegmentFromSegmentID(douSeg.dendriteISegmentD).AddNewConnection(pos);   //This is Very important as it adds the synapse to the dendrite as well
+                        newSegment.AddNewConnection(pos, SynapseType.Proximal);
+                        _cpm.GetSegmentFromSegmentID(douSeg.dendriteISegmentD).AddNewConnection(pos, SynapseType.Proximal);   //This is Very important as it adds the synapse to the dendrite as well
                         //Get the connecting Segment
                         // form a synapse 
                         // register both connections 
@@ -124,13 +187,13 @@ namespace HTM.Models
                         dendriticEndPoints.Add(douSeg.dendriteISegmentD.BasePosition);
                         var segId = douSeg.dendriteISegmentD;
                         newSegment = new Segment(segId.BasePosition, SegmentType.Proximal, segId.NeuronId, i, segId.GetSegmentID);
-                        newSegment.AddNewConnection(pos);
-                        _cpm.GetSegmentFromSegmentID(douSeg.axonalSegmentID).AddNewConnection(pos);
+                        newSegment.AddNewConnection(pos, SynapseType.Proximal);
+                        _cpm.GetSegmentFromSegmentID(douSeg.axonalSegmentID).AddNewConnection(pos, SynapseType.Proximal);
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("New Connection Synapse return type is incorrect");
+                    Console.WriteLine("New Connection Synapse return type is incorrect" + e.Message);
                 }
 
                 if(Segments.TryGetValue(newSegment.SegmentID.GetSegmentID , out Segment segment))
@@ -174,36 +237,8 @@ namespace HTM.Models
                 return seg;            
 
 
-
-
             throw new InvalidOperationException("Invalid Segment ID Access");
-        }                
-
-        /// <summary>
-        /// Handles Firing of a Neuron
-        /// </summary>
-        internal void Fire()
-        {
-            foreach(var point in axonEndPoints)
-            {
-                //Get connection table and check if any of the axon end points has connections ./AIII 118
-                //Collect those SegmentId's , get Neurons from those segmentID's
-                //start calling methods on those neurons with there respective segmentID's
-
-                DoubleSegment dSegment = _cpm.CTable.InterfaceFire(point.StringIDWithBID);
-
-                //_cpm.AddtoPredictedList(point, sId, NEURONAL_FIRE_VOLTAGE);
-                //_cpm.CTable.RecordFire(point);
-
-                //Get the doublesegment asociated with this position and directly send a grow signal to the denditic neuron.
-                if(dSegment != null)
-                    _cpm.GetNeuronFromPositionID(dSegment.dendriteISegmentD.NeuronId).Grow( _cpm.GetSegmentFromSegmentID(dSegment.dendriteISegmentD), dSegment.synapsePosition);
-                else
-                {
-                    //Neurons axons doesnt have any active connection to any dendrites near by.
-                }
-            }
-        }
+        }                        
 
         internal void FinishCycle()
         {
@@ -222,19 +257,28 @@ namespace HTM.Models
             Segment segment;
             if(!Segments.TryGetValue(pos.StringIDWithBID, out segment))
             {
-                segment.AddNewConnection(pos);
+                segment.AddNewConnection(pos, SynapseType.Distal);
                 return true;
             }
             return false;
-        }
+        }        
 
-        internal void Grow(Segment seg, Position3D synapse)
+        internal bool CheckConnections(Neuron neuron)
         {
-            //TODO:
-            //growth signal comes from CPM when neuron exceeds fire index in the fire cycle , we add new positions to both axonal endpoints and dendritic segments.
-            // Will need some details on which dendrites or axons are exactly firing.
+            bool toRet = false;
 
-            seg.Grow(synapse);
+            foreach(var seg in this.Segments)
+            {
+                foreach(var seg2 in neuron.Segments)
+                {
+                    if(CPM.GetInstance.CTable.DoesConnectionExist(seg.Value , seg2.Value))
+                    {
+                        toRet = true;
+                    }
+                }
+            }
+
+            return toRet;
         }
 
         internal void Prune()

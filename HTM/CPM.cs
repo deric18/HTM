@@ -157,7 +157,19 @@ namespace HTM
                         _readyTemporal = true;
                         break;
                     }
-            }            
+            }
+
+            
+            _ = instance.cycle == ulong.MaxValue ? instance.cycle = 0 : ++instance.cycle;
+            instance.FlushCycle(firstPattern);
+        }
+
+        private void FlushCycle(SDR sdr)
+        {
+
+            sdr.ActiveBits.ForEach(bit => ColumnFlush(bit.X, bit.Y));
+            //Flush the predicted segment
+            CPM.GetInstance.CTable.FlushPredictedSegments();
         }
 
 
@@ -197,15 +209,15 @@ namespace HTM
             instance.ColumnFlush(X, Y);
         }
 
-        internal void AddtoPredictedList(Position3D position, SegmentID segmentID, uint potential)
-        {
-            bool willFire = GetNeuronFromPosition(segmentID.NeuronId).Process(segmentID.BasePosition, segmentID, potential);
+        //internal void AddtoPredictedList(Position3D position, SegmentID segmentID, uint potential)
+        //{
+        //    bool willFire = GetNeuronFromPosition(segmentID.NeuronId).Process(segmentID.BasePosition, segmentID, potential);
 
-            if(willFire)
-            {
-                _predictedList.Add(new KeyValuePair<Segment, Neuron>(GetSegmentFromSegmentID(segmentID), GetNeuronFromSegmentID(segmentID)));
-            }            
-        }
+        //    if(willFire)
+        //    {
+        //        _predictedList.Add(new KeyValuePair<Segment, Neuron>(GetSegmentFromSegmentID(segmentID), GetNeuronFromSegmentID(segmentID)));
+        //    }            
+        //}
 
         /// <summary>
         /// Get the Current PRedict SDR of the System
@@ -227,6 +239,11 @@ namespace HTM
             return toReturn;
         }
 
+        internal uint DistanceBetween2Points(Position3D p1, Position3D p2)
+        {
+            return (uint) Math.Sqrt( Math.Pow((p1.X - p2.X), 2) + Math.Pow((p1.Y - p2.Y),2) + Math.Pow((p1.Z - p2.Z),2));
+        }
+
 
         /// <summary>
         /// 1.Neurons that are predicted in this cycle , all the neurons that contributed to the last cycle for these neurons to be predicted should be incremented.
@@ -239,60 +256,95 @@ namespace HTM
             //Call Connection Tables & Get aLl the DoubleSegment Objects
             //Strengthen all the connections using the DoubleSegments.
             var predictedSegments = instance.CTable.GetAllPredictedSegments();
-            
 
-            
 
             //for each item in predictedsegments contains a double segment and number of hits the segment has received
             //first order of business , get only the segments which belong to neurons which are going to fire this cycle and strengthen only those segments that have conrtibited
             //to the neuronal segments
             //Also if there too high of a count on one of the segments detect
 
-            foreach (var item in GetIntersectionSet())
+            var SuccesfullyContributedToFiringSet = GetIntersectionSet(predictedSegments);
+
+            foreach (var item in SuccesfullyContributedToFiringSet)      //Segmetnts which will fire in the next cycle , Strengthen all the contributing synapses and send grow signal to these neurons
             {
-                item.Key.Grow(item.Value, instance.CTable.InterfaceFire());
+                
+                
+
+
+            }
+
+            float successPercentage = ComputeSuccess();
+
+
+
+            if(successPercentage < 0.3)
+            {
+
+            }
+            else if(successPercentage > 0.3 && successPercentage < 0.6)
+            {
+
+            }
+            else if(successPercentage > 0.6 && successPercentage < 0.9)
+            {
+
+            }
+            else
+            {
+
             }
 
 
-            //Flush the predicted segment
-            CPM.GetInstance.CTable.FlushPredictedSegments();
+            //Foreach of the non predicted neurons which fired , send double Grow Signals
+
+            
 
         }
 
 
         /// <summary>
-        /// Takes in an SDR and a keyvaluepair enumerable set and spits out list of neurons
+        /// Returns a bunch of neurons and segments that have contributed to next firing pattern from this cycle.
         /// </summary>
         /// <returns></returns>
-        private List<KeyValuePair<Neuron, Segment>> GetIntersectionSet()
+        private List<KeyValuePair<Neuron, DoubleSegment>> GetIntersectionSet(Dictionary<string, DoubleSegment> predictedSegments)
         {
             List<Neuron> firingneuronsForNextPattern = GetPredictedNeuronsFromSDR(nextPattern);
 
-            List<KeyValuePair<Neuron, Segment>> toRet = new List<KeyValuePair<Neuron, Segment>>();
+            List<KeyValuePair<Neuron, DoubleSegment>> toRet = new List<KeyValuePair<Neuron, DoubleSegment>>();
 
-            if (_predictedList.Count == 0)
+            if (predictedSegments.Count == 0)
             {
                 Console.WriteLine("There are no predicted Neurons nor segments !! , THis is never supposed to happen!!!");
                 throw new Exception("There are no predicted Neurons nor segments !! , THis is never supposed to happen!!!");
             }
 
-            foreach(var kvp in _predictedList)                  //Compute if any of the predicted neuron from the last cycle is going to fire this cycle.
+            foreach(var kvp in predictedSegments)                  //Compute if any of the predicted neuron from the last cycle is going to fire this cycle.
             {
                 foreach(var neuron in firingneuronsForNextPattern)
                 {
                     if(kvp.Value.Equals(neuron))
                     {
-                        toRet.Add(new KeyValuePair<Neuron, Segment>(neuron, kvp.Key));
+                        toRet.Add(new KeyValuePair<Neuron, DoubleSegment>(neuron, kvp.Value));
                     }
                 }
             }
 
             //What if there are no neurons intersecting previous cycle ?
-            //TODO :Create a hardwired distal connection between these.
-
+            //TODO :Create a hardwired distal connection between these. Lets leave it for that here. Randomly if they fire often it these should be able to connect.
 
             return toRet;
         }
+
+        private bool CheckIfNeuronsAreConnected(Neuron neuron1, Neuron neuron2)
+        {
+            bool toRet = false;
+
+            if (neuron1.CheckConnections(neuron2))
+                toRet = true;
+
+            return toRet;
+
+        }             
 
         private List<Neuron> GetPredictedNeuronsFromSDR(SDR pattern)
         {

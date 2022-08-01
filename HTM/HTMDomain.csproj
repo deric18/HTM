@@ -60,6 +60,7 @@
     <Compile Include="Encoders\ByteEncoder.cs" />
     <Compile Include="Encoders\Models\Bucket.cs" />
     <Compile Include="Enums\PotentialType.cs" />
+    <Compile Include="Enums\SynapseType.cs" />
     <Compile Include="Enums\SignalType.cs" />
     <Compile Include="Enums\TransformType.cs" />
     <Compile Include="CPM.cs" />

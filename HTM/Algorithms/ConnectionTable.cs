@@ -5,15 +5,14 @@ using HTM.Enums;
 using HTM.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HTM.Algorithms
 {
     public class ConnectionTable
     {
         private char[,,,] cMap;            //  A = Available , d - Occupied by Dendrite , a - Occupied by axon , N - Not Available
-                                           //key : is always Position3D.GetStringIDWithBID();
-        private ulong openCounter;
-        private uint closedCounter;
+                                           //key : is always Position3D.GetStringIDWithBID();       
         private uint temporalCounter;
         private uint apicalCounter;
         private Dictionary<string, SegmentID> axonalEndPoints;          //holds only unconnected axonal ( active axonal connections)
@@ -33,8 +32,7 @@ namespace HTM.Algorithms
         }
 
         private ConnectionTable(uint numBlocks, BlockConfigProvider bcp)
-        {
-            openCounter = closedCounter = temporalCounter = closedCounter = 0;
+        {            
             axonalEndPoints = new Dictionary<string, SegmentID>();          //holds all the due axonal connections.
             dendriticEndPoints = new Dictionary<string, SegmentID>();       //<position3d , corresponding segment id of the dendrite>.
             synapses = new Dictionary<string, DoubleSegment>();             //Holds all the synapses with respective synapses ID's.
@@ -88,9 +86,9 @@ namespace HTM.Algorithms
 
         public int GetTotalSynapsesCount => synapses.Count;
 
-        public Dictionary<string, DoubleSegment>.ValueCollection GetAllPredictedSegments()
+        public Dictionary<string, DoubleSegment> GetAllPredictedSegments()
         {
-            return PredictedSegments.Values;
+            return PredictedSegments;
         }
 
         public void FlushPredictedSegments()
@@ -106,6 +104,27 @@ namespace HTM.Algorithms
         public char Position(uint blockID, uint x, uint y, uint z) => cMap[blockID, x,y, z];
 
         public bool IsPositionAvailable(Position3D pos) => (!dendriticEndPoints.TryGetValue(pos.StringIDWithBID, out SegmentID item) && !axonalEndPoints.TryGetValue(pos.StringIDWithBID, out SegmentID item1) && !synapses.TryGetValue(pos.StringIDWithBID, out DoubleSegment item2));
+
+        public bool DoesConnectionExist(Segment seg1, Segment seg2)
+        {
+            
+            if (seg1.Synapses.Count == 0 || seg2.Synapses.Count == 0)
+                return false;
+
+            foreach(var kvp in seg1.Synapses)
+            {
+                foreach(var kvp2 in seg2.Synapses)
+                {
+                    if(kvp.Key.Equals(kvp2.Key))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+
+        }
 
         private bool IsDendriteOccupied(Position3D pos) => (dendriticEndPoints.TryGetValue(pos.StringIDWithBID, out SegmentID item));
 
@@ -260,7 +279,7 @@ namespace HTM.Algorithms
         /// <param name="position"></param>
         /// <returns></returns>
         internal DoubleSegment InterfaceFire(string position)
-        {
+        { 
             //Called by axonal endpoints to extract if any dendrites are connected to it it ll fire them
             if(synapses.TryGetValue(position, out var doubleSegment))
             {

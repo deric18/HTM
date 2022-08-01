@@ -20,6 +20,11 @@
             hitcount = 0;
         }        
 
+        public void Grow()
+        {
+            CPM.GetInstance.GetNeuronFromSegmentID(dendriteISegmentD).Grow(dendriteISegmentD, synapsePosition);
+        }
+
         public void IncrementHitcount() =>
             hitcount++;
     }
