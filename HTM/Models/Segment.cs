@@ -7,24 +7,25 @@ using HTM.Enums;
 using HTM.Algorithms;
 
 namespace HTM.Models
-{    
+{
     /// <summary>
     /// -If Proximal Polarization  of the system
     /// -NMDA
     /// -Segment Growth.
     /// </summary>
     public class Segment
-    {        
+    {
         public Position3D BasePosition { get; private set; }    // Position where the Semgnet Originates and grows out of!.
         public uint _sumVoltage { get; private set; }
         public Position3D NeuronID { get; private set; }
         public string LineageString { get; private set; }
-        public  SegmentID SegmentID { get; private set; }
+        public SegmentID SegmentID { get; private set; }
         private uint _segmentNumber;
         private bool _fullyConnected;
-        private Dictionary<Position3D, uint> _synapses;     //uint helps in prunning anything thats zero is taken out and flushed to connection table.
+        public Dictionary<Position3D, uint> Synapses { get; private set; }     //uint helps in prunning anything thats zero is taken out and flushed to connection table.
         private Lazy<List<Segment>> SubSegments;        
-        private List<Position3D> _predictedSynapses;
+        private List<Position3D> _predictedSynapsesNNMDA;
+        private List<Position3D> _NMDApredictedSynapses;
         private uint _lastAccesedCycle;                     //helps in prunning of segments
         private bool IsSubSegment;                          //True if yes , False if no
         private SegmentType sType;
@@ -45,11 +46,12 @@ namespace HTM.Models
             this.sType = sType;
             _sumVoltage = 0;               
             _fullyConnected = false;
-            _synapses = new Dictionary<Position3D, uint>();
+            Synapses = new Dictionary<Position3D, uint>();            
             _lastAccesedCycle = 0;
-            _predictedSynapses = new List<Position3D>();
+            _predictedSynapsesNNMDA = new List<Position3D>();
+            _NMDApredictedSynapses = new List<Position3D>();
 
-            if(isSubSegment)
+            if (isSubSegment)
             {
                 LineageString = lineageString + basePos.StringIDWithBID + segCount.ToString();
             }
@@ -66,6 +68,10 @@ namespace HTM.Models
             MAX_Connection_Strength = uint.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_STRENGTH_FOR_SYNAPSE"]);
             MAX_SUBSEGMENTS_SEGMENT = uint.Parse(ConfigurationManager.AppSettings["MAX_SUBSEGMENTS_SEGMENT"]);
             NEW_SYNAPSE_CONNECTION_DEF = uint.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]);
+            PROXIMAL_NEW_SYNAPSE_STRENGTH = uint.Parse(ConfigurationManager.AppSettings["PROXIMAL_NEW_SYNAPSE_STRENGTH"]);
+            DISTAL_NEW_SYNAPSE_STRENGTH = uint.Parse(ConfigurationManager.AppSettings["DISTAL_NEW_SYNAPSE_STRENGTH"]);
+
+            Synapses.Add(basePos, PROXIMAL_NEW_SYNAPSE_STRENGTH);
         }
 
         //private string ComputeSegmentIDasString(Position3D neuronID, string segCount, Position3D basePos)
@@ -83,9 +89,23 @@ namespace HTM.Models
             return null;
         }
 
-        internal void AddNewConnection(Position3D pos) =>        
-            _synapses.Add(pos, 5);        
+        internal void AddNewConnection(Position3D pos, SynapseType sType)
+        {
+            if(Synapses.TryGetValue(pos, out uint val))
+            {
+                Console.WriteLine("AddNewConnection : Segment : Synapse at this point already exists ! Somebody fucked up relly bad!! :( DEBUG NEEDED !!! THIS Should NOT HAVE HAPPENED");
+                throw new Exception("You fucked up!!!");
+            }
+            else
+            {
+                if (sType.Equals(SynapseType.Distal))
+                    Synapses.Add(pos, DISTAL_NEW_SYNAPSE_STRENGTH);
+                else if (sType.Equals(SynapseType.Proximal))
+                    Synapses.Add(pos, PROXIMAL_NEW_SYNAPSE_STRENGTH);
+            }
 
+        }
+            
         /// <summary>
         /// Predict if the segment will fire or not based incoming voltage
         /// </summary>
@@ -116,20 +136,25 @@ namespace HTM.Models
             //}
             #endregion
 
-            _sumVoltage += voltage;            
-
-            if(_sumVoltage > NMDA_Spike_Potential)
+            if(Synapses.TryGetValue(synapseId, out uint sigStrength))
             {
-                //NMDA Spike
-                //Strengthen firing Neuron Connection.
-                uint connectionStrength;
-                if(_synapses.TryGetValue(synapseId, out connectionStrength))
-                {
-                    if (connectionStrength < MAX_Connection_Strength)                        
-                        _synapses[synapseId]++;                                                  //Debug and make sure this works fine
-                }
+                _sumVoltage += voltage * sigStrength;
+                _predictedSynapsesNNMDA.Add(synapseId);
+            }
+            else
+            {
+                Console.WriteLine("PROCESS: SEGMENT :  Invalid FIRE , SYNAPSE DOES NOT EXIST!!!");
+                throw new Exception("iNVALID fire()");
+            }
 
+            if(voltage >= NMDA_Spike_Potential)
+            {
+                _NMDApredictedSynapses.Add(synapseId);
                 return true;
+            }
+            else
+            {
+                _predictedSynapsesNNMDA.Add(synapseId);
             }
             return false;
         }                    
@@ -152,7 +177,7 @@ namespace HTM.Models
             SynapseGenerator sg =  CPM.GetInstance.synapseGenerator;
             Position3D newPosition;
 
-            if ((_synapses.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])))
+            if ((Synapses.Count < int.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_PER_SEGMENT"])))
             {//Below number of synapses threshold for segment 
                 
                 newPosition = sg.PredictNewRandomPosition(this.BasePosition);                                 
@@ -190,24 +215,30 @@ namespace HTM.Models
 
         public void Grow(Position3D synapseId) 
         {            
-            if(_synapses.TryGetValue(synapseId, out uint synapticStrength))
+            if(Synapses.TryGetValue(synapseId, out uint synapticStrength))
             {
                 synapticStrength++;
-                _synapses.Remove(synapseId);
-                _synapses.Add(synapseId, synapticStrength);
+                Synapses.Remove(synapseId);
+                Synapses.Add(synapseId, synapticStrength);
             }            
+        }
+
+        internal void FinishCycle()
+        {
+            _predictedSynapsesNNMDA.Clear();
+            FlushVoltage();
         }
 
         public void Prune()
         {
             //Run through synaptic list to eliminate neurons with lowest connection strength
             //also run through the subsegments and check the lastaccessed time and there synapses.
-            foreach(var s in _synapses)
+            foreach(var s in Synapses)
             {
                 if(s.Value <= int.Parse(ConfigurationManager.AppSettings["PRUNE_THRESHOLD"]))
                 {
                     Console.WriteLine("Removing synapse to Neuron" + PrintPosition(s.Key));
-                    _synapses.Remove(s.Key);
+                    Synapses.Remove(s.Key);
                 }
             }            
 
@@ -215,7 +246,13 @@ namespace HTM.Models
             {
                 segment.Prune();
             }
-        }        
+        }
+
+        internal void FlushVoltage()
+        {
+            _sumVoltage = 0;
+            _predictedSynapsesNNMDA.Clear();
+        }
 
         private void PrintSegmnetID()
         {
@@ -229,7 +266,7 @@ namespace HTM.Models
         //}                   
 
         private void AddConnection(Position3D newPosition) =>
-            _synapses.Add(newPosition, NEW_SYNAPSE_CONNECTION_DEF);                            
+            Synapses.Add(newPosition, NEW_SYNAPSE_CONNECTION_DEF);                            
 
         private void CreateSubSegment(Position3D basePosition)
         {
@@ -250,11 +287,7 @@ namespace HTM.Models
             }
         }
 
-        internal void FlushVoltage()
-        {
-            _sumVoltage = 0;
-            _predictedSynapses.Clear();
-        }
+      
 
         private string PrintPosition(Position3D pos4d)
         {
@@ -280,7 +313,7 @@ namespace HTM.Models
         {
             //Do we have a synapse at this position already ?
             uint val;
-            if (_synapses.TryGetValue(pos, out val))
+            if (Synapses.TryGetValue(pos, out val))
             {
                 return true;
             }

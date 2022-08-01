@@ -38,12 +38,13 @@ namespace HTM.Algorithms
 
         }
 
-        public static Position3D PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(Position3D pos, char dimension, uint blockRadius,  uint? count = 0)
+        public static Position3D PredictNewRandomSynapseWithoutIntervalWithConnectionCheck(Position3D pos, char dimension, uint blockRadius,  uint? count = 0)
         {
             if(pos.BID == 673)
             {
                 Console.WriteLine("Catch this raand!!!");
             }
+
             try
             {
                 if (count >= 5)
@@ -58,7 +59,7 @@ namespace HTM.Algorithms
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Wrong Block ID Allocation");
+                Console.WriteLine("Wrong Block ID Allocation" + ex.Message);
             }
 
             Position3D toRet = (Position3D)pos.Clone();
@@ -96,29 +97,21 @@ namespace HTM.Algorithms
             //just making sure we dont accidentlly pick the same position back to the caller)
             if (toRet.X == pos.X && toRet.Y == pos.Y && toRet.Z == pos.Z)
             {
-
-                toRet = PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(toRet, dimension, blockRadius, ++count);
-
-
+                toRet = PredictNewRandomSynapseWithoutIntervalWithConnectionCheck(toRet, dimension, blockRadius, ++count);
             }
 
-
-            //catching an exception!!!
-            if(toRet.BID>= CPM.GetInstance.NumBlocks || toRet == null || ( toRet.X >= CPM.GetInstance.BCP.NumXperBlock || toRet.Y >= CPM.GetInstance.BCP.NumYperBlock || toRet.Z >= CPM.GetInstance.BCP.NumZperBlock))
+            //Catching an Exception!!!
+            if (toRet.BID >= CPM.GetInstance.NumBlocks || toRet == null || ( toRet.X >= CPM.GetInstance.BCP.NumXperBlock || toRet.Y >= CPM.GetInstance.BCP.NumYperBlock || toRet.Z >= CPM.GetInstance.BCP.NumZperBlock))
             {
                 Console.WriteLine("Catch this exception");
             }
 
-
-
-
-            //making sure its available or recurse again.
+            //Making sure its available or recurse again.
             if (!cTable.IsPositionAvailable(toRet))
             {
-                //If the newly guessed random position is already occupied , if its an axon and we connecting a dendrite , then isntead of reguessing a new position 
+
+                //If the newly guessed random position is already occupied , if its an axon and we connecting a dendrite , then isntead of reguessing a new position.
                 //Send back a connecionType to inform the method we are creating a synapse.
-
-
                 if(cTable.Position(toRet.BID, toRet.X, toRet.Y, toRet.Z).Equals('a') && dimension.Equals('D'))
                 {
                     pos.cType = Enums.CType.DendriteConnectedToAxon;
@@ -130,7 +123,7 @@ namespace HTM.Algorithms
                     return toRet;
                 }
 
-                toRet = PredictNewRandomSynapseWithoutIntervalWithConnecctionCheck(pos, dimension, blockRadius, ++count);
+                toRet = PredictNewRandomSynapseWithoutIntervalWithConnectionCheck(pos, dimension, blockRadius, ++count);
             }            
 
             return toRet;
