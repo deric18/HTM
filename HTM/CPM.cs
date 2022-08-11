@@ -319,8 +319,29 @@ namespace HTM
 
         private List<Position2D> GetAllPredictedNeuronList()
         {
-            var predictedSegments = instance.CTable.GetAllPredictedSegments();
+            //The best things to do would be to go through all the neurons in the Region and figure out which one of them are in the predicted state.
 
+            List<Neuron> predictedNeurons = new List<Neuron>();
+
+            List<Position2D> predictedList = new List<Position2D>();
+
+            for (uint i=0;i<instance.NumX;i++)
+            {
+               for(uint j=0; j < instance.NumY; j++)
+                {
+                    if ( Columns[i,j].GetPredictedCells().Count > 0)
+                    {
+                        predictedNeurons.AddRange(Columns[i, j].GetPredictedCells());
+                    }
+                }
+            }
+
+            for(uint i= 0; i < predictedNeurons.Count; i++)
+            {
+                predictedList.Add(new Position2D(predictedNeurons[i].NeuronID.X, new Position2D(predictedNeurons[i].NeuronID.Y));
+            }
+
+            return predictedList;
         }
 
 
