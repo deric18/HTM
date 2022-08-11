@@ -567,7 +567,12 @@ namespace HTM.Algorithms
             uint blockRadius = blockCenter.X;
             axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnectionCheck(blockCenter, 'A', blockRadius);
             
-            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnectionCheck(blockCenter, 'D', blockRadius);
+            dend
+                
+                
+                
+                
+                riticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnectionCheck(blockCenter, 'D', blockRadius);
 
             toReturn.Add(axonPos);
             toReturn.Add(dendriticPos);

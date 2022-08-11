@@ -42,6 +42,7 @@ namespace HTM
         public ConnectionTable CTable { get; private set; }
         internal SynapseGenerator synapseGenerator;
         private ulong cycle;
+        private SDR currentPattern;
         private SDR nextPattern;
 
         public void Initialize(uint xyz, uint pointsPerBlock = 0)
@@ -62,6 +63,7 @@ namespace HTM
             instance._readyTemporal = false;
             instance._readySpatial = true;
             instance.cycle = 0;
+            instance.currentPattern = null;
             instance.nextPattern = null;
             instance.BCP = pointsPerBlock == 0 ? new BlockConfigProvider(100000) : new BlockConfigProvider(pointsPerBlock);
             instance.CTable = ConnectionTable.Singleton(instance.NumBlocks, instance.BCP);
@@ -102,6 +104,7 @@ namespace HTM
         /// <param name="iType"></param>
         public void Process(SDR firstPattern, SDR secondPattern)
         {
+            instance.currentPattern = firstPattern;
             instance.nextPattern = secondPattern;
             switch(firstPattern.IType)
             {
@@ -267,10 +270,8 @@ namespace HTM
 
             foreach (var item in SuccesfullyContributedToFiringSet)      //Segmetnts which will fire in the next cycle , Strengthen all the contributing synapses and send grow signal to these neurons
             {
-                
-                
-
-
+                item.Value.IncrementHitcount();
+                item.Value.Grow();                
             }
 
             float successPercentage = ComputeSuccess();
@@ -298,6 +299,27 @@ namespace HTM
             //Foreach of the non predicted neurons which fired , send double Grow Signals
 
             
+
+        }
+
+        private float ComputeSuccess()
+        {
+            //Returns a percentage floating point value , where 0 is absolute failure and 1 where all the segments succesfuuly contributed to the firing.
+            float result = 0.0;
+
+            //var predictedSet = instance.CTable.GetAllPredictedSegments();
+
+            var predictedNeuronSet = GetAllPredictedNeuronList();
+
+            SDR predictedPattern = new SDR(instance.currentPattern.Length, instance.currentPattern.Breadth, )
+
+
+
+        }
+
+        private List<Position2D> GetAllPredictedNeuronList()
+        {
+            var predictedSegments = instance.CTable.GetAllPredictedSegments();
 
         }
 

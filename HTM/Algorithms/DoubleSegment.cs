@@ -8,7 +8,7 @@
     {
         public SegmentID axonalSegmentID { get; private set; }
         public Position3D synapsePosition { get; private set; }
-        public SegmentID dendriteISegmentD { get; private set; }
+        public SegmentID dendriteSegmentID { get; private set; }
 
         public uint hitcount { get; private set; }
 
@@ -16,13 +16,13 @@
         {
             this.synapsePosition = synapsePosition;
             this.axonalSegmentID = axonalSegmentID;
-            this.dendriteISegmentD = dendriticSegmentID;
+            this.dendriteSegmentID = dendriticSegmentID;
             hitcount = 0;
         }        
 
         public void Grow()
         {
-            CPM.GetInstance.GetNeuronFromSegmentID(dendriteISegmentD).Grow(dendriteISegmentD, synapsePosition);
+            CPM.GetInstance.GetNeuronFromSegmentID(dendriteSegmentID).Grow(CPM.GetInstance.GetSegmentFromSegmentID(dendriteSegmentID), synapsePosition);
         }
 
         public void IncrementHitcount() =>

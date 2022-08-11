@@ -94,8 +94,8 @@ namespace HTM.Models
 
                 if (dSegment != null)
                 {
-                    var neuron = _cpm.GetNeuronFromSegmentID(dSegment.dendriteISegmentD);
-                    neuron.Process(point, dSegment.dendriteISegmentD, NEURONAL_FIRE_VOLTAGE);
+                    var neuron = _cpm.GetNeuronFromSegmentID(dSegment.dendriteSegmentD);
+                    neuron.Process(point, dSegment.dendriteSegmentD, NEURONAL_FIRE_VOLTAGE);
                 }
                 else
                 {
@@ -174,7 +174,7 @@ namespace HTM.Models
                         var segId = douSeg.axonalSegmentID;
                         newSegment = new Segment(segId.BasePosition, SegmentType.Axonal, segId.NeuronId, i, segId.GetSegmentID);
                         newSegment.AddNewConnection(pos, SynapseType.Proximal);
-                        _cpm.GetSegmentFromSegmentID(douSeg.dendriteISegmentD).AddNewConnection(pos, SynapseType.Proximal);   //This is Very important as it adds the synapse to the dendrite as well
+                        _cpm.GetSegmentFromSegmentID(douSeg.dendriteSegmentD).AddNewConnection(pos, SynapseType.Proximal);   //This is Very important as it adds the synapse to the dendrite as well
                         //Get the connecting Segment
                         // form a synapse 
                         // register both connections 
@@ -184,8 +184,8 @@ namespace HTM.Models
                     {
                         DoubleSegment douSeg = _cpm.CTable.InterfaceFire(pos.StringIDWithBID);
 
-                        dendriticEndPoints.Add(douSeg.dendriteISegmentD.BasePosition);
-                        var segId = douSeg.dendriteISegmentD;
+                        dendriticEndPoints.Add(douSeg.dendriteSegmentD.BasePosition);
+                        var segId = douSeg.dendriteSegmentD;
                         newSegment = new Segment(segId.BasePosition, SegmentType.Proximal, segId.NeuronId, i, segId.GetSegmentID);
                         newSegment.AddNewConnection(pos, SynapseType.Proximal);
                         _cpm.GetSegmentFromSegmentID(douSeg.axonalSegmentID).AddNewConnection(pos, SynapseType.Proximal);
