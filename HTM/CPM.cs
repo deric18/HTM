@@ -304,16 +304,13 @@ namespace HTM
 
         private float ComputeSuccess()
         {
-            //Returns a percentage floating point value , where 0 is absolute failure and 1 where all the segments succesfuuly contributed to the firing.
-            float result = 0.0;
-
-            //var predictedSet = instance.CTable.GetAllPredictedSegments();
+            //Returns a percentage floating point value , where 0 is absolute failure and 1 where all the segments succesfuuly contributed to the firing.                        
 
             var predictedNeuronSet = GetAllPredictedNeuronList();
 
-            SDR predictedPattern = new SDR(instance.currentPattern.Length, instance.currentPattern.Breadth, )
+            SDR predictedPattern = new SDR(instance.currentPattern.Length, instance.currentPattern.Breadth, GetAllPredictedNeuronList());
 
-
+            return nextPattern.CompateFloat(predictedPattern);
 
         }
 

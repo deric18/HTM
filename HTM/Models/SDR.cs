@@ -66,6 +66,31 @@ namespace HTM.Models
             return true;
         }        
 
+        public float CompateFloat(SDR firingPattern)
+        {
+            // first pattern is always the firing pattern and second pattern is the predicted pattern
+
+            float res = 0.0;
+
+            for( uint i=0; i < this.Length; i++)
+            {
+
+                for(uint j = 0; j < this.Breadth; j++)
+                {
+                    
+
+
+
+                }
+            }
+            
+            
+
+
+
+
+        }
+
         public bool Equals(SDR y)
         {
             if (this.Length == y.Length && this.Breadth == y.Breadth && this.ActiveBits.Count == y.ActiveBits.Count)
