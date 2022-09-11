@@ -66,29 +66,43 @@ namespace HTM.Models
             return true;
         }        
 
-        public float CompateFloat(SDR firingPattern)
+        public float CompareFloat(SDR firingPattern)
         {
             // first pattern is always the firing pattern and second pattern is the predicted pattern
 
-            float res = 0.0;
+            float matchFloat = 0;
+            float unmatchFloat = 0;
+            uint totalBits = (uint) (this.ActiveBits.Count + firingPattern.ActiveBits.Count);
+            uint MatchingBits = 0;
+            uint UnmatchingBits = 0;
+            bool flag = false;
 
-            for( uint i=0; i < this.Length; i++)
+            foreach(var item in this.ActiveBits)
             {
 
-                for(uint j = 0; j < this.Breadth; j++)
+                foreach( var item1 in firingPattern.ActiveBits)
                 {
                     
-
-
-
+                    if(item.Equals(item1)
+                    {
+                        MatchingBits++;
+                        flag = true;
+                        break;
+                    }                    
                 }
+
+                if (!flag)                
+                    UnmatchingBits++;
+
+                flag = false;
+
             }
-            
-            
 
 
+            matchFloat = (MatchingBits / totalBits) * 100;
+            unmatchFloat = (unmatchFloat / totalBits) * 100;
 
-
+            return matchFloat;
         }
 
         public bool Equals(SDR y)

@@ -278,39 +278,42 @@ namespace HTM
 
 
 
-            if(successPercentage < 0.3)
+            if(successPercentage == 0.0)
+            {
+                //New Pattern Coming in.
+            }
+            else if(successPercentage < 0.3)
             {
 
+                //Bad Prediction Model , Go back to the Drawing board type of learning 
             }
             else if(successPercentage > 0.3 && successPercentage < 0.6)
             {
-
+                //Pretty Normal
+                //Keep Bosting the connections that can be boosted
             }
             else if(successPercentage > 0.6 && successPercentage < 0.9)
             {
-
+                //Pretty Normal
+                //Do not boost anything
             }
-            else
+            else if( successPercentage <= 0.9)
             {
-
+                //Very Good
+                //Do Nothing
             }
-
-
-            //Foreach of the non predicted neurons which fired , send double Grow Signals
-
-            
 
         }
 
         private float ComputeSuccess()
         {
-            //Returns a percentage floating point value , where 0 is absolute failure and 1 where all the segments succesfuuly contributed to the firing.                        
+            //Returns a percentage floating point value , where 0 is absolute failure and 1 where all the segments succesfully contributed to the firing.                        
 
             var predictedNeuronSet = GetAllPredictedNeuronList();
 
             SDR predictedPattern = new SDR(instance.currentPattern.Length, instance.currentPattern.Breadth, GetAllPredictedNeuronList());
 
-            return nextPattern.CompateFloat(predictedPattern);
+            return nextPattern.CompareFloat(predictedPattern);
 
         }
 
