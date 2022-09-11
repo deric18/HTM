@@ -83,7 +83,7 @@ namespace HTM.Models
                 foreach( var item1 in firingPattern.ActiveBits)
                 {
                     
-                    if(item.Equals(item1)
+                    if(item.Equals(item1))
                     {
                         MatchingBits++;
                         flag = true;
