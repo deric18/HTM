@@ -44,6 +44,7 @@ namespace HTM
         private ulong cycle;
         private SDR currentPattern;
         private SDR nextPattern;
+        private ulong perfectFireCounter;
 
         public void Initialize(uint xyz, uint pointsPerBlock = 0)
         {
@@ -69,6 +70,7 @@ namespace HTM
             instance.CTable = ConnectionTable.Singleton(instance.NumBlocks, instance.BCP);
             synapseGenerator = SynapseGenerator.GetInstance;
             instance.Columns = new Column[xyz,xyz];
+            instance.perfectFireCounter = 0;
 
             try
             {
@@ -91,11 +93,7 @@ namespace HTM
             //Setup all the proximal Segments of all the neurons
             //Setup and Register all the Spatial vertical Axon Lines
             //Setup all the Temproal Horizontal Axon Lines.
-        }
-        
-        internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X,pos.Y].GetNeuron(pos.Z);
-
-        public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.NeuronId.X,segId.NeuronId.Y].GetNeuron(segId.NeuronId.Z);
+        }                
 
         /// <summary>
         /// All the Firing modules update the predicted list , changing the current state of the system.
@@ -123,7 +121,7 @@ namespace HTM
                         }
                         _readySpatial = false;
                         _readyApical = true;
-                        Grow();
+                        Grow(firingPositions);
 
                         break;
                     }
@@ -171,6 +169,7 @@ namespace HTM
         {
 
             sdr.ActiveBits.ForEach(bit => ColumnFlush(bit.X, bit.Y));
+            _firingNeurons.Clear();
             //Flush the predicted segment
             CPM.GetInstance.CTable.FlushPredictedSegments();
         }
@@ -189,18 +188,23 @@ namespace HTM
             if (predictedCells.Count == 0)
             {
                 //Burst 
+                _firingNeurons.AddRange(instance.Columns[X, Y].Neurons);
                 instance.Columns[X,Y].Fire();
             }
             else if (predictedCells.Count == 1)
             {
                 //fire
+                _firingNeurons.Add(predictedCells[0]);
                 predictedCells[0].Fire();
             }
             else
             {
                 //pick the cell with highest voltage & fire , inhibitting the others.
 
+                Console.WriteLine("This SHOULD NOT HAVE HAPPENED!!!!");
+
                 List<Neuron> toFire = instance.Columns[X,Y].GetMaxVoltageNeuronInColumn();
+                _firingNeurons.AddRange(toFire);
 
                 toFire.ForEach(neuron => neuron.Fire());
             }            
@@ -247,12 +251,18 @@ namespace HTM
             return (uint) Math.Sqrt( Math.Pow((p1.X - p2.X), 2) + Math.Pow((p1.Y - p2.Y),2) + Math.Pow((p1.Z - p2.Z),2));
         }
 
+        internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X, pos.Y].GetNeuron(pos.Z);
+
+        public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.NeuronId.X, segId.NeuronId.Y].GetNeuron(segId.NeuronId.Z);
+
+
 
         /// <summary>
-        /// 1.Neurons that are predicted in this cycle , all the neurons that contributed to the last cycle for these neurons to be predicted should be incremented.
-        /// 2.System should be advanced enough to recognise any neurons that usually dont fire and are firing in this iteration , should be analysed.
+        /// 1.Get Called after the firing neuron set has fired.
+        /// 2.Neurons that are predicted in this cycle , all the neurons that contributed to the last cycle for these neurons to be predicted should be incremented.
+        /// 3.System should be advanced enough to recognise any neurons that usually dont fire and are firing in this iteration , should be analysed.
         /// </summary>
-        private void Grow()
+        private void Grow(List<Position2D> firingColumns)
         {
             //TODO
             //Once the Firing Cycle has finished
@@ -268,7 +278,7 @@ namespace HTM
 
             var SuccesfullyContributedToFiringSet = GetIntersectionSet(predictedSegments);
 
-            foreach (var item in SuccesfullyContributedToFiringSet)      //Segmetnts which will fire in the next cycle , Strengthen all the contributing synapses and send grow signal to these neurons
+            foreach (var item in SuccesfullyContributedToFiringSet)      //Segments which will fire in the next cycle , Strengthen all the contributing synapses and send grow signal to these neurons
             {
                 item.Value.IncrementHitcount();
                 item.Value.Grow();                
@@ -277,31 +287,54 @@ namespace HTM
             float successPercentage = ComputeSuccess();
 
 
+            //At this point go through each of the firing set and send them growth signals
+
 
             if(successPercentage == 0.0)
             {
                 //New Pattern Coming in.
+                //None of the predicted segments fired , so check for any segments that did contribute and grow out existing segments more outwards
+                BroomNGroom(5);
+                
+
             }
             else if(successPercentage < 0.3)
             {
 
                 //Bad Prediction Model , Go back to the Drawing board type of learning 
+                //strengthen existing ones , give growth stimuli to the existing segments
+                BroomNGroom(4);
+
             }
             else if(successPercentage > 0.3 && successPercentage < 0.6)
             {
                 //Pretty Normal
-                //Keep Bosting the connections that can be boosted
+                //Strengthen existing ones , give growth stimuli to existing segments
+                BroomNGroom(3);
             }
             else if(successPercentage > 0.6 && successPercentage < 0.9)
             {
                 //Pretty Normal
                 //Do not boost anything
+                //Give slight stimuli to the existing ones and grow out existing branches
+                BroomNGroom(2);
             }
             else if( successPercentage <= 0.9)
             {
                 //Very Good
                 //Do Nothing
+                // Increment perfect fire counter                 
+                this.perfectFireCounter++;
+                Console.WriteLine("PERFECT FIRE!!!");
             }
+        }
+
+        private void BroomNGroom(uint totalNumberOfConnections)
+        {
+
+
+
+
 
         }
 
@@ -338,7 +371,7 @@ namespace HTM
 
             for(uint i= 0; i < predictedNeurons.Count; i++)
             {
-                predictedList.Add(new Position2D(predictedNeurons[i].NeuronID.X, new Position2D(predictedNeurons[i].NeuronID.Y));
+                predictedList.Add(new Position2D(predictedNeurons[i].NeuronID.X, predictedNeurons[i].NeuronID.Y));
             }
 
             return predictedList;
