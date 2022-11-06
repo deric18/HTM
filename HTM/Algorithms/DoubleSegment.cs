@@ -22,7 +22,7 @@
 
         public void Grow()
         {
-            CPM.GetInstance.GetNeuronFromSegmentID(dendriteSegmentID).Grow(CPM.GetInstance.GetSegmentFromSegmentID(dendriteSegmentID), synapsePosition);
+            CPM.GetInstance.GetNeuronFromSegmentID(dendriteSegmentID).GrowDirect(CPM.GetInstance.GetSegmentFromSegmentID(dendriteSegmentID), synapsePosition);
         }
 
         public void IncrementHitcount() =>

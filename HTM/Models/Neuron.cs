@@ -1,13 +1,16 @@
 ﻿//TODO : CreateProximalSegment, AddSegment, Prune, Grow
 //If more than 3 cycles and neuron has not fired then flushall the voltage that came in before 3 cycles.
-using HTM.Enums;
-using System.Collections.Generic;
-using System;
-using HTM.Algorithms;
-using System.Configuration;
 
 namespace HTM.Models
 {
+
+    using HTM.Enums;
+    using System.Collections.Generic;
+    using System;
+    using HTM.Algorithms;
+    using System.Configuration;
+    using System.Linq;
+
     /// <summary>
     /// 1.Account for both excitatory and inhibitory neurons . Need to rethink about this, one argument is that this is not neccessary because HTM Model already accounts for this by 
     /// picking single neurons from one column with highest values using selective firing techniques.
@@ -94,8 +97,8 @@ namespace HTM.Models
 
                 if (dSegment != null)
                 {
-                    var neuron = _cpm.GetNeuronFromSegmentID(dSegment.dendriteSegmentD);
-                    neuron.Process(point, dSegment.dendriteSegmentD, NEURONAL_FIRE_VOLTAGE);
+                    var neuron = _cpm.GetNeuronFromSegmentID(dSegment.dendriteSegmentID);
+                    neuron.Process(point, dSegment.dendriteSegmentID, NEURONAL_FIRE_VOLTAGE);
                 }
                 else
                 {
@@ -106,7 +109,7 @@ namespace HTM.Models
         }
 
 
-        internal void Grow(Segment seg, Position3D synapse)
+        internal void GrowDirect(Segment seg, Position3D synapse)
         {
             //TODO:
             //growth signal comes from CPM when neuron exceeds fire index in the fire cycle , we add new positions to both axonal endpoints and dendritic segments.
@@ -120,10 +123,21 @@ namespace HTM.Models
         /// increment synaptic strength on nmda & non nmda predicted segments
         /// send out a grow and prune signal to all the segments , to cut out unneccesary connection and grow more promissing ones.
         /// </summary>
-        internal void Grow()
+        internal void Grow(bool boostOnlyNMDA, bool shouldPrune, uint connStrength)
         {
+            //Increment synaptic strength on all the connections , more on ones that fired last cycle and less on ones that did not.
+            if(boostOnlyNMDA)
+            {
+                List<Segment> firingSegments = Segments.Values.Where(q => q.didFireLastCycle == true).ToList();
+                if(firingSegments.Count > 0)
+                {
+                    foreach(var seg in firingSegments)
+                    {
+                        seg.Grow();
+                    }
+                }
 
-
+                }
 
         }
 
@@ -174,7 +188,7 @@ namespace HTM.Models
                         var segId = douSeg.axonalSegmentID;
                         newSegment = new Segment(segId.BasePosition, SegmentType.Axonal, segId.NeuronId, i, segId.GetSegmentID);
                         newSegment.AddNewConnection(pos, SynapseType.Proximal);
-                        _cpm.GetSegmentFromSegmentID(douSeg.dendriteSegmentD).AddNewConnection(pos, SynapseType.Proximal);   //This is Very important as it adds the synapse to the dendrite as well
+                        _cpm.GetSegmentFromSegmentID(douSeg.dendriteSegmentID).AddNewConnection(pos, SynapseType.Proximal);   //This is Very important as it adds the synapse to the dendrite as well
                         //Get the connecting Segment
                         // form a synapse 
                         // register both connections 
@@ -184,8 +198,8 @@ namespace HTM.Models
                     {
                         DoubleSegment douSeg = _cpm.CTable.InterfaceFire(pos.StringIDWithBID);
 
-                        dendriticEndPoints.Add(douSeg.dendriteSegmentD.BasePosition);
-                        var segId = douSeg.dendriteSegmentD;
+                        dendriticEndPoints.Add(douSeg.dendriteSegmentID.BasePosition);
+                        var segId = douSeg.dendriteSegmentID;
                         newSegment = new Segment(segId.BasePosition, SegmentType.Proximal, segId.NeuronId, i, segId.GetSegmentID);
                         newSegment.AddNewConnection(pos, SynapseType.Proximal);
                         _cpm.GetSegmentFromSegmentID(douSeg.axonalSegmentID).AddNewConnection(pos, SynapseType.Proximal);
@@ -205,8 +219,8 @@ namespace HTM.Models
 
                 Segments.Add(newSegment.SegmentID.GetSegmentID, newSegment);
 
-
                 //TODO : Need to add these positions to synapses as well.
+
                 i++;
             }
         }

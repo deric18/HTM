@@ -565,14 +565,9 @@ namespace HTM.Algorithms
             Position3D blockCenter = CPM.GetInstance.BCP.BlockCenter;
             blockCenter.BID = neuronPos.BID;
             uint blockRadius = blockCenter.X;
+
             axonPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnectionCheck(blockCenter, 'A', blockRadius);
-            
-            dend
-                
-                
-                
-                
-                riticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnectionCheck(blockCenter, 'D', blockRadius);
+            dendriticPos = SynapseGeneratorHelper.PredictNewRandomSynapseWithoutIntervalWithConnectionCheck(blockCenter, 'D', blockRadius);
 
             toReturn.Add(axonPos);
             toReturn.Add(dendriticPos);

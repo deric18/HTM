@@ -331,7 +331,9 @@ namespace HTM
 
         private void BroomNGroom(uint totalNumberOfConnections)
         {
-
+            //What does this do ?
+            //- It Needs to broom and grrom based on the growth coefficient
+            // Just do a Grow on all of the connected synapses.
 
 
 
@@ -371,7 +373,7 @@ namespace HTM
 
             for(uint i= 0; i < predictedNeurons.Count; i++)
             {
-                predictedList.Add(new Position2D(predictedNeurons[i].NeuronID.X, predictedNeurons[i].NeuronID.Y));
+                predictedList.Add(new Position2D(predictedNeurons[(int)i].NeuronID.X, predictedNeurons[(int)i].NeuronID.Y));
             }
 
             return predictedList;

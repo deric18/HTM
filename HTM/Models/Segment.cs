@@ -21,11 +21,12 @@ namespace HTM.Models
         public string LineageString { get; private set; }
         public SegmentID SegmentID { get; private set; }
         private uint _segmentNumber;
+        public bool didFireLastCycle { get; private set; }
         private bool _fullyConnected;
         public Dictionary<Position3D, uint> Synapses { get; private set; }     //uint helps in prunning anything thats zero is taken out and flushed to connection table.
-        private Lazy<List<Segment>> SubSegments;        
-        private List<Position3D> _predictedSynapsesNNMDA;
-        private List<Position3D> _NMDApredictedSynapses;
+        private Lazy<List<Segment>> SubSegments;
+        private List<Position3D> _predictedSynapsesNNMDA;   //All predicted synapses are not NMDA Synapses but all NMDA Synapses has to be predicted at some point for it to be NMDA Spiking Synapse.
+        private List<Position3D> _nmdapredictedSynapses;    
         private uint _lastAccesedCycle;                     //helps in prunning of segments
         private bool IsSubSegment;                          //True if yes , False if no
         private SegmentType sType;
@@ -36,6 +37,8 @@ namespace HTM.Models
         private static uint NEW_SYNAPSE_CONNECTION_DEF;
         private uint MAX_SUBSEGMENTS_SEGMENT;
 
+
+
         public Segment(Position3D basePos, SegmentType sType, Position3D neuronID, uint segCount, string lineageString, bool isSubSegment = false)
         {            
             this._segmentNumber = segCount;
@@ -44,12 +47,13 @@ namespace HTM.Models
             NeuronID = neuronID;
             this.BasePosition = basePos;
             this.sType = sType;
+            this.didFireLastCycle = false;
             _sumVoltage = 0;               
             _fullyConnected = false;
             Synapses = new Dictionary<Position3D, uint>();            
             _lastAccesedCycle = 0;
             _predictedSynapsesNNMDA = new List<Position3D>();
-            _NMDApredictedSynapses = new List<Position3D>();
+            _nmdapredictedSynapses = new List<Position3D>();
 
             if (isSubSegment)
             {
@@ -74,6 +78,7 @@ namespace HTM.Models
             Synapses.Add(basePos, PROXIMAL_NEW_SYNAPSE_STRENGTH);
         }
 
+
         //private string ComputeSegmentIDasString(Position3D neuronID, string segCount, Position3D basePos)
         //{
         //    return neuronID.StringIDWithoutBID + "/" + segCount + "/" + basePos.StringIDWithoutBID;
@@ -88,6 +93,51 @@ namespace HTM.Models
 
             return null;
         }
+
+        public void Grow()
+        {
+            if()
+
+
+
+        }
+
+        public void GrowSingleNeuron(Position3D synapseId)
+        {
+            if (Synapses.TryGetValue(synapseId, out uint synapticStrength))
+            {
+                synapticStrength++;
+                Synapses.Remove(synapseId);
+                Synapses.Add(synapseId, synapticStrength);
+            }
+        }
+
+        internal void FinishCycle()
+        {
+            _predictedSynapsesNNMDA.Clear();
+            didFireLastCycle = false;
+            FlushVoltage();
+        }
+
+        public void Prune()
+        {
+            //Run through synaptic list to eliminate neurons with lowest connection strength
+            //also run through the subsegments and check the lastaccessed time and there synapses.
+            foreach (var s in Synapses)
+            {
+                if (s.Value <= int.Parse(ConfigurationManager.AppSettings["PRUNE_THRESHOLD"]))
+                {
+                    Console.WriteLine("Removing synapse to Neuron" + PrintPosition(s.Key));
+                    Synapses.Remove(s.Key);
+                }
+            }
+
+            foreach (var segment in SubSegments.Value)
+            {
+                segment.Prune();
+            }
+        }
+
 
         internal void AddNewConnection(Position3D pos, SynapseType sType)
         {
@@ -135,7 +185,7 @@ namespace HTM.Models
             //    default:break;
             //}
             #endregion
-
+            this.didFireLastCycle = true;
             if(Synapses.TryGetValue(synapseId, out uint sigStrength))
             {
                 _sumVoltage += voltage * sigStrength;
@@ -149,7 +199,7 @@ namespace HTM.Models
 
             if(voltage >= NMDA_Spike_Potential)
             {
-                _NMDApredictedSynapses.Add(synapseId);
+                _nmdapredictedSynapses.Add(synapseId);
                 return true;
             }
             else
@@ -157,7 +207,7 @@ namespace HTM.Models
                 _predictedSynapsesNNMDA.Add(synapseId);
             }
             return false;
-        }                    
+        }  
         
         //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
@@ -211,42 +261,7 @@ namespace HTM.Models
                 _fullyConnected = true;
                 //log Information with details , Segment has reached a peak connection pathway , this is essentially a crucial segment for the whole region.
             }            
-        }              
-
-        public void Grow(Position3D synapseId) 
-        {            
-            if(Synapses.TryGetValue(synapseId, out uint synapticStrength))
-            {
-                synapticStrength++;
-                Synapses.Remove(synapseId);
-                Synapses.Add(synapseId, synapticStrength);
-            }            
-        }
-
-        internal void FinishCycle()
-        {
-            _predictedSynapsesNNMDA.Clear();
-            FlushVoltage();
-        }
-
-        public void Prune()
-        {
-            //Run through synaptic list to eliminate neurons with lowest connection strength
-            //also run through the subsegments and check the lastaccessed time and there synapses.
-            foreach(var s in Synapses)
-            {
-                if(s.Value <= int.Parse(ConfigurationManager.AppSettings["PRUNE_THRESHOLD"]))
-                {
-                    Console.WriteLine("Removing synapse to Neuron" + PrintPosition(s.Key));
-                    Synapses.Remove(s.Key);
-                }
-            }            
-
-            foreach(var segment in SubSegments.Value)
-            {
-                segment.Prune();
-            }
-        }
+        }                      
 
         internal void FlushVoltage()
         {
@@ -254,7 +269,7 @@ namespace HTM.Models
             _predictedSynapsesNNMDA.Clear();
         }
 
-        private void PrintSegmnetID()
+        private void PrintSegmenttID()
         {
             Console.Write(SegmentID.GetSegmentID);
         }
@@ -276,7 +291,7 @@ namespace HTM.Models
                 Segment newSegment = new Segment(basePosition, this.sType, NeuronID, count, LineageString, true);
                 
                 Console.WriteLine("New Segment Added to Neuron " + this.NeuronID.StringIDWithoutBID + "Segment ID : ");
-                newSegment.PrintSegmnetID();
+                newSegment.PrintSegmenttID();
 
                 
                 SubSegments.Value.Add(newSegment);
