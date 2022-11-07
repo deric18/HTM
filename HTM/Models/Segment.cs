@@ -26,8 +26,9 @@ namespace HTM.Models
         public Dictionary<Position3D, uint> Synapses { get; private set; }     //uint helps in prunning anything thats zero is taken out and flushed to connection table.
         private Lazy<List<Segment>> SubSegments;
         private List<Position3D> _predictedSynapses;   //All predicted synapses are not NMDA Synapses but all NMDA Synapses has to be predicted at some point for it to be NMDA Spiking Synapse.
-        private List<Position3D> _nmdapredictedSynapses;    
-        private uint _lastAccesedCycle;                     //helps in prunning of segments
+        private List<Position3D> _nmdapredictedSynapses;
+        private ulong createdCycle;
+        private ulong _lastAccesedCycle;                     //helps in prunning of segments
         private bool IsSubSegment;                          //True if yes , False if no
         private SegmentType sType;
         private static uint NMDA_Spike_Potential;
@@ -37,8 +38,6 @@ namespace HTM.Models
         private static uint NEW_SYNAPSE_CONNECTION_DEF;
         private uint MAX_SUBSEGMENTS_SEGMENT;
 
-
-
         public Segment(Position3D basePos, SegmentType sType, Position3D neuronID, uint segCount, string lineageString, bool isSubSegment = false)
         {            
             this._segmentNumber = segCount;
@@ -47,6 +46,8 @@ namespace HTM.Models
             NeuronID = neuronID;
             this.BasePosition = basePos;
             this.sType = sType;
+            this.createdCycle = CPM.GetInstance.currenCcycle;
+            this._lastAccesedCycle = CPM.GetInstance.currenCcycle;
             this.didFireLastCycle = false;
             _sumVoltage = 0;               
             _fullyConnected = false;
@@ -77,6 +78,7 @@ namespace HTM.Models
 
             Synapses.Add(basePos, PROXIMAL_NEW_SYNAPSE_STRENGTH);
         }
+
 
 
         //private string ComputeSegmentIDasString(Position3D neuronID, string segCount, Position3D basePos)
@@ -234,6 +236,8 @@ namespace HTM.Models
             //    default:break;
             //}
             #endregion
+
+            this._lastAccesedCycle = CPM.GetInstance.currenCcycle;
             this.didFireLastCycle = true;
             if(Synapses.TryGetValue(synapseId, out uint sigStrength))
             {

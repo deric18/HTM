@@ -41,7 +41,8 @@ namespace HTM
         private bool _readyApical;
         public ConnectionTable CTable { get; private set; }
         internal SynapseGenerator synapseGenerator;
-        private ulong cycle;
+        public ulong currenCcycle { get; private set; }
+        public ulong cycle2 { get; private set; }
         private SDR currentPattern;
         private SDR nextPattern;
         private ulong perfectFireCounter;
@@ -63,7 +64,8 @@ namespace HTM
             instance._readyApical = false;
             instance._readyTemporal = false;
             instance._readySpatial = true;
-            instance.cycle = 0;
+            instance.currenCcycle = 0;
+            instance.cycle2 = 0;
             instance.currentPattern = null;
             instance.nextPattern = null;
             instance.BCP = pointsPerBlock == 0 ? new BlockConfigProvider(100000) : new BlockConfigProvider(pointsPerBlock);
@@ -93,7 +95,7 @@ namespace HTM
             //Setup all the proximal Segments of all the neurons
             //Setup and Register all the Spatial vertical Axon Lines
             //Setup all the Temproal Horizontal Axon Lines.
-        }                
+        }
 
         /// <summary>
         /// All the Firing modules update the predicted list , changing the current state of the system.
@@ -104,7 +106,7 @@ namespace HTM
         {
             instance.currentPattern = firstPattern;
             instance.nextPattern = secondPattern;
-            switch(firstPattern.IType)
+            switch (firstPattern.IType)
             {
                 case InputPatternType.SPATIAL:
                     {
@@ -115,8 +117,8 @@ namespace HTM
 
                         List<Position2D> firingPositions = firstPattern.ActiveBits;
 
-                        foreach(var pos in firingPositions)
-                        {                            
+                        foreach (var pos in firingPositions)
+                        {
                             instance.ColumnFire(Convert.ToUInt32(pos.X), Convert.ToUInt32(pos.Y), firstPattern.IType);
                         }
                         _readySpatial = false;
@@ -140,7 +142,7 @@ namespace HTM
                         _readySpatial = true;
                         _readyTemporal = false;
                         break;
-                    }                    
+                    }
                 case InputPatternType.APICAL:
                     {
                         //Fetch , Fire , Update
@@ -160,8 +162,16 @@ namespace HTM
                     }
             }
 
-            
-            _ = instance.cycle == ulong.MaxValue ? instance.cycle = 0 : ++instance.cycle;
+
+            if(instance.currenCcycle < ulong.MaxValue)
+            {
+                instance.currenCcycle++;
+            }
+            else
+            {
+                instance.currenCcycle = 0;
+                instance.cycle2++;
+            }
             instance.FlushCycle(firstPattern);
         }
 

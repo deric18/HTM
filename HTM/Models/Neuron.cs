@@ -115,7 +115,7 @@ namespace HTM.Models
             //growth signal comes from CPM when neuron exceeds fire index in the fire cycle , we add new positions to both axonal endpoints and dendritic segments.
             // Will need some details on which dendrites or axons are exactly firing.
 
-            seg.Grow(synapse);
+            seg.GrowSingleNeuron(synapse);
             
         }
 
@@ -133,7 +133,7 @@ namespace HTM.Models
                 {
                     foreach(var seg in firingSegments)
                     {
-                        seg.Grow();
+                        seg.Grow(boostOnlyNMDA, connStrength);
                     }
                 }
 
