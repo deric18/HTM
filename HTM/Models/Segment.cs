@@ -1,4 +1,4 @@
-﻿//Grow , Prune , lastAccesedCycle.
+﻿//TODO :Prune
 //Segment ID Syntax : << Neuron Position3D > -- < Segment Number > -- < Segment Position3D >>
 using System.Configuration;
 using System.Collections.Generic;
@@ -148,9 +148,6 @@ namespace HTM.Models
                     Console.WriteLine("WARNING :: NO Synapses UNDER this NEURON!!!");
                 }
             }
-
-
-
         }
 
         public void GrowSingleNeuron(Position3D synapseId)

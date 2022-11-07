@@ -342,7 +342,7 @@ namespace HTM
         private void BroomNGroom(uint totalNumberOfConnections)
         {
             //What does this do ?
-            //- It Needs to broom and grrom based on the growth coefficient
+            //- It Needs to broom and groom based on the growth coefficient
             // Just do a Grow on all of the connected synapses.
 
 
