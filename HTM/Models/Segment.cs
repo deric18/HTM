@@ -1,4 +1,4 @@
-﻿//Grow , Prune
+﻿//Grow , Prune , lastAccesedCycle.
 //Segment ID Syntax : << Neuron Position3D > -- < Segment Number > -- < Segment Position3D >>
 using System.Configuration;
 using System.Collections.Generic;
@@ -25,7 +25,7 @@ namespace HTM.Models
         private bool _fullyConnected;
         public Dictionary<Position3D, uint> Synapses { get; private set; }     //uint helps in prunning anything thats zero is taken out and flushed to connection table.
         private Lazy<List<Segment>> SubSegments;
-        private List<Position3D> _predictedSynapsesNNMDA;   //All predicted synapses are not NMDA Synapses but all NMDA Synapses has to be predicted at some point for it to be NMDA Spiking Synapse.
+        private List<Position3D> _predictedSynapses;   //All predicted synapses are not NMDA Synapses but all NMDA Synapses has to be predicted at some point for it to be NMDA Spiking Synapse.
         private List<Position3D> _nmdapredictedSynapses;    
         private uint _lastAccesedCycle;                     //helps in prunning of segments
         private bool IsSubSegment;                          //True if yes , False if no
@@ -52,7 +52,7 @@ namespace HTM.Models
             _fullyConnected = false;
             Synapses = new Dictionary<Position3D, uint>();            
             _lastAccesedCycle = 0;
-            _predictedSynapsesNNMDA = new List<Position3D>();
+            _predictedSynapses = new List<Position3D>();
             _nmdapredictedSynapses = new List<Position3D>();
 
             if (isSubSegment)
@@ -94,9 +94,58 @@ namespace HTM.Models
             return null;
         }
 
-        public void Grow()
+        public void Grow(bool onlyNMDA, uint numPulses = 1)
         {
-            if()
+            if(onlyNMDA)
+            {
+                if(_nmdapredictedSynapses.Count > 0)
+                {
+                    foreach(var pos in _nmdapredictedSynapses)
+                    {
+                        if (Synapses.TryGetValue(pos, out uint value))
+                        {
+                            Synapses[pos] += numPulses;
+                        }
+                        else
+                        {
+                            Console.WriteLine("EXCEPTION :: SEGMENT :: GROW :: PREDICTED SYNAPSE NOT PRESENT IN SYNAPSES LIST IN SEGMENT");
+                        }
+                    }
+                }
+                else if(_predictedSynapses.Count > 0)
+                {
+                    foreach( var pos in _predictedSynapses)
+                    {
+                        Synapses[pos] += numPulses;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("INFORMATION :: NO NMDA Predicted Segments Found");
+                }
+            }
+            else
+            {
+                if(Synapses.Count > 0)
+                {
+                    foreach(var kvp in Synapses)
+                    {
+                        Synapses[kvp.Key] += numPulses;
+                    }
+                }
+                else if(SubSegments.IsValueCreated)
+                {
+                    Console.WriteLine("INFORMATIONAL :: GROWING SUB SEGMENT");
+                    foreach(var subseg in SubSegments.Value)
+                    {
+                        subseg.Grow(onlyNMDA, numPulses);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("WARNING :: NO Synapses UNDER this NEURON!!!");
+                }
+            }
 
 
 
@@ -114,7 +163,7 @@ namespace HTM.Models
 
         internal void FinishCycle()
         {
-            _predictedSynapsesNNMDA.Clear();
+            _predictedSynapses.Clear();
             didFireLastCycle = false;
             FlushVoltage();
         }
@@ -189,7 +238,7 @@ namespace HTM.Models
             if(Synapses.TryGetValue(synapseId, out uint sigStrength))
             {
                 _sumVoltage += voltage * sigStrength;
-                _predictedSynapsesNNMDA.Add(synapseId);
+                _predictedSynapses.Add(synapseId);
             }
             else
             {
@@ -204,7 +253,7 @@ namespace HTM.Models
             }
             else
             {
-                _predictedSynapsesNNMDA.Add(synapseId);
+                _predictedSynapses.Add(synapseId);
             }
             return false;
         }  
@@ -266,7 +315,7 @@ namespace HTM.Models
         internal void FlushVoltage()
         {
             _sumVoltage = 0;
-            _predictedSynapsesNNMDA.Clear();
+            _predictedSynapses.Clear();
         }
 
         private void PrintSegmenttID()
