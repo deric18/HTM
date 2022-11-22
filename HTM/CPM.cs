@@ -20,7 +20,7 @@ namespace HTM
                 if (instance == null)
                 {                
                         if (instance == null)
-                            instance = new CPM();                       
+                            instance = new CPM();            
                 }
 
                 return instance;
@@ -73,6 +73,7 @@ namespace HTM
             synapseGenerator = SynapseGenerator.GetInstance;
             instance.Columns = new Column[xyz,xyz];
             instance.perfectFireCounter = 0;
+            instance.RegisterAxonLines();
 
             try
             {
@@ -266,9 +267,8 @@ namespace HTM
         public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.NeuronId.X, segId.NeuronId.Y].GetNeuron(segId.NeuronId.Z);
 
 
-
         /// <summary>
-        /// 1.Get Called after the firing neuron set has fired.
+        /// 1.Gets Called after the firing neuron set has fired.
         /// 2.Neurons that are predicted in this cycle , all the neurons that contributed to the last cycle for these neurons to be predicted should be incremented.
         /// 3.System should be advanced enough to recognise any neurons that usually dont fire and are firing in this iteration , should be analysed.
         /// </summary>
@@ -278,7 +278,7 @@ namespace HTM
             //Once the Firing Cycle has finished
             //Call Connection Tables & Get aLl the DoubleSegment Objects
             //Strengthen all the connections using the DoubleSegments.
-            var predictedSegments = instance.CTable.GetAllPredictedSegments();
+            var contributingNeurons = instance.CTable.GetAllPredictedSegments(); 
 
 
             //for each item in predictedsegments contains a double segment and number of hits the segment has received
@@ -286,7 +286,7 @@ namespace HTM
             //to the neuronal segments
             //Also if there too high of a count on one of the segments detect
 
-            var SuccesfullyContributedToFiringSet = GetIntersectionSet(predictedSegments);
+            var SuccesfullyContributedToFiringSet = GetIntersectionSet(contributingNeurons);
 
             foreach (var item in SuccesfullyContributedToFiringSet)      //Segments which will fire in the next cycle , Strengthen all the contributing synapses and send grow signal to these neurons
             {
@@ -299,13 +299,12 @@ namespace HTM
 
             //At this point go through each of the firing set and send them growth signals
 
-
             if(successPercentage == 0.0)
             {
                 //New Pattern Coming in.
-                //None of the predicted segments fired , so check for any segments that did contribute and grow out existing segments more outwards
+                //None of the predicted segments fired , so check for any segments that did contribute and grow out existing segments more outwards]
+                Console.WriteLine("GROW :: No Contributing Synapses for this FIRE!!!");
                 BroomNGroom(5);
-                
 
             }
             else if(successPercentage < 0.3)
@@ -345,7 +344,7 @@ namespace HTM
             //- It Needs to broom and groom based on the growth coefficient
             // Just do a Grow on all of the connected synapses.
 
-
+            
 
 
         }
