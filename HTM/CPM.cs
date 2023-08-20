@@ -361,7 +361,7 @@ namespace HTM
         private float ComputeSuccess()
         {
             //Returns a percentage floating point value , where 0 is absolute failure and 1 where all the segments succesfully contributed to the firing.                        
-
+             
             var predictedNeuronSet = GetAllPredictedNeuronList();
 
             SDR predictedPattern = new SDR(instance.currentPattern.Length, instance.currentPattern.Breadth, GetAllPredictedNeuronList());
