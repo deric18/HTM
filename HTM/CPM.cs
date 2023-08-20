@@ -278,7 +278,7 @@ namespace HTM
             //Once the Firing Cycle has finished
             //Call Connection Tables & Get aLl the DoubleSegment Objects
             //Strengthen all the connections using the DoubleSegments.
-            var contributingNeurons = instance.CTable.GetAllPredictedSegments(); 
+            var contributingNeurons = instance.CTable.GetAllPredictedSegments();
 
 
             //for each item in predictedsegments contains a double segment and number of hits the segment has received
@@ -286,7 +286,15 @@ namespace HTM
             //to the neuronal segments
             //Also if there too high of a count on one of the segments detect
 
+
             var SuccesfullyContributedToFiringSet = GetIntersectionSet(contributingNeurons);
+
+            if(SuccesfullyContributedToFiringSet.Count == 0)
+            {
+                // Brand New Pattern coming in , Cycle Will Most Likely Burst , How to Handle Growth for Bursting Columns
+                // Very Important to learn what pattern lead to this pattern , Very important to connect the last firing neurons to this firing Set
+                // Question : Should it make hardwired connections ?
+            }
 
             foreach (var item in SuccesfullyContributedToFiringSet)      //Segments which will fire in the next cycle , Strengthen all the contributing synapses and send grow signal to these neurons
             {
@@ -303,7 +311,8 @@ namespace HTM
             {
                 //New Pattern Coming in.
                 //None of the predicted segments fired , so check for any segments that did contribute and grow out existing segments more outwards]
-                Console.WriteLine("GROW :: No Contributing Synapses for this FIRE!!!");
+                Console.WriteLine("GROW :: No Contributing Synapses for this FIRE!!! Brand New Pattern");
+                //
                 BroomNGroom(5);
 
             }

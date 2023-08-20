@@ -41,6 +41,9 @@ GROW SIGNAL
 grow()
 -collect all the firing neurons from the last cycle that fired
 -and get all the predicted neurons from this cycle that will fire
--got Ctable see if there is a intersection :
-	-get the segment that directly connects these two neurons 
-		-in case if there are multiple segments that 
+-get Ctable to see if there is any intersection :
+	-get the segmental pathway that lead to this firing.
+		-in case if there are multiple segments that contributed to this firing then call individual grow on these segments.
+	-in case of axonal / temporal connections that led to these firings and not a neuronal segment then its context based firing grow these segments and strengthen these connections on these segments
+	-there cannot be case where there are no intersection between these two sets ( firing neurons in the last cycle & predicted neurons from this cycle that will fire)
+-if there is NO intersection between predicted set from this cycle and firing set from this cycle then this is brand new pattern and it needs to burst
