@@ -61,6 +61,7 @@ namespace HtmTest
             Assert.AreEqual(true, actual.Equals(expected));
         }
 
+        //TODO :  fix test case , synapses are not forming in the network. Debug and track individual Calls.
         [TestMethod]
         public void TestFireProcessCycle()
         {

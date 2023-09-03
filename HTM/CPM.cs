@@ -41,7 +41,7 @@ namespace HTM
         private bool _readyApical;
         public ConnectionTable CTable { get; private set; }
         internal SynapseGenerator synapseGenerator;
-        public ulong currenCcycle { get; private set; }
+        public ulong currentCycle { get; private set; }
         public ulong cycle2 { get; private set; }
         private SDR currentPattern;
         private SDR nextPattern;
@@ -64,7 +64,7 @@ namespace HTM
             instance._readyApical = false;
             instance._readyTemporal = false;
             instance._readySpatial = true;
-            instance.currenCcycle = 0;
+            instance.currentCycle = 0;
             instance.cycle2 = 0;
             instance.currentPattern = null;
             instance.nextPattern = null;
@@ -165,16 +165,19 @@ namespace HTM
             }
 
 
-            if(instance.currenCcycle < ulong.MaxValue)
+            if(instance.currentCycle < ulong.MaxValue)
             {
-                instance.currenCcycle++;
+                instance.currentCycle++;
             }
             else
             {
-                instance.currenCcycle = 0;
+                instance.currentCycle = 0;
                 instance.cycle2++;
             }
-            instance.FlushCycle(firstPattern);
+
+            Console.WriteLine(currentCycle);
+
+            //instance.FlushCycle(firstPattern);
         }
 
         private void FlushCycle(SDR sdr)
@@ -257,17 +260,7 @@ namespace HTM
 
             return toReturn;
         }
-
-        internal uint DistanceBetween2Points(Position3D p1, Position3D p2)
-        {
-            return (uint) Math.Sqrt( Math.Pow((p1.X - p2.X), 2) + Math.Pow((p1.Y - p2.Y),2) + Math.Pow((p1.Z - p2.Z),2));
-        }
-
-        internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X, pos.Y].GetNeuron(pos.Z);
-
-        public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.NeuronId.X, segId.NeuronId.Y].GetNeuron(segId.NeuronId.Z);
-
-
+        
         /// <summary>
         /// 1.Gets Called after the firing neuron set has fired.
         /// 2.Neurons that are predicted in this cycle , all the neurons that contributed to the last cycle for these neurons to be predicted should be incremented.
@@ -375,6 +368,15 @@ namespace HTM
             return nextPattern.CompareFloat(predictedPattern);
 
         }
+
+        internal uint DistanceBetween2Points(Position3D p1, Position3D p2)
+        {
+            return (uint)Math.Sqrt(Math.Pow((p1.X - p2.X), 2) + Math.Pow((p1.Y - p2.Y), 2) + Math.Pow((p1.Z - p2.Z), 2));
+        }
+
+        internal Neuron GetNeuronFromPositionID(Position3D pos) => Columns[pos.X, pos.Y].GetNeuron(pos.Z);
+
+        public Neuron GetNeuronFromSegmentID(SegmentID segId) => Columns[segId.NeuronId.X, segId.NeuronId.Y].GetNeuron(segId.NeuronId.Z);
 
         private List<Position2D> GetAllPredictedNeuronList()
         {

@@ -46,8 +46,8 @@ namespace HTM.Models
             NeuronID = neuronID;
             this.BasePosition = basePos;
             this.sType = sType;
-            this.createdCycle = CPM.GetInstance.currenCcycle;
-            this._lastAccesedCycle = CPM.GetInstance.currenCcycle;
+            this.createdCycle = CPM.GetInstance.currentCycle;
+            this._lastAccesedCycle = CPM.GetInstance.currentCycle;
             this.didFireLastCycle = false;
             _sumVoltage = 0;               
             _fullyConnected = false;
@@ -234,7 +234,7 @@ namespace HTM.Models
             //}
             #endregion
 
-            this._lastAccesedCycle = CPM.GetInstance.currenCcycle;
+            this._lastAccesedCycle = CPM.GetInstance.currentCycle;
             this.didFireLastCycle = true;
             if(Synapses.TryGetValue(synapseId, out uint sigStrength))
             {
