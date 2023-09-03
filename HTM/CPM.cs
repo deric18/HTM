@@ -295,7 +295,8 @@ namespace HTM
                 // Very Important to learn what pattern lead to this pattern , Very important to connect the last firing neurons to this firing Set
                 // Question : Should it make hardwired connections ?
 
-                //case 1: Network is still in initia phases of development , takes time to learn, first 50 iterations
+                //case 1: Network is still in initia phases of development , takes time to learn, first 50 iterations , So just return an empty set , its fine!!!
+                return;
                 //case 2: Post 50 iterations , Network is still firing these on a regular basis , close to < 20% is fine otherise need to readjust growth rate.
 
             }
