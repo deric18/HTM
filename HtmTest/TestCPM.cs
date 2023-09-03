@@ -65,20 +65,20 @@ namespace HtmTest
         public void TestFireProcessCycle()
         {
             SDR temporalPattern = GetNewSDR(InputPatternType.TEMPORAL, new List<Position2D>() { new Position2D(3, 3), new Position2D(6, 6), new Position2D(4, 4) });
-            SDR spatialPattern = GetNewSDR(InputPatternType.SPATIAL, new List<Position2D>() { new Position2D(2, 2), new Position2D(3, 3), new Position2D(7, 7) });
+            SDR spatialPattern = GetNewSDR(InputPatternType.SPATIAL, new List<Position2D>() { new Position2D(2, 2), new Position2D(3, 3), new Position2D(7, 7), new Position2D(9, 9) });
 
-            SDR expected = new SDR(10, 10);
+            //SDR expected = new SDR(10, 10);
 
             int total = 0;
 
-            while (total != 1)
+            while (total == 0)
             {
                 temporalPattern = GetNewRandomSDR(InputPatternType.TEMPORAL);
                 spatialPattern = GetNewRandomSDR(InputPatternType.SPATIAL);
 
                 instance.Process(temporalPattern, spatialPattern);
 
-                total = instance.CTable.GetTotalSynapsesCount;                
+                total = instance.CTable.GetTotalSynapsesCount;
             }
 
             Assert.IsTrue(total > 0);

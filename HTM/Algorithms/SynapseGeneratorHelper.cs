@@ -1,6 +1,5 @@
 ﻿using HTM.Models;
 using System;
-using System.Security.Cryptography;
 
 namespace HTM.Algorithms
 {

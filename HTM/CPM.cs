@@ -99,7 +99,7 @@ namespace HTM
         }
 
         /// <summary>
-        /// All the Firing modules update the predicted list , changing the current state of the system.
+        /// All the Firing columns update there predicted list , changing the current state of the system.
         /// </summary>
         /// <param name="firstPattern"></param>
         /// <param name="iType"></param>
@@ -107,6 +107,7 @@ namespace HTM
         {
             instance.currentPattern = firstPattern;
             instance.nextPattern = secondPattern;
+
             switch (firstPattern.IType)
             {
                 case InputPatternType.SPATIAL:
@@ -224,7 +225,7 @@ namespace HTM
 
         private void ColumnFlush(uint X, uint Y)
         {
-            instance.ColumnFlush(X, Y);
+            instance.Columns[X, Y].ColumnFlush();
         }
 
         //internal void AddtoPredictedList(Position3D position, SegmentID segmentID, uint potential)

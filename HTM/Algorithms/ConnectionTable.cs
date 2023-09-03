@@ -295,7 +295,7 @@ namespace HTM.Algorithms
                 return doubleSegment;
             }
 
-            Console.WriteLine("Invalid Synapse ID : Synapse does nto exist at this position");
+            Console.WriteLine("Invalid Synapse ID : Synapse does NOT exist at this position");
 
             return null;
         }

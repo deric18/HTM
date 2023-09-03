@@ -65,10 +65,9 @@ namespace HTM.Models
         }
 
         //CycleFlush
-        internal void ColumnFlush(uint x, uint y)
+        internal void ColumnFlush()
         {
-            Neurons.ForEach(neuron => neuron.FinishCycle());
-            
+            this.Neurons.ForEach(neuron => neuron.FinishCycle());            
         }
 
         public Neuron GetNeuron(uint z) => Neurons[Convert.ToInt32(z)];
