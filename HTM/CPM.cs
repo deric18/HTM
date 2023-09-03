@@ -294,6 +294,10 @@ namespace HTM
                 // Brand New Pattern coming in , Cycle Will Most Likely Burst , How to Handle Growth for Bursting Columns
                 // Very Important to learn what pattern lead to this pattern , Very important to connect the last firing neurons to this firing Set
                 // Question : Should it make hardwired connections ?
+
+                //case 1: Network is still in initia phases of development , takes time to learn, first 50 iterations
+                //case 2: Post 50 iterations , Network is still firing these on a regular basis , close to < 20% is fine otherise need to readjust growth rate.
+
             }
 
             foreach (var item in SuccesfullyContributedToFiringSet)      //Segments which will fire in the next cycle , Strengthen all the contributing synapses and send grow signal to these neurons
@@ -410,8 +414,8 @@ namespace HTM
 
             if (predictedSegments.Count == 0)
             {
-                Console.WriteLine("There are no predicted Neurons nor segments !! , THis is never supposed to happen!!!");
-                throw new Exception("There are no predicted Neurons nor segments !! , THis is never supposed to happen!!!");
+                Console.WriteLine("There are no predicted Neurons nor segments !! HAppens on Initial Level of Initializations");
+                return toRet;
             }
 
             foreach(var kvp in predictedSegments)                  //Compute if any of the predicted neuron from the last cycle is going to fire this cycle.

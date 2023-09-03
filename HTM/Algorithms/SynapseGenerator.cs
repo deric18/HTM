@@ -285,7 +285,7 @@ namespace HTM.Algorithms
                 toReturn = BasisBlockType.UpSBB;
             else if ((pos.BID > 0 && pos.BID < 99))
                 toReturn = BasisBlockType.FrontSBB;
-            else if ((pos.BID > 910 && pos.BID < 988))
+            else if ((pos.BID > 910 && pos.BID <= 988))
                 toReturn = BasisBlockType.BackSBB;
 
             return toReturn;
@@ -905,8 +905,8 @@ namespace HTM.Algorithms
                     }
                 default:
                     {
-                        Console.WriteLine("-------------------ERROR-----------");
-                        Console.WriteLine("Invalid Block Type");
+                        Console.WriteLine("-------------------ERROR in : " + "ComputeProximalCoordinatesForSingleBB" + "-----------");
+                        Console.WriteLine("Invalid Block Type  " + neuronId.StringIDWithBID );
                         break;
                     }
             }
