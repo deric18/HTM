@@ -188,7 +188,7 @@ namespace HTM.Models
                         newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i, string.Empty, false);
                         ProximalSegmentList.Add(pos);
                     }
-                    else if (pos.cType == CType.AxonConnectedToDendrite)
+                    else if (pos.cType == CType.AxonConnectedToDendrite)        //Axon connecting to a position occupied by a dendrite
                     {
                         DoubleSegment douSeg = _cpm.CTable.InterfaceFire(pos.StringIDWithBID);
 
@@ -197,12 +197,13 @@ namespace HTM.Models
                         newSegment = new Segment(segId.BasePosition, SegmentType.Axonal, segId.NeuronId, i, segId.GetSegmentID);
                         newSegment.AddNewConnection(pos, SynapseType.Proximal);
                         _cpm.GetSegmentFromSegmentID(douSeg.dendriteSegmentID).AddNewConnection(pos, SynapseType.Proximal);   //This is Very important as it adds the synapse to the dendrite as well
+                        _cpm.CTable.ClaimPosition(pos, douSeg.axonalSegmentID, EndPointType.Axon);
                         //Get the connecting Segment
                         // form a synapse 
                         // register both connections 
                         
                     }
-                    else if(pos.cType == CType.DendriteConnectedToAxon)
+                    else if(pos.cType == CType.DendriteConnectedToAxon)         //Dendrite connecting to a position occupied by an axonfs
                     {
                         DoubleSegment douSeg = _cpm.CTable.InterfaceFire(pos.StringIDWithBID);
 
@@ -211,6 +212,7 @@ namespace HTM.Models
                         newSegment = new Segment(segId.BasePosition, SegmentType.Proximal, segId.NeuronId, i, segId.GetSegmentID);
                         newSegment.AddNewConnection(pos, SynapseType.Proximal);
                         _cpm.GetSegmentFromSegmentID(douSeg.axonalSegmentID).AddNewConnection(pos, SynapseType.Proximal);
+                        _cpm.CTable.ClaimPosition(pos, douSeg.axonalSegmentID, EndPointType.Dendrite);
                     }
                 }
                 catch (Exception e)

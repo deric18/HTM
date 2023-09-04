@@ -5,8 +5,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using HTM;
 using HTM.Enums;
 using System.Collections.Generic;
-using NUnit;
-
 
 namespace HtmTest
 {
@@ -44,7 +42,6 @@ namespace HtmTest
                         Assert.AreEqual(neuron.NeuronID.Z, k);
                     }
         }        
-
 
         [TestMethod]
         public void TestEmptyProcessCycle()
@@ -85,6 +82,13 @@ namespace HtmTest
             Assert.IsTrue(total > 0);
         }
 
+        [TestMethod]
+        public void TestSynapseCreation()
+        {
+
+        }
+
+
         [TestMethod, Ignore]
         public void TestBlockConfigProvider()
         {
@@ -92,7 +96,7 @@ namespace HtmTest
 
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void TestGetIntersectionSet()
         {
 

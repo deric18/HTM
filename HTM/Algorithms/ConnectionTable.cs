@@ -143,7 +143,7 @@ namespace HTM.Algorithms
         {
             /// Scenario 1: If the claimer is a dendrite and the position is empty we just give the position to them.  Most Probable scenario
             /// Scenario 2: If the claimer is a axon and the position is empty we just give the position to them.
-            /// Scenario 3: If the claimer is a dendrite and the positio9n is occupied by an axonal seg then check for selfing , remove the axonal seg id from the dict ,mark the position as 'N' in cMap and return the seg id.
+            /// Scenario 3: If the claimer is a dendrite and the position is occupied by an axonal seg then check for selfing , remove the axonal seg id from the dict ,mark the position as 'N' in cMap and return the seg id.
             /// Scenario 4: If the claimer is a axon and the position is occupied by the dendrite then we again check for selfing, and send connect signal to claimed neuron, mark the position and return bind signal to claiming neuron.            
             #region COMMENTED OUT
 

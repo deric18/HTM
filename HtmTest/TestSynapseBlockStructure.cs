@@ -20,19 +20,16 @@
             //cTable = ConnectionTable.Singleton();
         }
         
-
         [TestMethod]
         public void CreateNewPositionBasisBlock_WithintheBlock()
         {
             //Create a synapses at  Edge blocks and check the created synapses are at within those blocks , also check cTable
             synGen = SynapseGenerator.GetInstance;
-            Position3D basePosition = new Position3D(1, 1, 1, 1);
+            Position3D basePosition = new Position3D(1, 1, 1);
 
             Position3D newPredictedSynapse = synGen.PredictNewRandomPosition(basePosition, 3);
 
-
-
-
+            Assert.AreEqual(basePosition.BID, newPredictedSynapse.BID);
         }
 
         [TestMethod]
