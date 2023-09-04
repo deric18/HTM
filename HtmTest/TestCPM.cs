@@ -89,17 +89,15 @@ namespace HtmTest
         public void TestBlockConfigProvider()
         {
 
-        }
 
+        }
 
         [TestMethod]
         public void TestGetIntersectionSet()
         {
 
 
-
         }
-
 
         private SDR GetNewSDR(InputPatternType iType, List<Position2D> activeBits)
         {

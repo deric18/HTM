@@ -123,22 +123,26 @@ namespace HTM.Models
         /// increment synaptic strength on nmda & non nmda predicted segments
         /// send out a grow and prune signal to all the segments , to cut out unneccesary connection and grow more promissing ones.
         /// </summary>
-        internal void Grow(bool boostOnlyNMDA, bool shouldPrune, uint connStrength)
+        internal void Grow(bool boostOnlyNMDA, bool shouldPrune = false)
         {
             //Increment synaptic strength on all the connections , more on ones that fired last cycle and less on ones that did not.
             if(boostOnlyNMDA)
             {
                 List<Segment> firingSegments = Segments.Values.Where(q => q.didFireLastCycle == true).ToList();
+
                 if(firingSegments.Count > 0)
                 {
                     foreach(var seg in firingSegments)
                     {
-                        seg.Grow(boostOnlyNMDA, connStrength);
+                        seg.Grow(boostOnlyNMDA);
                     }
                 }
+            }
 
-                }
-
+            foreach (var seg in Segments.Values)
+            {
+                seg.Grow(false);
+            }
         }
 
 
@@ -158,6 +162,10 @@ namespace HTM.Models
             if (proximalSegList == null)
                 proximalSegList = new List<Position3D>();   //Avoiding Exceptions
 
+            if(NeuronID.BID == 0)
+            {
+                Console.WriteLine("Cathc IT");
+            }
 
             uint i = 0;
 
@@ -166,18 +174,18 @@ namespace HTM.Models
 
             foreach(Position3D pos in proximalSegList)
             {
-                Segment newSegment = null;                
+                Segment newSegment = null;
 
                 try
                 {
                     if (pos.cType == CType.SuccesfullyClaimedByAxon)
                     {
-                        newSegment = new Segment(pos, SegmentType.Axonal, NeuronID, i, null, false);
+                        newSegment = new Segment(pos, SegmentType.Axonal, NeuronID, i, string.Empty, false);
                         axonEndPoints.Add(pos);
                     }
                     else if (pos.cType == CType.SuccesfullyClaimedByDendrite)
                     {                        
-                        newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i, null, false);
+                        newSegment = new Segment(pos, SegmentType.Proximal, NeuronID, i, string.Empty, false);
                         ProximalSegmentList.Add(pos);
                     }
                     else if (pos.cType == CType.AxonConnectedToDendrite)

@@ -114,8 +114,8 @@ namespace HTM
                     {
                         //Fetch the columns to fire and decide if to burst the whole column or fire specific neurons
                         //Fire the neurons and update predicted list
-                        //if (!_readySpatial)
-                        //    throw new Exception("Invalid Input Pattern Type");
+                        if (!_readySpatial)
+                            throw new Exception("Invalid Input Pattern Type");
 
                         List<Position2D> firingPositions = firstPattern.ActiveBits;
 
@@ -123,10 +123,11 @@ namespace HTM
                         {
                             instance.ColumnFire(Convert.ToUInt32(pos.X), Convert.ToUInt32(pos.Y), firstPattern.IType);
                         }
+
                         _readySpatial = false;
                         _readyApical = true;
-                        Grow(firingPositions);
 
+                        Grow(firingPositions);
                         break;
                     }
                 case InputPatternType.TEMPORAL:
@@ -289,8 +290,13 @@ namespace HTM
                 // Very Important to learn what pattern lead to this pattern , Very important to connect the last firing neurons to this firing Set
                 // Question : Should it make hardwired connections ?
 
-                //case 1: Network is still in initia phases of development , takes time to learn, first 50 iterations , So just return an empty set , its fine!!!
-                return;
+                //case 1: Network is still in initial phases of development , takes time to learn, first 50 iterations , So just return an empty set , its fine!!!
+                //send grow signal to all the neurons that fired this iteration.
+                foreach (var neuron in _firingNeurons)
+                {
+                    neuron.Grow(false);
+                }
+
                 //case 2: Post 50 iterations , Network is still firing these on a regular basis , close to < 20% is fine otherise need to readjust growth rate.
 
             }

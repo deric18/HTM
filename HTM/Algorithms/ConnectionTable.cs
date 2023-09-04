@@ -268,7 +268,6 @@ namespace HTM.Algorithms
                 }
             }
 
-
             return new ConnectionType(CType.NotAvailable);
         }
 
@@ -299,7 +298,6 @@ namespace HTM.Algorithms
 
             return null;
         }
-
 
         //Axonal is always the Claimer and Dendrite is always the Claimee
         private CType AxonClaim(Position3D pos, SegmentID claimerSegID)

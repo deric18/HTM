@@ -83,7 +83,7 @@ Algorithm:
 -Compute new Coordinates for the random square block for the given position.
 -Once computed determine transform for every point thereby also determining basis blocks for the corresponding positions.
 -Using the computed basis blocks predict new point using Interval class.
-===============================================================================================================================================\==SEGMENT============================================================================================================================================================================
+=================================================================================================================================================SEGMENT============================================================================================================================================================================
 
 Problems:
 -There are 2 types of segments proximal and distal , how does proximal segments create new distal segments

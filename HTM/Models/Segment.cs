@@ -35,6 +35,7 @@ namespace HTM.Models
         private static uint MAX_Connection_Strength;
         private static uint DISTAL_NEW_SYNAPSE_STRENGTH;
         private static uint PROXIMAL_NEW_SYNAPSE_STRENGTH;
+        private static uint MAX_CONNECTIONS_SEGMENT;
         private static uint NEW_SYNAPSE_CONNECTION_DEF;
         private uint MAX_SUBSEGMENTS_SEGMENT;
 
@@ -62,30 +63,27 @@ namespace HTM.Models
             }
             else
             {
-                if(lineageString == null)
+                if(lineageString.Equals(string.Empty))
                 {
                     LineageString = neuronID.StringIDWithBID + "/" + segCount.ToString() + "/" + BasePosition.StringIDWithBID;
                 }                
             }
             
-
             NMDA_Spike_Potential = uint.Parse(ConfigurationManager.AppSettings["NMDA_SPIKE_POTENTIAL"]);
             MAX_Connection_Strength = uint.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_STRENGTH_FOR_SYNAPSE"]);
             MAX_SUBSEGMENTS_SEGMENT = uint.Parse(ConfigurationManager.AppSettings["MAX_SUBSEGMENTS_SEGMENT"]);
             NEW_SYNAPSE_CONNECTION_DEF = uint.Parse(ConfigurationManager.AppSettings["PRE_SYNAPTIC_CONNECTION_STRENGTH"]);
             PROXIMAL_NEW_SYNAPSE_STRENGTH = uint.Parse(ConfigurationManager.AppSettings["PROXIMAL_NEW_SYNAPSE_STRENGTH"]);
             DISTAL_NEW_SYNAPSE_STRENGTH = uint.Parse(ConfigurationManager.AppSettings["DISTAL_NEW_SYNAPSE_STRENGTH"]);
+            MAX_CONNECTIONS_SEGMENT = uint.Parse(ConfigurationManager.AppSettings["MAX_CONNECTIONS_SEGMENT"]);
 
             Synapses.Add(basePos, PROXIMAL_NEW_SYNAPSE_STRENGTH);
         }
-
-
 
         //private string ComputeSegmentIDasString(Position3D neuronID, string segCount, Position3D basePos)
         //{
         //    return neuronID.StringIDWithoutBID + "/" + segCount + "/" + basePos.StringIDWithoutBID;
         //}        
-
         internal Segment GetSegment(int v)
         {
             if(SubSegments.IsValueCreated)
@@ -128,6 +126,16 @@ namespace HTM.Models
             }
             else
             {
+                if(Synapses.Count < MAX_CONNECTIONS_SEGMENT)
+                {
+                    var newSynapsePos = CPM.GetInstance.synapseGenerator.PredictNewRandomPosition(BasePosition);
+                    if (newSynapsePos != null && Synapses.TryGetValue(newSynapsePos, out _))
+                    {
+                        Synapses.Add(newSynapsePos, numPulses);
+                    }
+
+                }
+
                 if(Synapses.Count > 0)
                 {
                     foreach(var kvp in Synapses)
@@ -135,7 +143,8 @@ namespace HTM.Models
                         Synapses[kvp.Key] += numPulses;
                     }
                 }
-                else if(SubSegments.IsValueCreated)
+                
+                if(SubSegments.IsValueCreated)
                 {
                     Console.WriteLine("INFORMATIONAL :: GROWING SUB SEGMENT");
                     foreach(var subseg in SubSegments.Value)
@@ -143,10 +152,7 @@ namespace HTM.Models
                         subseg.Grow(onlyNMDA, numPulses);
                     }
                 }
-                else
-                {
-                    Console.WriteLine("WARNING :: NO Synapses UNDER this NEURON!!!");
-                }
+                
             }
         }
 

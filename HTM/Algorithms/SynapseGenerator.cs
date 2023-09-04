@@ -388,7 +388,7 @@ namespace HTM.Algorithms
                     };
                 default:
                     {
-                        Console.WriteLine("AddProximalSegment : Not Supposed To HAppen!!! SHITTY CODE!!! No Proximal Segment Positions found for this block", neuronId.BID);
+                        Console.WriteLine("AddProximalSegment : Not Supposed To Happen!!! SHITTY CODE!!! No Proximal Segment Positions found for this block", neuronId.BID);
                     }
                         break;
             };

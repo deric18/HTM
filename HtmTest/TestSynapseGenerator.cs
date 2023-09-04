@@ -17,7 +17,7 @@ namespace HtmTest
         public void Initialze()
         {
             instance = CPM.GetInstance;
-            instance.Initialize(10, 1000000);
+            instance.Initialize(10, 100000);
             cTable = instance.CTable;
         }
 
