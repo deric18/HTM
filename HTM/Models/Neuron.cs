@@ -126,31 +126,28 @@ namespace HTM.Models
         internal void Grow(bool boostOnlyNMDA, bool shouldPrune = false)
         {
             //Increment synaptic strength on all the connections , more on ones that fired last cycle and less on ones that did not.
-            if(boostOnlyNMDA)
+            if (boostOnlyNMDA)
             {
                 List<Segment> firingSegments = Segments.Values.Where(q => q.didFireLastCycle == true).ToList();
 
-                if(firingSegments.Count > 0)
+                if (firingSegments.Count > 0)
                 {
-                    foreach(var seg in firingSegments)
+                    foreach (var seg in firingSegments)
                     {
                         seg.Grow(boostOnlyNMDA);
                     }
                 }
             }
-
-            foreach (var seg in Segments.Values)
+            else
             {
-                seg.Grow(false);
+                foreach (var seg in Segments.Values)
+                {                    
+                    seg.Grow(false);
+                    seg.Grow(false);
+                    seg.Grow(false);
+                }
             }
         }
-
-
-        internal void Audit()
-        {
-            //Go through all the segments and there respective connections and audit there hitcounters , if 0 for 50 cycles then prune them 
-        }
-
 
         public void CreateProximalSegments()
         {
@@ -235,6 +232,11 @@ namespace HTM.Models
             }
         }
 
+
+        internal void Audit()
+        {
+            //Go through all the segments and there respective connections and audit there hitcounters , if 0 for 50 cycles then prune them 
+        }
 
         public void RegisterSubSegmentToNeuron(Segment segment)
         {

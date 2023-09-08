@@ -38,6 +38,12 @@ namespace HtmTest
 
         }
 
+        [TestMethod]
+        public void TestGrow()
+        {
+
+        }
+
 
         [TestMethod, TestCategory("Neuron Tests")]
         public void TestGetSegment()

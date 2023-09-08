@@ -42,6 +42,11 @@ namespace HTM.Models
             Neurons.ForEach(x => x.Fire());
         }
 
+        internal void Grow()
+        {
+            Neurons.ForEach(neu => neu.Grow(false));
+        }
+
         internal List<Neuron> GetMaxVoltageNeuronInColumn()
         {
             List<Neuron> toRet = null;

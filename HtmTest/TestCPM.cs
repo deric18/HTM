@@ -51,10 +51,11 @@ namespace HtmTest
             SDR expected = new SDR(10, 10);            
 
 
-            instance.Process(temporalPattern, spatialPattern);
+            instance.Process(temporalPattern);
+            instance.Process(spatialPattern);
 
             SDR actual = instance.Predict();
-
+            
             Assert.AreEqual(true, actual.Equals(expected));
         }
 
@@ -63,7 +64,7 @@ namespace HtmTest
         public void TestFireProcessCycle()
         {
             SDR temporalPattern = GetNewSDR(InputPatternType.TEMPORAL, new List<Position2D>() { new Position2D(3, 3), new Position2D(6, 6), new Position2D(4, 4) });
-            SDR spatialPattern = GetNewSDR(InputPatternType.SPATIAL, new List<Position2D>() { new Position2D(2, 2), new Position2D(3, 3), new Position2D(7, 7), new Position2D(9, 9) });
+            SDR spatialPattern = GetNewRandomSDR(InputPatternType.SPATIAL);
 
             //SDR expected = new SDR(10, 10);
 
@@ -74,7 +75,8 @@ namespace HtmTest
                 temporalPattern = GetNewRandomSDR(InputPatternType.TEMPORAL);
                 spatialPattern = GetNewRandomSDR(InputPatternType.SPATIAL);
 
-                instance.Process(temporalPattern, spatialPattern);
+                instance.Process(temporalPattern);
+                instance.Process(spatialPattern);
 
                 total = instance.CTable.GetTotalSynapsesCount;
             }

@@ -42,7 +42,8 @@ namespace HTM
         public ConnectionTable CTable { get; private set; }
         internal SynapseGenerator synapseGenerator;
         public ulong currentCycle { get; private set; }
-        public ulong cycle2 { get; private set; }
+        public ulong nullFireCycle { get; private set; }
+        public bool nullCycleBool { get; set; } 
         private SDR currentPattern;
         private SDR nextPattern;
         private ulong perfectFireCounter;
@@ -65,7 +66,8 @@ namespace HTM
             instance._readyTemporal = false;
             instance._readySpatial = true;
             instance.currentCycle = 0;
-            instance.cycle2 = 0;
+            instance.nullFireCycle = 0;
+            instance.nullCycleBool = false;
             instance.currentPattern = null;
             instance.nextPattern = null;
             instance.BCP = pointsPerBlock == 0 ? new BlockConfigProvider(100000) : new BlockConfigProvider(pointsPerBlock);
@@ -103,10 +105,10 @@ namespace HTM
         /// </summary>
         /// <param name="firstPattern"></param>
         /// <param name="iType"></param>
-        public void Process(SDR firstPattern, SDR secondPattern)
+        public void Process(SDR firstPattern)
         {
             instance.currentPattern = firstPattern;
-            instance.nextPattern = secondPattern;
+            //instance.nextPattern = secondPattern;
 
             switch (firstPattern.IType)
             {
@@ -170,15 +172,20 @@ namespace HTM
             {
                 instance.currentCycle++;
             }
-            else
-            {
-                instance.currentCycle = 0;
-                instance.cycle2++;
-            }
+
+            GrowAll();
 
             Console.WriteLine(currentCycle);
 
             //instance.FlushCycle(firstPattern);
+        }
+
+        private void GrowAll()
+        {
+            foreach (var col in Columns)
+            {
+                col.Grow();                
+            }
         }
 
         private void FlushCycle(SDR sdr)
